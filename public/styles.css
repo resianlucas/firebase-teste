@@ -1,0 +1,132 @@
+/* Estilos gerais */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body[data-theme='dark'] {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+h1, h3 {
+    text-align: center;
+    color: #6a0dad;
+    margin-top: 20px;
+}
+
+/* Estilos para o botão de alternância de tema */
+.theme-toggle {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #6a0dad;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: #5a0da0;
+}
+
+body[data-theme='dark'] .theme-toggle {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+body[data-theme='dark'] .theme-toggle:hover {
+    background-color: #c0c0c0;
+}
+
+/* Estilos para a navegação */
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style-type: none;
+    padding: 0;
+    background-color: #6a0dad;
+    margin: 0;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    display: block;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #5a0da0;
+    color: white;
+}
+
+body[data-theme='dark'] nav ul {
+    background-color: #333;
+}
+
+body[data-theme='dark'] nav ul li a {
+    color: #e0e0e0;
+}
+
+body[data-theme='dark'] nav ul li a:hover {
+    background-color: #444;
+    color: #e0e0e0;
+}
+
+/* Estilos para a tabela */
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background-color: #6a0dad;
+    color: white;
+}
+
+body[data-theme='dark'] thead {
+    background-color: #333;
+    color: #e0e0e0;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
+body[data-theme='dark'] tbody tr:nth-child(odd) {
+    background-color: #1e1e1e;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+body[data-theme='dark'] tbody tr:hover {
+    background-color: #2a2a2a;
+}
+
+tbody tr {
+    transition: background-color 0.3s;
+}

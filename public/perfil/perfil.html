@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Perfil</title>
+</head>
+<body>
+    <!-- Botão para alternar entre temas -->
+    <button class="theme-toggle">Toggle Theme</button>
+
+    <!-- Conteúdo principal da página -->
+    <h1>Perfil</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="produtos.html">Produtos</a></li>
+            <li><a href="pedidos.html">Pedidos</a></li>
+            <li><a href="login.html">Login</a></li>
+        </ul>
+    </nav>
+    <main>
+        <div>
+            <h3>PERFIS ASSOCIADOS</h3>
+            <!-- Tabela para exibir os perfis associados -->
+            <table id="bling-table">
+                <thead>
+                    <tr>
+                        <th>Nome da Empresa</th>
+                        <th>Access Token</th>
+                        <th>Refresh Token</th>
+                    </tr>
+                </thead>
+                <tbody id="bling-tbody">
+                    <!-- Linhas da tabela serão adicionadas aqui -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        // Alternar entre temas claro e escuro
+        document.querySelector('.theme-toggle').addEventListener('click', () => {
+            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+        });
+    </script>
+    <script type="module">
+        import { fetchBlings } from './script.js';
+
+        // Função para exibir os blings na tabela
+        function displayBlings(blings) {
+            const blingTbody = document.getElementById('bling-tbody');
+            blingTbody.innerHTML = ''; // Limpa a tabela
+
+            Object.entries(blings).forEach(([clientId, bling]) => {
+                const row = document.createElement('tr');
+
+                const nameCell = document.createElement('td');
+                nameCell.textContent = bling.name;
+                row.appendChild(nameCell);
+
+                const accessTokenCell = document.createElement('td');
+                accessTokenCell.textContent = bling.access_token;
+                row.appendChild(accessTokenCell);
+
+                const refreshTokenCell = document.createElement('td');
+                refreshTokenCell.textContent = bling.refresh_token;
+                row.appendChild(refreshTokenCell);
+
+                blingTbody.appendChild(row);
+            });
+        }
+
+        // Inicializa a página, buscando e exibindo os blings
+        async function init() {
+            try {
+                const blings = await fetchBlings();
+                if (blings) {
+                    displayBlings(blings);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar blings: ', error);
+            }
+        }
+
+        // Chama a função init ao carregar a página
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
