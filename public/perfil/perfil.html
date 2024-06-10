@@ -27,11 +27,10 @@
                         <th>Nome da Empresa</th>
                         <th>Access Token</th>
                         <th>Refresh Token</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="bling-tbody">
-                    <!-- Linhas da tabela serão adicionadas aqui -->
-                </tbody>
+                <tbody id="bling-tbody"></tbody>
             </table>
         </div>
     </main>
@@ -44,12 +43,14 @@
         });
     </script>
     <script type="module">
-        import { fetchBlings } from './script.js';
+        import { fetchBlings, refreshBlingToken } from '/public/script.js';
 
         // Função para exibir os blings na tabela
         function displayBlings(blings) {
             const blingTbody = document.getElementById('bling-tbody');
             blingTbody.innerHTML = ''; // Limpa a tabela
+
+            console.log(blings)
 
             Object.entries(blings).forEach(([clientId, bling]) => {
                 const row = document.createElement('tr');
@@ -65,6 +66,24 @@
                 const refreshTokenCell = document.createElement('td');
                 refreshTokenCell.textContent = bling.refresh_token;
                 row.appendChild(refreshTokenCell);
+
+                const actionCell = document.createElement('td')
+                const refreshButton = document.createElement('button')
+                refreshButton.textContent = 'Atualizar'
+                
+                refreshButton.onclick = async () => {
+                    try {
+                        await refreshBlingToken(bling.client_id, bling.client_secret, bling.refresh_token);
+                        alert('Token atualizado com sucesso!');
+                        const updatedBlings = await fetchBlings();
+                        displayBlings(updatedBlings);
+                    } catch (error) {
+                        alert('Erro ao atualizar token: ' + error);
+                    }
+                }
+                actionCell.appendChild(refreshButton)
+                row.appendChild(actionCell)
+
 
                 blingTbody.appendChild(row);
             });
