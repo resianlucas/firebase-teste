@@ -107,13 +107,17 @@ body[data-theme='dark'] button.theme-toggle {
     color: #333;
 }
 
+.login-container label {
+    display: flex
+}
+
 .login-container input {
     width: 100%;
     padding: 10px 0px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f4f4f4;
+    border: none;
+    border-bottom: 3px solid #000000;
+    background-color: #f4f4f400;
     color: #333;
     transition: background-color 0.3s ease;
 }
