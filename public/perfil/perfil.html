@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
+    <script type="module" src="perfil.js"></script>
     <link rel="stylesheet" href="perfil.css">
     <title>Perfil</title>
 </head>
 <body>
-    <!-- Botão para alternar entre temas -->
     <button class="theme-toggle">Toggle Theme</button>
-
-    <!-- Conteúdo principal da página -->
     <h1>Perfil</h1>
     <nav>
         <ul>
@@ -18,7 +18,7 @@
         </ul>
     </nav>
     <main>
-        <div>
+        <div class="bling-section">
             <h3>PERFIS ASSOCIADOS</h3>
             <!-- Tabela para exibir os perfis associados -->
             <table id="bling-table">
@@ -34,75 +34,11 @@
             </table>
         </div>
     </main>
-
-    <!-- Scripts -->
     <script>
         // Alternar entre temas claro e escuro
         document.querySelector('.theme-toggle').addEventListener('click', () => {
             document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
         });
-    </script>
-    <script type="module">
-        import { fetchBlings, refreshBlingToken } from '/public/script.js';
-
-        // Função para exibir os blings na tabela
-        function displayBlings(blings) {
-            const blingTbody = document.getElementById('bling-tbody');
-            blingTbody.innerHTML = ''; // Limpa a tabela
-
-            console.log(blings)
-
-            Object.entries(blings).forEach(([clientId, bling]) => {
-                const row = document.createElement('tr');
-
-                const nameCell = document.createElement('td');
-                nameCell.textContent = bling.name;
-                row.appendChild(nameCell);
-
-                const accessTokenCell = document.createElement('td');
-                accessTokenCell.textContent = bling.access_token;
-                row.appendChild(accessTokenCell);
-
-                const refreshTokenCell = document.createElement('td');
-                refreshTokenCell.textContent = bling.refresh_token;
-                row.appendChild(refreshTokenCell);
-
-                const actionCell = document.createElement('td')
-                const refreshButton = document.createElement('button')
-                refreshButton.textContent = 'Atualizar'
-                
-                refreshButton.onclick = async () => {
-                    try {
-                        await refreshBlingToken(bling.client_id, bling.client_secret, bling.refresh_token);
-                        alert('Token atualizado com sucesso!');
-                        const updatedBlings = await fetchBlings();
-                        displayBlings(updatedBlings);
-                    } catch (error) {
-                        alert('Erro ao atualizar token: ' + error);
-                    }
-                }
-                actionCell.appendChild(refreshButton)
-                row.appendChild(actionCell)
-
-
-                blingTbody.appendChild(row);
-            });
-        }
-
-        // Inicializa a página, buscando e exibindo os blings
-        async function init() {
-            try {
-                const blings = await fetchBlings();
-                if (blings) {
-                    displayBlings(blings);
-                }
-            } catch (error) {
-                console.error('Erro ao buscar blings: ', error);
-            }
-        }
-
-        // Chama a função init ao carregar a página
-        window.addEventListener('load', init);
     </script>
 </body>
 </html>

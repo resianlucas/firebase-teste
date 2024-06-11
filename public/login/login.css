@@ -84,3 +84,95 @@ body[data-theme='dark'] nav ul li a {
 body[data-theme='dark'] button.theme-toggle {
     background-color: #007bff;
 }
+
+/* Login Form */
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.login-container .campo {
+    max-width: 100%;
+}
+
+
+
+.login-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 10px 0px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f4f4f4;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.login-container input:focus {
+    background-color: #e4e4e4;
+    outline: none;
+}
+
+.login-container button {
+    width: 150px;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container button:hover {
+    background-color: #0056b3;
+}
+
+.forgot-password {
+    margin-top: 10px;
+}
+
+.forgot-password a {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: #0056b3;
+}
+
+/* Dark Theme for Login Form */
+body[data-theme='dark'] .login-container {
+    background-color: #1e1e1e;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme='dark'] .login-container h2 {
+    color: #ffffff;
+}
+
+body[data-theme='dark'] .login-container input {
+    background-color: #333;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+body[data-theme='dark'] .login-container input:focus {
+    background-color: #444;
+}
+
+body[data-theme='dark'] .forgot-password a {
+    color: #007bff;
+}

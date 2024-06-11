@@ -1,7 +1,6 @@
 // public/script.js
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, child, update} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -51,8 +50,8 @@ export async function refreshBlingToken(clientId, clientSecret, refreshToken) {
     const options = {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Basic ${credentials}`
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Basic ${credentials}`
         },
         body: encodeFormData({
             'grant_type': 'refresh_token',
@@ -74,7 +73,7 @@ export async function refreshBlingToken(clientId, clientSecret, refreshToken) {
         if (!response.ok) {
             throw new Error('Erro na solicitação de refresh token: ' + response.statusText);
         }
-        
+
         const data = JSON.parse(responseText);
         console.log('Parsed Response Data:', data);
 
@@ -91,3 +90,4 @@ export async function refreshBlingToken(clientId, clientSecret, refreshToken) {
     }
 }
 
+export { db };

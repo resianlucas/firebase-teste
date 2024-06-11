@@ -4,18 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="produtos.css">
-    <title>Produtos</title>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
+    <script type="module" src="produtos.js"></script>
+    <title>Produtos</title>
 </head>
 <body>
     <button class="theme-toggle">Toggle Theme</button>
-    <!-- Restante do conteúdo -->
-    <script>
-        document.querySelector('.theme-toggle').addEventListener('click', () => {
-            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-        });
-    </script>
     <h1>Produtos</h1>
     <nav>
         <ul>
@@ -23,116 +18,41 @@
         </ul>
     </nav>
     <form id="addItemForm">
-        <input type="text" id="itemName" placeholder="Nome do Item" required>
-        <input type="number" id="itemQuantity" placeholder="Quantidade" required>
+        <label for="name">Nome</label>
+        <input id="name" type="text" placeholder="Insira o nome..." required>
+        
+        <label for="sku">SKU</label>
+        <input id="sku" type="text" placeholder="Insira o sku..." required>
+        
+        <label for="ean">EAN</label>
+        <input id="ean" type="text" placeholder="Insira o código ean..." required>
+        
+        <label for="category">Categoria</label>
+        <input id="category" type="text" placeholder="Insira a categoria..." required>
+        
+        <label for="brand">Marca</label>
+        <input id="brand" type="text" placeholder="Insira a marca..." required>
+        
+        <label for="price">Preço</label>
+        <input id="price" type="text" placeholder="Insira o preço..." required>
+        
+        <label for="quantity">Quantidade</label>
+        <input id="quantity" type="text" placeholder="Insira a quantidade..." required>
+        
+        <label for="url-image">Imagem</label>
+        <input id="url-image" type="text" placeholder="Insira o URL da imagem..." required>
+        
+        <label for="description">Descrição</label>
+        <textarea id="description" rows="5" placeholder="Insira a descrição..." required></textarea>
+        
         <button type="submit">Adicionar Item</button>
     </form>
     <h2>Estoque Atual</h2>
     <ul id="inventoryList"></ul>
-    
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDJTzpoFxQ9_W0JCGPXfwFasr_vdywwePs",
-            authDomain: "hub-stock-control.firebaseapp.com",
-            databaseURL: "https://hub-stock-control-default-rtdb.firebaseio.com",
-            projectId: "hub-stock-control",
-            storageBucket: "hub-stock-control.appspot.com",
-            messagingSenderId: "1006784039020",
-            appId: "1:1006784039020:web:5b824b2c2f0a2deed47049",
-            measurementId: "G-LDEPBP8926"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        const addItemForm = document.getElementById('addItemForm');
-        const inventoryList = document.getElementById('inventoryList');
-
-        // Function to add item to Firebase
-        addItemForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const itemNameValue = document.getElementById('itemName').value;
-            const itemQuantityValue = document.getElementById('itemQuantity').value;
-
-            const newItemRef = ref(db, 'inventory/' + itemNameValue);
-            set(newItemRef, {
-                name: itemNameValue,
-                quantity: itemQuantityValue
-            })
-            .then(() => {
-                alert('Item adicionado com sucesso!');
-                document.getElementById('addItemForm').reset();
-                fetchInventory();
-            })
-            .catch((error) => {
-                alert('Erro ao adicionar item: ' + error);
-            });
+    <script>
+        document.querySelector('.theme-toggle').addEventListener('click', () => {
+            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
         });
-
-        // Function to fetch and display inventory
-        function fetchInventory() {
-            const inventoryRef = ref(db, 'inventory/');
-            onValue(inventoryRef, (snapshot) => {
-                inventoryList.innerHTML = '';
-                snapshot.forEach((childSnapshot) => {
-                    const childData = childSnapshot.val();
-                    const li = document.createElement('li');
-                    li.textContent = `${childData.name}: ${childData.quantity}`;
-
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Deletar';
-                    deleteButton.onclick = () => deleteItem(childData.name);
-
-                    const updateButton = document.createElement('button');
-                    updateButton.textContent = 'Alterar';
-                    updateButton.onclick = () => updateItem(childData.name, prompt('Nova quantidade:', childData.quantity));
-
-                    li.appendChild(deleteButton);
-                    li.appendChild(updateButton);
-                    inventoryList.appendChild(li);
-                });
-            });
-        }
-
-        // Function to delete item from Firebase
-        function deleteItem(itemName) {
-            const itemRef = ref(db, 'inventory/' + itemName);
-            remove(itemRef)
-            .then(() => {
-                alert('Item deletado com sucesso!');
-                fetchInventory();
-            })
-            .catch((error) => {
-                alert('Erro ao deletar item: ' + error);
-            });
-        }
-
-        // Function to update item quantity in Firebase
-        function updateItem(itemName, newQuantity) {
-            if (newQuantity !== null) {
-                const itemRef = ref(db, 'inventory/' + itemName);
-                update(itemRef, {
-                    quantity: newQuantity
-                })
-                .then(() => {
-                    alert('Item alterado com sucesso!');
-                    fetchInventory();
-                })
-                .catch((error) => {
-                    alert('Erro ao alterar item: ' + error);
-                });
-            }
-        } 
-
-        // Fetch inventory on load
-        fetchInventory();
-
     </script>
 </body>
 </html>
