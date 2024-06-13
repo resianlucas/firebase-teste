@@ -1,123 +1,177 @@
 import { db } from '/public/script.js';
-import { ref, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { ref, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const addItemForm = document.getElementById('addItemForm');
-const inventoryList = document.getElementById('inventoryList');
+let produtos = [];
+const productsPerPage = 100;
+let currentPage = 1;
+let totalProducts = 0;
+let totalPages = 0;
+let searchBar;
 
-// Function to add item to Firebase
-addItemForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const product = {
-        name: document.getElementById("name").value,
-        sku: document.getElementById("sku").value,
-        ean: document.getElementById("ean").value,
-        category: document.getElementById("category").value,
-        brand: document.getElementById("brand").value,
-        price: document.getElementById("price").value,
-        quantity: document.getElementById("quantity").value,
-        imageUrl: document.getElementById("url-image").value,
-        description: document.getElementById("description").value
-    };
-
-    console.log('Produto a ser armazenado:', product);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM content loaded');
     
-    const newItemRef = ref(db, 'products/' + product.sku);
-    set(newItemRef, product)
-    .then(() => {
-        console.log('Item adicionado com sucesso!');
-        alert('Item adicionado com sucesso!');
-        document.getElementById('addItemForm').reset();
-        fetchInventory();
-    })
-    .catch((error) => {
-        console.error('Erro ao adicionar item:', error);
-        alert('Erro ao adicionar item: ' + error);
+    // Theme toggle
+    document.querySelector('.theme-toggle').addEventListener('click', () => {
+        document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
     });
+
+    searchBar = document.getElementById('search-bar');
+    const firstPageButton = document.querySelector('button[onclick="goToPage(\'first\')"]');
+    const prevPageButton = document.querySelector('button[onclick="goToPage(\'prev\')"]');
+    const nextPageButton = document.querySelector('button[onclick="goToPage(\'next\')"]');
+    const lastPageButton = document.querySelector('button[onclick="goToPage(\'last\')"]');
+    const productTableBody = document.getElementById('productTableBody');
+    const currentPageDisplay = document.getElementById('currentPage');
+
+    if (searchBar && firstPageButton && prevPageButton && nextPageButton && lastPageButton && productTableBody && currentPageDisplay) {
+        console.log('All necessary elements are present in the DOM');
+        fetchProducts();
+
+        firstPageButton.addEventListener('click', () => goToPage('first'));
+        prevPageButton.addEventListener('click', () => goToPage('prev'));
+        nextPageButton.addEventListener('click', () => goToPage('next'));
+        lastPageButton.addEventListener('click', () => goToPage('last'));
+
+        searchBar.addEventListener('input', searchProducts);
+    } else {
+        console.error('One or more elements are missing from the DOM');
+    }
+
+    // Check if there's a SKU in the URL and fill the form
+    const urlParams = new URLSearchParams(window.location.search);
+    const sku = urlParams.get('sku');
+    if (sku) {
+        preencherFormulario(sku);
+    }
 });
 
-// Function to fetch and display inventory
-function fetchInventory() {
-    console.log('Fetching inventory...');
-    const inventoryRef = ref(db, 'products/');
-    onValue(inventoryRef, (snapshot) => {
-        inventoryList.innerHTML = '';
+async function fetchProducts() {
+    console.log('Fetching products from Firebase');
+    const dbRef = ref(db, 'products');
+    onValue(dbRef, (snapshot) => {
+        produtos = [];
         snapshot.forEach((childSnapshot) => {
-            const childData = childSnapshot.val();
-            console.log('Item encontrado:', childData);
-            const li = document.createElement('li');
-            li.textContent = `${childData.name}: ${childData.quantity}`;
-            li.style.cursor = 'pointer';
-            li.onclick = () => {
-                window.location.href = `produto.html?sku=${childSnapshot.key}`;
-            };
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Deletar';
-            deleteButton.onclick = (e) => {
-                e.stopPropagation();
-                deleteItem(childSnapshot.key);
-            };
-
-            const updateButton = document.createElement('button');
-            updateButton.textContent = 'Alterar';
-            updateButton.onclick = (e) => {
-                e.stopPropagation();
-                updateItem(childSnapshot.key, prompt('Nova quantidade:', childData.quantity));
-            };
-
-            li.appendChild(deleteButton);
-            li.appendChild(updateButton);
-            inventoryList.appendChild(li);
+            produtos.push(childSnapshot.val());
         });
-
-        // Add "Create New Product" button
-        const createButton = document.createElement('button');
-        createButton.textContent = 'Criar Novo Produto';
-        createButton.onclick = () => {
-            window.location.href = 'produto.html';
-        };
-        inventoryList.appendChild(createButton);
+        console.log(`Fetched ${produtos.length} products from Firebase`);
+        renderProductTable(currentPage);
     });
 }
 
-// Function to delete item from Firebase
-function deleteItem(itemKey) {
-    console.log('Deletando item:', itemKey);
-    const itemRef = ref(db, 'products/' + itemKey);
-    remove(itemRef)
-    .then(() => {
-        console.log('Item deletado com sucesso!');
-        alert('Item deletado com sucesso!');
-        fetchInventory();
-    })
-    .catch((error) => {
-        console.error('Erro ao deletar item:', error);
-        alert('Erro ao deletar item: ' + error);
+function renderProductTable(page = 1) {
+    console.log(`Rendering product table for page ${page}`);
+    totalProducts = produtos.length;
+    totalPages = Math.ceil(totalProducts / productsPerPage);
+    const start = (page - 1) * productsPerPage;
+    const end = start + productsPerPage;
+    const productsToShow = produtos.slice(start, end);
+
+    const tbody = document.getElementById('productTableBody');
+    tbody.innerHTML = '';
+
+    productsToShow.forEach(produto => {
+        const row = document.createElement('tr');
+        row.setAttribute('data-sku', produto.sku);
+        row.innerHTML = `
+        <td><img src="${produto.imageUrl}" alt="${produto.name}" onError="this.onerror=null;this.src='placeholder.jpg';"></td>
+        <td>${produto.name}</td>
+        <td>${produto.sku}</td>
+        <td>${produto.brand}</td>
+        <td>${produto.price}</td>
+        <td><input type="number" value="${produto.quantity}" onchange="atualizarEstoque('${produto.sku}', this.value)"></td>
+      `;
+        tbody.appendChild(row);
+    
+        // Adicionar event listener apenas para a célula de quantidade
+        row.querySelector('input[type="number"]').addEventListener('click', (event) => {
+            event.stopPropagation(); // Impede a propagação do evento para evitar redirecionamento
+        });
+    
+        // Adicionar event listener para redirecionar ao clicar na linha (exceto na célula de quantidade)
+        row.addEventListener('click', () => {
+            window.location.href = `produto.html?sku=${produto.sku}`;
+        });
+    });
+    
+
+    document.getElementById('currentPage').textContent = page;
+}
+
+function goToPage(action) {
+    console.log(`Going to page ${action}`);
+    if (action === 'first') {
+        currentPage = 1;
+    } else if (action === 'prev' && currentPage > 1) {
+        currentPage--;
+    } else if (action === 'next' && currentPage < totalPages) {
+        currentPage++;
+    } else if (action === 'last') {
+        currentPage = totalPages;
+    }
+    renderProductTable(currentPage);
+}
+
+function searchProducts() {
+    const term = searchBar.value.toLowerCase();
+    console.log(`Searching products with term: ${term}`);
+    const filteredProducts = produtos.filter(produto =>
+        produto.name.toLowerCase().includes(term) ||
+        produto.sku.toLowerCase().includes(term) ||
+        produto.brand.toLowerCase().includes(term)
+    );
+
+    const tbody = document.getElementById('productTableBody');
+    tbody.innerHTML = '';
+
+    filteredProducts.forEach(produto => {
+        const row = document.createElement('tr');
+        row.setAttribute('data-sku', produto.sku);
+        row.innerHTML = `
+        <td><img src="${produto.image}" alt="${produto.name}" onError="this.onerror=null;this.src='placeholder.jpg';"></td>
+        <td>${produto.name}</td>
+        <td>${produto.sku}</td>
+        <td>${produto.brand}</td>
+        <td>${produto.price}</td>
+        <td><input type="number" value="${produto.quantity}" onchange="atualizarEstoque('${produto.sku}', this.value)"></td>
+      `;
+        row.addEventListener('click', () => {
+            window.location.href = `produto.html?sku=${produto.sku}`;
+        });
+        tbody.appendChild(row);
     });
 }
 
-// Function to update item quantity in Firebase
-function updateItem(itemKey, newQuantity) {
-    if (newQuantity !== null) {
-        console.log('Atualizando item:', itemKey, 'Nova quantidade:', newQuantity);
-        const itemRef = ref(db, 'products/' + itemKey);
-        update(itemRef, {
-            quantity: newQuantity
-        })
-        .then(() => {
-            console.log('Item alterado com sucesso!');
-            alert('Item alterado com sucesso!');
-            fetchInventory();
-        })
-        .catch((error) => {
-            console.error('Erro ao alterar item:', error);
-            alert('Erro ao alterar item: ' + error);
-        });
-    } else {
-        console.log('Alteração de item cancelada.');
+async function atualizarEstoque(sku, quantidade) {
+    quantidade = parseInt(quantidade, 10);
+    console.log(`Updating stock for SKU: ${sku} with quantity: ${quantidade}`);
+    if (isNaN(quantidade) || quantidade < 0) {
+        alert('Quantidade inválida');
+        return;
+    }
+    const produtoRef = ref(db, 'products/' + sku);
+    await update(produtoRef, { quantity: quantidade });
+    alert('Estoque atualizado com sucesso');
+    console.log(`Stock updated for SKU: ${sku}`);
+}
+
+async function preencherFormulario(sku) {
+    const produtoRef = ref(db, 'products/' + sku);
+    const snapshot = await get(produtoRef);
+
+    if (snapshot.exists()) {
+        const produto = snapshot.val();
+        document.getElementById('name').value = produto.name;
+        document.getElementById('sku').value = produto.sku;
+        document.getElementById('ean').value = produto.ean;
+        document.getElementById('category').value = produto.category;
+        document.getElementById('brand').value = produto.brand;
+        document.getElementById('price').value = produto.price;
+        document.getElementById('quantity').value = produto.quantity;
+        document.getElementById('url-image').value = produto.image;
+        document.getElementById('description').value = produto.description;
     }
 }
 
-// Fetch inventory on load
-console.log('Carregando inventário...');
-fetchInventory();
+window.atualizarEstoque = atualizarEstoque;
+window.searchProducts = searchProducts;

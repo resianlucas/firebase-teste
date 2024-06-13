@@ -1,56 +1,57 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/public/produtos/styles.css">
+    <link rel="stylesheet" href="produtos.css">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
-    <script type="module" src="/public/produtos/scripts.js"></script>
-    <title>SGS Marketing e Informática</title>
+    <script type="module" src="produto.js"></script>
+    <title>Produtos</title>
 </head>
 
 <body>
-    <header>
-        <button class="theme-toggle">Toggle Theme</button>
-        <h1>Produtos</h1>
-        <nav>
-            <ul>
-                <li><a href="/public/index.html">Home</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section class="search-filter">
-            <div class="search">
-                <input id="search-bar" type="text" placeholder="Nome, Sku ou Marca">
-                <button id="search-button" onclick="searchProducts()">Buscar</button>
-            </div>
-        </section>
-        <section class="product-list">
-            <table id="productTable">
-                <thead>
-                    <tr>
-                        <th>Imagem</th>
-                        <th>Nome</th>
-                        <th>SKU</th>
-                        <th>Marca</th>
-                        <th>Preço</th>
-                        <th>Quantidade</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody"></tbody>
-            </table>
-            <div class="pagination">
-                <button onclick="goToPage('first')">Primeira</button>
-                <button onclick="goToPage('prev')">Anterior</button>
-                <span id="currentPage">1</span>
-                <button onclick="goToPage('next')">Próxima</button>
-                <button onclick="goToPage('last')">Última</button>
-            </div>
-        </section>
-        <button id="createProductButton">Criar Novo Produto</button>
-    </main>
+    <button class="theme-toggle">Toggle Theme</button>
+    <h1>Produtos</h1>
+    <nav>
+        <ul>
+            <li><a href="/public/index.html">Home</a></li>
+            <li><a href="/public/produtos/produtos.html">Voltar</a></li>
+        </ul>
+    </nav>
+    <form id="addItemForm">
+        <label for="name">Nome</label>
+        <input id="name" type="text" placeholder="Insira o nome..." required>
+
+        <label for="sku">SKU</label>
+        <input id="sku" type="text" placeholder="Insira o sku..." required>
+
+        <label for="ean">EAN</label>
+        <input id="ean" type="text" placeholder="Insira o código ean..." required>
+
+        <label for="category">Categoria</label>
+        <input id="category" type="text" placeholder="Insira a categoria..." required>
+
+        <label for="brand">Marca</label>
+        <input id="brand" type="text" placeholder="Insira a marca..." required>
+
+        <label for="price">Preço</label>
+        <input id="price" type="number" step="0.01" placeholder="Insira o preço..." pattern="^\d+(\.\d{1,2})?$"
+            title="Formato: R$ 0.00" required>
+
+        <label for="quantity">Quantidade</label>
+        <input id="quantity" type="number" pattern="\d+" placeholder="Insira a quantidade..." required>
+
+        <label for="url-image">Imagem</label>
+        <input id="url-image" type="url" placeholder="Insira o URL da imagem..." required>
+
+        <label for="description">Descrição</label>
+        <textarea id="description" rows="5" placeholder="Insira a descrição..." required></textarea>
+
+        <button type="submit">Salvar Item</button>
+    </form>
+
 </body>
 
 </html>

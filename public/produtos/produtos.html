@@ -1,58 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="produtos.css">
+    <link rel="stylesheet" href="/public/produtos/styles.css">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
-    <script type="module" src="produtos.js"></script>
-    <title>Produtos</title>
+    <script type="module" src="/public/produtos/produtos.js"></script>
+    <title>SGS Marketing e Informática</title>
 </head>
+
 <body>
-    <button class="theme-toggle">Toggle Theme</button>
-    <h1>Produtos</h1>
-    <nav>
-        <ul>
-            <li><a href="/public/index.html">Home</a></li>
-        </ul>
-    </nav>
-    <form id="addItemForm">
-        <label for="name">Nome</label>
-        <input id="name" type="text" placeholder="Insira o nome..." required>
-        
-        <label for="sku">SKU</label>
-        <input id="sku" type="text" placeholder="Insira o sku..." required>
-        
-        <label for="ean">EAN</label>
-        <input id="ean" type="text" placeholder="Insira o código ean..." required>
-        
-        <label for="category">Categoria</label>
-        <input id="category" type="text" placeholder="Insira a categoria..." required>
-        
-        <label for="brand">Marca</label>
-        <input id="brand" type="text" placeholder="Insira a marca..." required>
-        
-        <label for="price">Preço</label>
-        <input id="price" type="text" placeholder="Insira o preço..." required>
-        
-        <label for="quantity">Quantidade</label>
-        <input id="quantity" type="text" placeholder="Insira a quantidade..." required>
-        
-        <label for="url-image">Imagem</label>
-        <input id="url-image" type="text" placeholder="Insira o URL da imagem..." required>
-        
-        <label for="description">Descrição</label>
-        <textarea id="description" rows="5" placeholder="Insira a descrição..." required></textarea>
-        
-        <button type="submit">Adicionar Item</button>
-    </form>
-    <h2>Estoque Atual</h2>
-    <ul id="inventoryList"></ul>
-    <script>
-        document.querySelector('.theme-toggle').addEventListener('click', () => {
-            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-        });
-    </script>
+    <header>
+        <button class="theme-toggle">Toggle Theme</button>
+        <h1>Produtos</h1>
+        <nav>
+            <ul>
+                <li><a href="/public/index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <button id="createProductButton" onclick="window.location.href='produto.html'">Criar Novo Produto</button>
+        <section class="search-filter">
+            <div class="search">
+                <input id="search-bar" type="text" placeholder="Nome, Sku ou Marca">
+                <button id="search-button" onclick="searchProducts()">Buscar</button>
+            </div>
+        </section>
+        <section class="product-list">
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Imagem</th>
+                        <th>Nome</th>
+                        <th>SKU</th>
+                        <th>Marca</th>
+                        <th>Preço</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody"></tbody>
+            </table>
+            <div class="pagination">
+                <button onclick="goToPage('first')">Primeira</button>
+                <button onclick="goToPage('prev')">Anterior</button>
+                <span id="currentPage">1</span>
+                <button onclick="goToPage('next')">Próxima</button>
+                <button onclick="goToPage('last')">Última</button>
+            </div>
+        </section>
+    </main>
 </body>
+
 </html>
