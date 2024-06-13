@@ -1,4 +1,3 @@
-// produtos.js
 import { db } from '/public/script.js';
 import { ref, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -47,19 +46,37 @@ function fetchInventory() {
             console.log('Item encontrado:', childData);
             const li = document.createElement('li');
             li.textContent = `${childData.name}: ${childData.quantity}`;
+            li.style.cursor = 'pointer';
+            li.onclick = () => {
+                window.location.href = `produto.html?sku=${childSnapshot.key}`;
+            };
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Deletar';
-            deleteButton.onclick = () => deleteItem(childSnapshot.key);
+            deleteButton.onclick = (e) => {
+                e.stopPropagation();
+                deleteItem(childSnapshot.key);
+            };
 
             const updateButton = document.createElement('button');
             updateButton.textContent = 'Alterar';
-            updateButton.onclick = () => updateItem(childSnapshot.key, prompt('Nova quantidade:', childData.quantity));
+            updateButton.onclick = (e) => {
+                e.stopPropagation();
+                updateItem(childSnapshot.key, prompt('Nova quantidade:', childData.quantity));
+            };
 
             li.appendChild(deleteButton);
             li.appendChild(updateButton);
             inventoryList.appendChild(li);
         });
+
+        // Add "Create New Product" button
+        const createButton = document.createElement('button');
+        createButton.textContent = 'Criar Novo Produto';
+        createButton.onclick = () => {
+            window.location.href = 'produto.html';
+        };
+        inventoryList.appendChild(createButton);
     });
 }
 
