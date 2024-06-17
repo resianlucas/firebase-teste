@@ -89,9 +89,11 @@ async function updateAllQuantities() {
 
         console.log(`Atualizando quantidades no Firebase:`, updates);
         await update(ref(db), updates);
-        alert('Quantidades atualizadas com sucesso!');
         console.log('Quantidades atualizadas com sucesso!');
         
+        // Mostrar janela pop-up com produtos atualizados
+        mostrarJanelaPopup();
+
         // Resetar os contadores
         productCounters = {};
         document.getElementById('product-quantity-value').textContent = 0;
@@ -100,3 +102,53 @@ async function updateAllQuantities() {
         alert('Erro ao atualizar quantidades.');
     }
 }
+
+function mostrarJanelaPopup() {
+    let popupWindow = window.open("", "Produtos Atualizados", "width=600,height=400");
+    popupWindow.document.write(`
+        <html>
+            <head>
+                <title>Produtos Atualizados</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 20px;
+                    }
+
+                    h1 {
+                        text-align: center;
+                        color: #333;
+                    }
+
+                    ul {
+                        list-style-type: none;
+                        padding: 0;
+                    }
+
+                    li {
+                        background-color: #fff;
+                        margin: 10px 0;
+                        padding: 10px;
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    }
+
+                    li:nth-child(even) {
+                        background-color: #f9f9f9;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Produtos Atualizados</h1>
+                <ul>
+                    ${Object.entries(productCounters).map(([sku, quantity]) => `<li>SKU: ${sku}, Quantidade Atualizada: ${quantity}</li>`).join('')}
+                </ul>
+            </body>
+        </html>
+    `);
+    popupWindow.document.close();
+}
+

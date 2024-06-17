@@ -1,0 +1,37 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+}
+
+.logo img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+}
+
+.fields {
+    margin-top: 20px;
+    width: 300px;
+}
+
+.fields label {
+    display: block;
+    margin-top: 10px;
+}
+
+.fields input, .fields textarea {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.scan-product {
+    margin-top: 20px;
+}

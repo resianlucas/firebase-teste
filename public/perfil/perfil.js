@@ -23,7 +23,7 @@ function displayBlings(blings) {
         const actionCell = document.createElement('td');
         const refreshButton = document.createElement('button');
         refreshButton.textContent = 'Atualizar';
-        
+
         refreshButton.onclick = async () => {
             try {
                 await refreshBlingToken(clientId, bling.client_secret, bling.refresh_token);

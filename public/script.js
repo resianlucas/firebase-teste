@@ -1,4 +1,3 @@
-// public/script.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -23,7 +22,6 @@ function encodeFormData(data) {
         .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
         .join('&');
 }
-
 
 // Função para buscar os blings cadastrados no Firebase
 export async function fetchBlings() {
@@ -90,4 +88,4 @@ export async function refreshBlingToken(clientId, clientSecret, refreshToken) {
     }
 }
 
-export { db , app};
+export { db , app };

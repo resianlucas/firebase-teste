@@ -10,7 +10,7 @@ let searchBar;
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM content loaded');
-    
+
     // Theme toggle
     document.querySelector('.theme-toggle').addEventListener('click', () => {
         document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
@@ -82,18 +82,17 @@ function renderProductTable(page = 1) {
         <td><input type="number" value="${produto.quantity}" onchange="atualizarEstoque('${produto.sku}', this.value)"></td>
       `;
         tbody.appendChild(row);
-    
+
         // Adicionar event listener apenas para a célula de quantidade
         row.querySelector('input[type="number"]').addEventListener('click', (event) => {
             event.stopPropagation(); // Impede a propagação do evento para evitar redirecionamento
         });
-    
+
         // Adicionar event listener para redirecionar ao clicar na linha (exceto na célula de quantidade)
         row.addEventListener('click', () => {
             window.location.href = `produto.html?sku=${produto.sku}`;
         });
     });
-    
 
     document.getElementById('currentPage').textContent = page;
 }
@@ -135,6 +134,11 @@ function searchProducts() {
         <td>${produto.price}</td>
         <td><input type="number" value="${produto.quantity}" onchange="atualizarEstoque('${produto.sku}', this.value)"></td>
       `;
+
+        row.querySelector('input[type="number"]').addEventListener('click', (event) => {
+            event.stopPropagation(); // Impede a propagação do evento para evitar redirecionamento
+        });
+        
         row.addEventListener('click', () => {
             window.location.href = `produto.html?sku=${produto.sku}`;
         });

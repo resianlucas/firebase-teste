@@ -3,6 +3,18 @@ import { ref, set, update, get } from "https://www.gstatic.com/firebasejs/10.12.
 
 const addItemForm = document.getElementById('addItemForm');
 
+function converterPreco(preco) {
+    // Remove qualquer caractere não numérico (exceto ponto e vírgula) e converte para número
+    const precoNumerico = parseFloat(preco.replace(',', '.').replace(/[^0-9.]/g, ''));
+    // Retorna o valor com 2 casas decimais
+    return parseFloat(precoNumerico.toFixed(2));
+}
+
+function converterQuantidade(quantidade) {
+    // Remove qualquer caractere não numérico e converte para número inteiro
+    return parseInt(quantidade.replace(/[^0-9]/g, ''), 10);
+}
+
 // Function to add item to Firebase
 addItemForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -12,8 +24,8 @@ addItemForm.addEventListener('submit', (e) => {
         ean: document.getElementById("ean").value,
         category: document.getElementById("category").value,
         brand: document.getElementById("brand").value,
-        price: document.getElementById("price").value,
-        quantity: document.getElementById("quantity").value,
+        price: converterPreco(document.getElementById("price").value),
+        quantity: converterQuantidade(document.getElementById("quantity").value),
         imageUrl: document.getElementById("url-image").value,
         description: document.getElementById("description").value
     };
