@@ -59,13 +59,13 @@ async function fetchProducts() {
     });
 }
 
-function renderProductTable(page = 1) {
+function renderProductTable(page = 1, products = produtos) {
     console.log(`Rendering product table for page ${page}`);
-    totalProducts = produtos.length;
+    totalProducts = products.length;
     totalPages = Math.ceil(totalProducts / productsPerPage);
     const start = (page - 1) * productsPerPage;
     const end = start + productsPerPage;
-    const productsToShow = produtos.slice(start, end);
+    const productsToShow = products.slice(start, end);
 
     const tbody = document.getElementById('productTableBody');
     tbody.innerHTML = '';
@@ -115,36 +115,16 @@ function searchProducts() {
     const term = searchBar.value.toLowerCase();
     console.log(`Searching products with term: ${term}`);
     
-    const filteredProducts = produtos.filter(produto =>
-        produto.name.toLowerCase().includes(term) ||
-        produto.sku.toLowerCase().includes(term) ||
-        produto.brand.toLowerCase().includes(term)
-    );
+    const filteredProducts = produtos.filter(produto => {
+        const name = produto.name ? produto.name.toLowerCase() : '';
+        const sku = produto.sku ? produto.sku.toLowerCase() : '';
+        const brand = produto.brand ? produto.brand.toLowerCase() : '';
+        const ean = produto.ean ? produto.ean.toLowerCase() : '';
 
-    const tbody = document.getElementById('productTableBody');
-    tbody.innerHTML = '';
-
-    filteredProducts.forEach(produto => {
-        const row = document.createElement('tr');
-        row.setAttribute('data-sku', produto.sku);
-        row.innerHTML = `
-        <td><img src="${produto.image}" alt="${produto.name}" onError="this.onerror=null;this.src='placeholder.jpg';"></td>
-        <td>${produto.name}</td>
-        <td>${produto.sku}</td>
-        <td>${produto.brand}</td>
-        <td>${produto.price}</td>
-        <td><input type="number" value="${produto.quantity}" onchange="atualizarEstoque('${produto.sku}', this.value)"></td>
-      `;
-
-        row.querySelector('input[type="number"]').addEventListener('click', (event) => {
-            event.stopPropagation(); // Impede a propagação do evento para evitar redirecionamento
-        });
-        
-        row.addEventListener('click', () => {
-            window.location.href = `produto.html?sku=${produto.sku}`;
-        });
-        tbody.appendChild(row);
+        return name.includes(term) || sku.includes(term) || brand.includes(term) || ean.includes(term);
     });
+
+    renderProductTable(1, filteredProducts);
 }
 
 async function atualizarEstoque(sku, quantidade) {
@@ -173,7 +153,8 @@ async function preencherFormulario(sku) {
         document.getElementById('brand').value = produto.brand;
         document.getElementById('price').value = produto.price;
         document.getElementById('quantity').value = produto.quantity;
-        document.getElementById('url-image').value = produto.image;
+        document.getElementById('url-image').value = produto.imageUrl;
+        document.getElementById('product-preview-image').src = produto.imageUrl;
         document.getElementById('description').value = produto.description;
     }
 }
