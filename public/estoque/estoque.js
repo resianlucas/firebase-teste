@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const eanBar = document.getElementById('ean-bar');
     const updateButton = document.getElementById('update-button');
     const deleteButton = document.getElementById('delete-button');
+    const loadXmlButton = document.getElementById('load-xml-button');
+    const xmlFileInput = document.getElementById('xml-file-input');
 
     searchEanButton.addEventListener('click', searchProductByEan);
     eanBar.addEventListener('keypress', (e) => {
@@ -17,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     updateButton.addEventListener('click', updateAllQuantities);
     deleteButton.addEventListener('click', deleteScannedQuantities);
+    loadXmlButton.addEventListener('click', loadXml);
 });
 
 async function cadastrar(ean) {
@@ -210,4 +213,53 @@ function mostrarJanelaPopup(isDeletion = false) {
         </html>
     `);
     popupWindow.document.close();
+}
+
+function loadXml() {
+    const xmlFileInput = document.getElementById('xml-file-input');
+    const file = xmlFileInput.files[0];
+
+    if (!file) {
+        alert('Por favor, selecione um arquivo XML.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
+
+        const produtos = xmlDoc.getElementsByTagName("det");
+
+        for (let i = 0; i < produtos.length; i++) {
+            const produto = produtos[i];
+            const ean = produto.getElementsByTagName("cEAN")[0].textContent;
+            const quantidade = parseInt(produto.getElementsByTagName("qCom")[0].textContent, 10);
+
+            if (!productCounters[ean]) {
+                productCounters[ean] = 0;
+            }
+            productCounters[ean] += quantidade;
+
+            const productSnapshot = await getProductByEan(ean);
+
+            if (productSnapshot) {
+                const product = productSnapshot.val();
+                const currentQuantity = product.quantity || 0;
+                const newQuantity = currentQuantity + quantidade;
+                await update(ref(db, `products/${product.sku}/quantity`), { quantity: newQuantity });
+            } else {
+                await set(ref(db, `cadastrar/${ean}`), {
+                    ean: ean,
+                    quantity: quantidade,
+                    sku: produto.getElementsByTagName("cProd")[0].textContent,
+                    name: produto.getElementsByTagName("xProd")[0].textContent
+                });
+            }
+        }
+
+        alert('Estoque atualizado a partir do XML.');
+    };
+
+    reader.readAsText(file);
 }
