@@ -97,6 +97,8 @@ class Estoque extends BaseClass {
                     continue;
                 }
 
+                console.log('RESPONSE: ', response)
+
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];
 
                 if (response.data && response.data.length > 0) {
@@ -108,9 +110,9 @@ class Estoque extends BaseClass {
                     console.log('estoques:', estoques);
 
                     // Salvar informações associadas à resposta
-                    result[blingInfo.nome] = {
+                    result[blingInfo.name] = {
                         id: blingInfo.idLoja,
-                        empresa: blingInfo.nome,
+                        empresa: blingInfo.name,
                         dataHora: new Date().toISOString(),
                         method: 'getEstoque',
                         request: estoques
@@ -178,7 +180,11 @@ class Estoque extends BaseClass {
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('testButton').addEventListener('click', async () => {
-        const estoque = new Estoque();
+        const estoque = new Estoque({
+            params: {
+                idsProdutos: [16225593493]
+            }
+        })
         const result = await estoque.getEstoque();
         console.log('Result:', result);
     });
