@@ -258,7 +258,7 @@ class PedidoVenda extends BaseClass {
     //METODOS DE COMUNICAÇÃO API//
     //////////////////////////////
     async getPedidoVenda() {
-        const endpoint = '/api/pedidos/vendas';
+        const endpoint = '/pedidos/vendas';
         let url = baseUrl + endpoint;
         let queryString = this.buildQueryString(this.params);
         if (queryString) {
@@ -281,6 +281,8 @@ class PedidoVenda extends BaseClass {
                     }
                 });
             });
+
+            console.log('REQUESTS: ', requests)
     
             let responses = await Promise.all(requests);
             

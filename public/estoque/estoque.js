@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchEanButton = document.getElementById('search-ean-button');
     const eanBar = document.getElementById('ean-bar');
     const updateButton = document.getElementById('update-button');
+    const deleteButton = document.getElementById('delete-button');
 
     searchEanButton.addEventListener('click', searchProductByEan);
     eanBar.addEventListener('keypress', (e) => {
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     updateButton.addEventListener('click', updateAllQuantities);
+    deleteButton.addEventListener('click', deleteScannedQuantities);
 });
 
 async function cadastrar(ean) {
@@ -123,7 +125,45 @@ async function updateAllQuantities() {
     }
 }
 
-function mostrarJanelaPopup() {
+async function deleteScannedQuantities() {
+    const updates = {};
+
+    try {
+        for (const sku in productCounters) {
+            const declaredQuantity = productCounters[sku];
+            const productRef = ref(db, `products/${sku}`);
+            const productSnapshot = await get(productRef);
+
+            if (productSnapshot.exists()) {
+                const currentQuantity = productSnapshot.val().quantity || 0;
+                const newQuantity = currentQuantity - declaredQuantity;
+                if (newQuantity < 0) {
+                    alert(`Quantidade negativa não permitida para SKU: ${sku}`);
+                    continue;
+                }
+                updates[`/products/${sku}/quantity`] = newQuantity;
+            } else {
+                alert(`Produto com SKU: ${sku} não encontrado para deletar.`);
+            }
+        }
+
+        console.log(`Atualizando quantidades no Firebase:`, updates);
+        await update(ref(db), updates);
+        console.log('Quantidades deletadas com sucesso!');
+
+        // Mostrar janela pop-up com produtos atualizados
+        mostrarJanelaPopup(true);
+
+        // Resetar os contadores
+        productCounters = {};
+        document.getElementById('product-quantity-value').textContent = 0;
+    } catch (error) {
+        console.error('Erro ao deletar quantidades:', error);
+        alert('Erro ao deletar quantidades.');
+    }
+}
+
+function mostrarJanelaPopup(isDeletion = false) {
     let popupWindow = window.open("", "Produtos Atualizados", "width=600,height=400");
     popupWindow.document.write(`
         <html>
@@ -162,9 +202,9 @@ function mostrarJanelaPopup() {
                 </style>
             </head>
             <body>
-                <h1>Produtos Atualizados</h1>
+                <h1>${isDeletion ? 'Produtos Deletados' : 'Produtos Atualizados'}</h1>
                 <ul>
-                    ${Object.entries(productCounters).map(([sku, quantity]) => `<li>SKU: ${sku}, Quantidade Atualizada: ${quantity}</li>`).join('')}
+                    ${Object.entries(productCounters).map(([sku, quantity]) => `<li>SKU: ${sku}, Quantidade ${isDeletion ? 'Deletada' : 'Atualizada'}: ${quantity}</li>`).join('')}
                 </ul>
             </body>
         </html>
