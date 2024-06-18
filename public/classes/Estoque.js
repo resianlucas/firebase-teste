@@ -1,3 +1,5 @@
+const baseUrl = 'http://localhost:3000/api'
+
 class Estoque extends BaseClass {
     constructor({
         produto = {

@@ -1,3 +1,5 @@
+const baseUrl = 'http://localhost:3000/api'
+
 class PedidoVenda extends BaseClass {
     constructor({
         id = null,
