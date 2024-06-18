@@ -41,7 +41,7 @@ export async function fetchBlings() {
 }
 
 export async function refreshBlingToken(clientId, clientSecret, refreshToken) {
-    const url = 'http://localhost:3000/api'; // URL do proxy ou servidor que gerencia o refresh token
+    const url = 'http://localhost:3000/api/Api/v3'; // URL do proxy ou servidor que gerencia o refresh token
 
     const credentials = btoa(clientId + ":" + clientSecret);
 
