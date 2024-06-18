@@ -22,7 +22,7 @@ class Estoque extends BaseClass {
             operacao: ''
         },
         idLoja = null
-    }) {
+    } = {}) {
         if (typeof produto.id !== 'number' && produto.id !== null) {
             throw new TypeError('O id do produto deve ser um Número ou null')
         }
@@ -57,61 +57,73 @@ class Estoque extends BaseClass {
     //////////////////////////////
     //METODOS DE COMUNICAÇÃO API//
     //////////////////////////////
-    getEstoque() {
-        const endpoint = '/estoques/saldos'
+    async getEstoque() {
+        const endpoint = '/estoques/saldos';
         let url = baseUrl + endpoint;
         let queryString = this.buildQueryString(this.params);
         if (queryString) {
             url += '?' + queryString;
         }
-        let accessToken = this.getBling();
+
+        console.log('URL:', url);
+
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
 
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                let request = {
-                    'url': url,
-                    'method': 'get',
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
+                console.log('Bling Info:', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     }
-                };
-                requests.push(request);
-            }
-            let responses = UrlFetchApp.fetchAll(requests);
+                });
+            });
+
+            console.log('REQUESTS:', requests);
+
+            let responses = await Promise.all(requests);
+
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
+                let response = await responses[i].text(); // Alterado para text() para pegar HTML
+                try {
+                    response = JSON.parse(response); // Tenta parsear como JSON
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
 
-                var estoques = [];
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
 
-                response.data.forEach(data => {
-                    estoques.push({
-                        id: data.produto.id,
-                        quantidade: data.saldoVirtualTotal
-                    });
-                });
+                if (response.data && response.data.length > 0) {
+                    const estoques = response.data.map(dado => ({
+                        id: dado.produto.id,
+                        quantidade: dado.saldoVirtualTotal
+                    }));
 
-                console.log('estoques: ', estoques);
+                    console.log('estoques:', estoques);
 
-                // Salvar informações associadas à resposta
-                result[blingInfo.nome] = {
-                    id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
-                    method: 'getEstoque',
-                    request: estoques
-                };
+                    // Salvar informações associadas à resposta
+                    result[blingInfo.nome] = {
+                        id: blingInfo.idLoja,
+                        empresa: blingInfo.nome,
+                        dataHora: new Date().toISOString(),
+                        method: 'getEstoque',
+                        request: estoques
+                    };
+                }
             }
             return result;
         } catch (error) {
-            console.error('Erro gerado: ', error.stack);
+            console.error('Erro ao buscar estoques:', error);
             return null;
         }
     }
+
 
     createEstoque() {
         const endpoint = '/estoques'
@@ -163,3 +175,11 @@ class Estoque extends BaseClass {
         }
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('testButton').addEventListener('click', async () => {
+        const estoque = new Estoque();
+        const result = await estoque.getEstoque();
+        console.log('Result:', result);
+    });
+});
