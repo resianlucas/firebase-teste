@@ -273,11 +273,12 @@ class PedidoVenda extends BaseClass {
         try {
             let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
+                console.log('Bling Info: ', blingInfo)
                 return fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     }
                 });
             });

@@ -1,3 +1,5 @@
+import { BaseClass } from './BaseClass.js'
+
 const baseUrl = 'http://localhost:3000/api'
 
 class Estoque extends BaseClass {
