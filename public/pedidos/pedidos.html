@@ -8,18 +8,13 @@
 </head>
 <body>
     <button class="theme-toggle">Toggle Theme</button>
-    <!-- Restante do conteúdo -->
-    <script>
-        document.querySelector('.theme-toggle').addEventListener('click', () => {
-            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-        });
-    </script>
     <h1>Pedidos</h1>
     <nav>
         <ul>
             <li><a href="/public/index.html">Home</a></li>
         </ul>
     </nav>
-    <!-- Conteúdo da página de pedidos -->
+    <button id="testButton">Testar getPedidoVenda</button>
+    <script type="module" src="/public/classes/PedidoVenda.js"></script>
 </body>
 </html>

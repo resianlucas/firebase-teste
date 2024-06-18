@@ -32,7 +32,7 @@ cadastrar.addEventListener('submit', async (e) => {
     const code = document.getElementById('code').value;
 
     async function getToken() {
-        const url = 'http://localhost:3000/api';  // URL do proxy
+        const url = 'http://localhost:3000/api/Api/v3';  // URL do proxy
         const credentials = btoa(clientId + ':' + clientSecret);
 
         let options = {

@@ -25,7 +25,7 @@ app.use('/api', createProxyMiddleware({
     target: 'https://www.bling.com.br',
     changeOrigin: true,
     pathRewrite: {
-        '^/api': '/Api/v3/oauth/token', // reescreve '/api' para '/Api/v3/oauth/token'
+        '^/api/Api/v3': '/Api/v3/oauth/token', // reescreve '/api' para '/Api/v3/oauth/token'
         '^/api/depositos': '/Api/v3/depositos',
         '^/api/empresas/me/dados-basicos': '/Api/v3/empresas/me/dados-basicos',
         '^/api/estoques/saldos': '/Api/v3/estoques/saldos',

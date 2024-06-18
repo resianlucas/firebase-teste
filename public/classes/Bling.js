@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -25,7 +25,7 @@ function encodeFormData(data) {
         .join('&');
 }
 
-class Bling {
+export class Bling {
     constructor({
         idLoja = 0,
         nome = '',
@@ -97,6 +97,23 @@ class Bling {
             console.log('Tokens updated and saved to Firebase:', data);
         } catch (error) {
             console.error('Erro ao atualizar o token:', error);
+        }
+    }
+
+    async getBling() {
+        const dbRef = ref(db);
+        try {
+            const snapshot = await get(child(dbRef, 'bling/'));
+            if (snapshot.exists()) {
+                const blings = snapshot.val();
+                console.log('Blings:', blings);
+                return blings;
+            } else {
+                console.log('No bling data available');
+                return null;
+            }
+        } catch (error) {
+            console.error('Erro ao buscar blings:', error);
         }
     }
 }

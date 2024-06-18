@@ -1,4 +1,6 @@
-class BaseClass extends Bling {
+import { Bling } from "./bling.js";
+
+export class BaseClass extends Bling {
     buildQueryString(params) {
         var queryString = '';
         var usedKeys = {};
@@ -36,3 +38,4 @@ class BaseClass extends Bling {
         return queryString;
     }
 }
+
