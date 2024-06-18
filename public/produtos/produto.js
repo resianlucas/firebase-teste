@@ -59,6 +59,7 @@ async function preencherFormulario(sku) {
         document.getElementById('price').value = produto.price;
         document.getElementById('quantity').value = produto.quantity;
         document.getElementById('url-image').value = produto.imageUrl;
+        document.getElementById('product-preview-image').src = produto.imageUrl;
         document.getElementById('description').value = produto.description;
     }
 }
