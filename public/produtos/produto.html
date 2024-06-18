@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="produtos.css">
+    <link rel="stylesheet" href="produto.css">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
     <script type="module" src="produto.js"></script>
@@ -20,44 +20,68 @@
             <li><a href="/public/produtos/produtos.html">Voltar</a></li>
         </ul>
     </nav>
+
     <form id="addItemForm">
-        <label for="name">Nome</label>
-        <input id="name" type="text" placeholder="Insira o nome..." required>
+        <div class="header-container">
+            <div class="title-container">
+                <label for="name">Nome</label>
+                <input id="name" type="text" placeholder="Insira o nome..." required>
+            </div>
+            <button type="submit">Salvar Item</button>
+        </div>
 
-        <label for="sku">SKU</label>
-        <input id="sku" type="text" placeholder="Insira o sku..." required>
+        <main class="main-container">
+            <div class="image-container">
+                <label for="url-image">Imagem</label>
+                <input id="url-image" type="url" placeholder="Insira o URL da imagem..." required>
+                <img id="product-preview-image" src="placeholder.jpg" alt="Pré-visualização da Imagem do Produto">
+            </div>
+            <div class="info-container">
+                <div class="info-row">
+                    <div>
+                        <label for="sku">SKU</label>
+                        <input id="sku" type="text" placeholder="Insira o sku..." required>
+                    </div>
+                    <div>
+                        <label for="ean">EAN</label>
+                        <input id="ean" type="text" placeholder="Insira o código ean..." required>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div>
+                        <label for="price">Preço</label>
+                        <input id="price" type="number" step="0.01" placeholder="Insira o preço..." pattern="^\d+(\.\d{1,2})?$" title="Formato: R$ 0.00" required>
+                    </div>
+                    <div>
+                        <label for="quantity">Quantidade</label>
+                        <input id="quantity" type="number" pattern="\d+" placeholder="Insira a quantidade..." required>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-        <label for="ean">EAN</label>
-        <input id="ean" type="text" placeholder="Insira o código ean..." required>
-
-        <label for="category">Categoria</label>
-        <input id="category" type="text" placeholder="Insira a categoria..." required>
-
-        <label for="brand">Marca</label>
-        <input id="brand" type="text" placeholder="Insira a marca..." required>
-
-        <label for="price">Preço</label>
-        <input id="price" type="number" step="0.01" placeholder="Insira o preço..." pattern="^\d+(\.\d{1,2})?$"
-            title="Formato: R$ 0.00" required>
-
-        <label for="quantity">Quantidade</label>
-        <input id="quantity" type="number" pattern="\d+" placeholder="Insira a quantidade..." required>
-
-        <label for="url-image">Imagem</label>
-        <input id="url-image" type="url" placeholder="Insira o URL da imagem..." required>
-
-        <label for="description">Descrição</label>
-        <textarea id="description" rows="5" placeholder="Insira a descrição..." required></textarea>
-
-        <button type="submit">Salvar Item</button>
+        <footer class="footer-container">
+            <div class="brand-category-container">
+                <div>
+                    <label for="category">Categoria</label>
+                    <input id="category" type="text" placeholder="Insira a categoria..." required>
+                </div>
+                <div>
+                    <label for="brand">Marca</label>
+                    <input id="brand" type="text" placeholder="Insira a marca..." required>
+                </div>
+            </div>
+            <div class="description-container">
+                <label for="description">Descrição</label>
+                <textarea id="description" rows="5" placeholder="Insira a descrição..." required></textarea>
+            </div>
+        </footer>
     </form>
-
-    <div class="product-preview">
-        <h2>Pré-visualização do Produto</h2>
-        <img id="product-preview-image" src="placeholder.jpg" alt="Pré-visualização da Imagem do Produto">
-        <p id="product-preview-description"></p>
-    </div>
-
+    <script>
+        // Alternar entre temas claro e escuro
+        document.querySelector('.theme-toggle').addEventListener('click', () => {
+            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+        });
+    </script>
 </body>
-
 </html>
