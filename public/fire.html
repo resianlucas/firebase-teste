@@ -16,8 +16,14 @@
         function converterPreco(preco) {
             // Remove qualquer caractere não numérico (exceto ponto e vírgula) e converte para número
             const precoNumerico = parseFloat(preco.replace(',', '.').replace(/[^0-9.]/g, ''));
-            // Retorna o valor com 2 casas decimais
-            return parseFloat(precoNumerico.toFixed(2));
+            
+            if (!preco) {
+                const novoPreco = parseFloat(0);
+                return novoPreco
+            } else {
+                return parseFloat(precoNumerico.toFixed(2));
+            }
+            
         }
 
         function converterQuantidade(quantidade) {

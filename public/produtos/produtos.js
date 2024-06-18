@@ -114,6 +114,7 @@ function goToPage(action) {
 function searchProducts() {
     const term = searchBar.value.toLowerCase();
     console.log(`Searching products with term: ${term}`);
+    
     const filteredProducts = produtos.filter(produto =>
         produto.name.toLowerCase().includes(term) ||
         produto.sku.toLowerCase().includes(term) ||

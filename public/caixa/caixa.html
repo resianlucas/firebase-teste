@@ -8,28 +8,38 @@
 </head>
 <body>
     <div class="container">
-        <div class="logo">
-            <img id="product-image" src="logo.png" alt="Logo">
+        <div class="header">
+            <span>CPF:</span>
+            <span>CONSUMIDOR</span>
         </div>
-        <div class="fields">
-            <label for="quantity">Quantidade:</label>
-            <input type="number" id="quantity" name="quantity" readonly>
-            
-            <label for="price">Preço:</label>
-            <input type="text" id="price" name="price" readonly>
-            
-            <label for="scanned-products">Produtos Scanneados:</label>
-            <textarea id="scanned-products" name="scanned-products" readonly></textarea>
-            
-            <label for="last-scanned">Último Produto Scanneado:</label>
-            <input type="text" id="last-scanned" name="last-scanned" readonly>
+        <div class="main-content">
+            <div class="logo-section">
+                <img id="product-image" src="https://i.ibb.co/9stvHsP/placeholder-sem-foto.png" alt="Logo">
+            </div>
+            <div class="details-section">
+                <textarea id="scanned-products" name="scanned-products" readonly></textarea>
+            </div>
         </div>
-        <div class="scan-product">
-            <label for="ean-bar">Código EAN:</label>
-            <input type="text" id="ean-bar" name="ean-bar">
-            <button id="search-ean-button">Procurar Produto</button>
+        <div class="footer">
+            <div class="product-details">
+                <label for="product-code">CÓDIGO DO PRODUTO (F2):</label>
+                <input type="text" id="product-code" name="product-code" readonly>
+                <input type="text" id="ean-bar" placeholder="Digite ou scanneie o EAN">
+                <button id="search-ean-button">Buscar</button>
+                <div id="product-info">
+                    <span id="last-scanned">Último Produto Scanneado</span>
+                    <span id="quantity">Quantidade: 0</span>
+                    <span id="price">Preço: 0,00</span>
+                </div>
+            </div>
+            <div class="total">
+                <span>QTD. ITENS</span>
+                <span id="total-items">0</span>
+                <span>SUBTOTAL</span>
+                <span id="subtotal">0,00</span>
+            </div>
         </div>
     </div>
-    <script src="caixa.js"></script>
+    <script type="module" src="caixa.js"></script>
 </body>
 </html>

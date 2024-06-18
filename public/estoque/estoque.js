@@ -1,5 +1,5 @@
 import { db } from '/public/script.js';
-import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 let productCounters = {};
 
@@ -17,20 +17,31 @@ document.addEventListener('DOMContentLoaded', () => {
     updateButton.addEventListener('click', updateAllQuantities);
 });
 
+async function cadastrar(ean) {
+    const quantidade = productCounters[ean] || 0;
+    const produtosRef = ref(db, `cadastrar/${ean}`);
+    await set(produtosRef, { ean, quantity: quantidade });
+    novoCadastro(ean);
+    incrementProductCounter(ean);
+}
+
 async function searchProductByEan() {
     const ean = document.getElementById('ean-bar').value.trim();
     console.log(`Procurando produto com EAN: ${ean}`);
-    if (!ean) return;
+    if (!ean) {
+        return alert("EAN não pode ser vazio");
+    }
 
     try {
         const productSnapshot = await getProductByEan(ean);
-        if (productSnapshot.exists()) {
+        if (productSnapshot) {
             const product = productSnapshot.val();
             console.log(`Produto encontrado:`, product);
             updateProductDetails(product);
             incrementProductCounter(product.sku);
         } else {
-            alert('Produto não encontrado.');
+            await cadastrar(ean);
+            alert('Produto não encontrado. Cadastrado na tabela "cadastrar".');
         }
     } catch (error) {
         console.error('Erro ao buscar produto:', error);
@@ -52,6 +63,12 @@ async function getProductByEan(ean) {
 
     console.log(`Resultado da busca por EAN ${ean}:`, productSnapshot ? productSnapshot.val() : 'Nenhum produto encontrado');
     return productSnapshot;
+}
+
+function novoCadastro(ean) {
+    document.getElementById('product-image').src = 'placeholder.jpg';
+    document.getElementById('product-name').textContent = ean;
+    document.getElementById('product-quantity-value').textContent = productCounters[ean] || 0;
 }
 
 function updateProductDetails(product) {
@@ -84,13 +101,16 @@ async function updateAllQuantities() {
                 const currentQuantity = productSnapshot.val().quantity || 0;
                 const newQuantity = currentQuantity + declaredQuantity;
                 updates[`/products/${sku}/quantity`] = newQuantity;
+            } else {
+                const cadastrarRef = ref(db, `cadastrar/${sku}`);
+                await set(cadastrarRef, { ean: sku, quantity: declaredQuantity });
             }
         }
 
         console.log(`Atualizando quantidades no Firebase:`, updates);
         await update(ref(db), updates);
         console.log('Quantidades atualizadas com sucesso!');
-        
+
         // Mostrar janela pop-up com produtos atualizados
         mostrarJanelaPopup();
 
@@ -151,4 +171,3 @@ function mostrarJanelaPopup() {
     `);
     popupWindow.document.close();
 }
-

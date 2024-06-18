@@ -1,37 +1,98 @@
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
 }
 
 .container {
+    width: 80%;
+    height: 80%;
+    border: 1px solid #ccc;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #ddd;
+    font-size: 1.2em;
+}
+
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.logo-section {
+    width: 60%;
+    display: flex;
+    justify-content: center;
     align-items: center;
-    margin: 20px;
+    border-right: 1px solid #ccc;
 }
 
-.logo img {
-    width: 200px;
-    height: 200px;
-    object-fit: contain;
-}
-
-.fields {
-    margin-top: 20px;
-    width: 300px;
-}
-
-.fields label {
-    display: block;
-    margin-top: 10px;
-}
-
-.fields input, .fields textarea {
+.logo-section img {
     width: 100%;
-    padding: 5px;
-    margin-top: 5px;
-    box-sizing: border-box;
+    height: auto;
+    max-width: 300px;
 }
 
-.scan-product {
-    margin-top: 20px;
+.details-section {
+    width: 40%;
+    padding: 10px;
+}
+
+.details-section textarea {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: none;
+    padding: 10px;
+    font-size: 1.2em;
+    background-color: #eee;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #ddd;
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+}
+
+.product-details label,
+.product-details input,
+.product-details div {
+    margin: 5px 0;
+}
+
+.product-details #product-info {
+    display: flex;
+    justify-content: space-between;
+}
+
+.total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 40%;
+    padding: 10px;
+    background-color: #ff0;
+    font-size: 1.5em;
 }
