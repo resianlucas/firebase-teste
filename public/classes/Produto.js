@@ -1,4 +1,6 @@
 import { BaseClass } from './BaseClass.js'
+import { db } from '/public/script.js';
+import { ref, set, update, child ,onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -1113,201 +1115,434 @@ class Produto extends BaseClass {
     //METODOS DE COMUNICAÇÃO API//
     //////////////////////////////
 
-    getProduto() {
+    async getProduto() {
         const endpoint = '/produtos';
         let url = baseUrl + endpoint;
-        let queryString = this.buildQueryString(this.params)
+        let queryString = this.buildQueryString(this.params);
         if (queryString) {
             url += '?' + queryString;
         }
-        let accessToken = this.getBling();
+
+        console.log('URL:', url);
+
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
+
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                let request = {
-                    'url': url,
-                    'method': 'get',
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
+                console.log('Bling Info: ', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     }
-                };
-                requests.push(request);
-            };
-            let responses = UrlFetchApp.fetchAll(requests);
+                });
+            });
+
+            console.log('REQUESTS: ', requests);
+
+            let responses = await Promise.all(requests);
+
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
 
-                result[blingInfo.nome] = {
-                    id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
-                    method: 'getProduto',
-                    request: response.data
-                };
-            };
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+
+                if (response.data && response.data.length > 0) {
+
+                    result[blingInfo.name] = {
+                        id: blingInfo.idLoja,
+                        empresa: blingInfo.name,
+                        dataHora: new Date().toISOString(),
+                        method: 'getProduto',
+                        request: response.data
+                    };
+                }
+            }
+            console.log('OPERAÇÃO FINALIZADA', result)
             return result;
         } catch (error) {
-            console.error('Erro gerado: ', error.stack);
+            console.error('Erro ao buscar produtos:', error);
             return null;
-        };
-    };
+        }
+    }
 
-    getProdutoById(idProduto) {
-        const endpoint = `/produtos/${idProduto}`
+
+    async getProdutoById(idProduto) {
+        const endpoint = `/produtos/${idProduto}`;
         let url = baseUrl + endpoint;
-        let accessToken = this.getBling();
+
+        console.log('URL:', url);
+
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
 
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                let request = {
-                    'url': url,
-                    'method': 'get',
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
+                console.log('Bling Info: ', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     }
-                };
-                requests.push(request);
-            }
-            let responses = UrlFetchApp.fetchAll(requests);
+                });
+            });
+
+            console.log('REQUESTS: ', requests);
+
+            let responses = await Promise.all(requests);
+
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
 
-                result[blingInfo.nome] = {
-                    id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
-                    method: 'getProdutoById',
-                    request: response.data
-                };
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+
+                if (response.data) {
+
+                    result[blingInfo.name] = {
+                        id: blingInfo.idLoja,
+                        empresa: blingInfo.name,
+                        dataHora: new Date().toISOString(),
+                        method: 'getProdutoById',
+                        request: response.data
+                    };
+                }
             }
             return result;
-        } catch (erro) {
-            console.error('Erro gerado: ', erro.stack);
-        };
-    };
+        } catch (error) {
+            console.error('Erro ao buscar produto por ID:', error);
+            return null;
+        }
+    }
+
 
     //metodo para criar um produto, recebe o payload
-    createProduct() {
+    async createProduct() {
         const endpoint = '/produtos';
         let url = baseUrl + endpoint;
 
-        let accessToken = this.getBling();
+        console.log('URL:', url);
+
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
 
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-
-                let request = {
-                    'url': url,
-                    'method': 'post',
-                    'payload': this.payload,
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
+                console.log('Bling Info: ', blingInfo);
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     },
-                    'muteHttpExceptions': true
-                };
-                console.log('request: ', request)
-                requests.push(request);
-            }
+                    body: JSON.stringify(this.payload),
+                    muteHttpExceptions: true
+                });
+            });
 
-            let responses = UrlFetchApp.fetchAll(requests);
+            console.log('REQUESTS: ', requests);
+
+            let responses = await Promise.all(requests);
+
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
 
-                console.log('response: ', response)
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
 
-                result[blingInfo.nome] = {
-                    id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
-                    method: 'createProduct',
-                    request: response.data
-                };
+                if (response.data) {
+                    result[blingInfo.nome] = {
+                        id: blingInfo.idLoja,
+                        empresa: blingInfo.nome,
+                        dataHora: new Date().toISOString(),
+                        method: 'createProduct',
+                        request: response.data
+                    };
+                }
             }
             return result;
-        } catch (erro) {
-            console.error('Erro gerado: ', erro.stack);
-            console.log(erro.fields);
+        } catch (error) {
+            console.error('Erro ao criar produto:', error);
+            return null;
         }
     }
 
     //metodo para alterar um produto, recebe o id e o payload
-    altProduct(idProduto) {
+    async altProduct(idProduto) {
         const endpoint = `/produtos/${idProduto}`;
         let url = baseUrl + endpoint;
-        let accessToken = this.getBling();
+
+        console.log('URL:', url);
+
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
 
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                let request = {
-                    'url': url,
-                    'method': 'put',
-                    'payload': this.payload,
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
-                    }
-                };
-                requests.push(request);
-            }
-            let responses = UrlFetchApp.fetchAll(requests);
+                console.log('Bling Info: ', blingInfo);
+                return fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
+                    },
+                    body: JSON.stringify(this.payload),
+                });
+            });
+
+            console.log('REQUESTS: ', requests);
+
+            let responses = await Promise.all(requests);
+
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
 
-                result[blingInfo.nome] = {
-                    id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
-                    method: 'altProduct',
-                    request: response.data
-                };
-            };
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+
+                if (response.data) {
+                    result[blingInfo.nome] = {
+                        id: blingInfo.idLoja,
+                        empresa: blingInfo.nome,
+                        dataHora: new Date().toISOString(),
+                        method: 'altProduct',
+                        request: response.data
+                    };
+                }
+            }
             return result;
-        } catch (erro) {
-            console.error('Erro gerado: ', erro.stack);
-        };
-    };
+        } catch (error) {
+            console.error('Erro ao alterar produto:', error);
+            return null;
+        }
+    }
+
 
     //metodo para alterar situacao de um produto, recebe id e situacao
-    altProductSituation() {
+    async altProductSituation() {
         const endpoint = '/produtos/situacoes';
         let url = baseUrl + endpoint;
+
         let payload = {
             idsProdutos: this.paramsSituacao.idsProdutos,
             situacao: this.situacao
-        }
+        };
+
+        console.log('URL:', url);
+        console.log('Payload:', payload);
+
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
+
         try {
-            let options = {
-                'method': 'put',
-                'payload': payload,
-                'headers': {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': `Bearer ${this.getBling().accessToken}`
-                },
-                'muteHttpExceptions': true
-            };
-            let reqs = UrlFetchApp.fetch(url, options);
-            let ress = JSON.parse(reqs.getContentText());
-            return ress;
-        } catch (erro) {
-            console.error('Erro gerado: ', erro.stack);
+            let requests = Object.keys(accessToken).map(id => {
+                const blingInfo = accessToken[id];
+                console.log('Bling Info: ', blingInfo);
+                return fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
+                    },
+                    body: JSON.stringify(payload),
+                    muteHttpExceptions: true
+                });
+            });
+
+            console.log('REQUESTS: ', requests);
+
+            let responses = await Promise.all(requests);
+
+            let result = {};
+            for (let i = 0; i < responses.length; i++) {
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
+
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+
+                if (response.data) {
+                    result[blingInfo.nome] = {
+                        id: blingInfo.idLoja,
+                        empresa: blingInfo.nome,
+                        dataHora: new Date().toISOString(),
+                        method: 'altProductSituation',
+                        request: response.data
+                    };
+                }
+            }
+            return result;
+        } catch (error) {
+            console.error('Erro ao alterar situação do produto:', error);
+            return null;
         }
     }
+
+}
+
+async function fetchProducts() {
+    console.log('Fetching products from Firebase');
+    const dbRef = ref(db, 'products');
+    let produtos = []
+    onValue(dbRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            produtos.push(childSnapshot.val());
+        });
+    });
+    console.log("Produtos: ", produtos);
+    return produtos;
+}
+
+// Function to fetch product IDs by SKU and save them to Firebase
+async function pegarIdsProdutoBySku(sku) {
+
+    console.log("Pegando id dos produtos")
+    try {
+        const produto = new Produto({ params: { criterio: 5, codigo: sku } });
+        const produtos = await produto.getProduto();
+
+        console.log('Produto encontrado:', produtos);
+
+        for (const chave in produtos) {
+            if (produtos.hasOwnProperty(chave)) {
+                const bling = produtos[chave];
+                if (bling.request.length > 0) {
+                    const productData = {
+                        requestCode: bling.request[0].codigo,
+                        requestId: bling.request[0].id,
+                        chave: chave
+                    };
+
+                    const newItemRef = ref(db, `ids/${bling.request[0].codigo}/${bling.request[0].id}`);
+                    await set(newItemRef, productData);
+
+                    console.log('Informações do produto salvas no Firebase:', productData);
+                }
+            }
+        }
+
+        console.log('Todos os produtos foram salvos no Firebase com sucesso!');
+    } catch (error) {
+        console.error('Erro ao buscar e salvar produtos:', error);
+    }
+}
+
+// async function pegarTodosIds(sku) {
+//     const newItemRef = ref(child(db, 'ids/' + sku));
+//     const ids = await get(newItemRef);
+
+//     console.log('ids encontrados: ', ids)
+
+//     return ids;
+// }
+
+async function pegarTodosIds(sku) {
+    try {
+        console.log('Iniciando a função pegarTodosIds...');
+        if (!db) {
+            throw new Error('A instância do banco de dados (db) não está definida.');
+        }
+        console.log('Instância do banco de dados está definida.');
+
+        if (!sku) {
+            throw new Error('O SKU fornecido está indefinido ou nulo.');
+        }
+        console.log('SKU fornecido: ', sku);
+
+        const newItemRef = ref(db, 'ids/' + sku);
+        console.log('Referência construída: ', newItemRef);
+
+        const snapshot = await get(newItemRef);
+        console.log('Snapshot recebido: ', snapshot);
+
+        if (!snapshot.exists()) {
+            console.log('Nenhum dado encontrado para o SKU fornecido.');
+            return null;
+        }
+
+        const ids = snapshot.val();
+        console.log('IDs encontrados: ', ids);
+
+        return ids;
+    } catch (error) {
+        console.error('Erro ao pegar os IDs: ', error.message);
+        return null;
+    }
+}
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.getElementById('testButton').addEventListener('click', async () => {
+
+        const id = document.getElementById('parametro-funcao').value
+
+        const result = await pegarTodosIds(id);
+        console.log('Result:', result);
+    });
+});
+
+
+
+
+function pegarIdBySku(sku) {
+    const ids = pegarTodosIds();
+
+
+
+    const id = ids.filter(produto => produto.sku === sku);
+    console.log(id);
+    return id;
+
+}
+
+async function todosIds() {
+    console.log('Pegando produtos');
+    const produtos = await fetchProducts();
+
+    const promise = produtos.map(async (produto) => {
+        await pegarIdsProdutoBySku(produto.sku);
+    })
+
+    let results = await Promise.all(promise);
+
+    console.log('All product IDs have been fetched');
+    return results;
 }
