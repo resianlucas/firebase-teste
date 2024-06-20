@@ -1506,8 +1506,6 @@ async function pegarTodosIds(sku) {
     }
 }
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('testButton').addEventListener('click', async () => {
@@ -1519,14 +1517,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-
-
 function pegarIdBySku(sku) {
     const ids = pegarTodosIds();
-
-
-
     const id = ids.filter(produto => produto.sku === sku);
     console.log(id);
     return id;

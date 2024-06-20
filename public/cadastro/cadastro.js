@@ -25,23 +25,31 @@ function encodeFormData(data) {
 }
 
 // Function to get the next available ID
+// Function to generate the next ID by checking the existing company data
 async function generateNextId() {
-    const idRef = ref(db, 'bling/ids');
-    const snapshot = await get(idRef);
+    const companiesRef = ref(db, 'bling');
+    const snapshot = await get(companiesRef);
     if (snapshot.exists()) {
-        const ids = snapshot.val();
-        const lastId = Math.max(...Object.values(ids));
+        const companies = snapshot.val();
+        const ids = Object.values(companies).map(company => company.id);
+        const lastId = Math.max(...ids);
         return lastId + 1;
     } else {
-        return 1; // Start from 1 if no IDs exist
+        return 1; // Start from 1 if no companies exist
     }
 }
 
 // Function to validate clientId uniqueness
 async function isClientIdUnique(clientId) {
-    const clientRef = ref(db, 'bling/' + clientId);
-    const snapshot = await get(clientRef);
-    return !snapshot.exists();
+    const companiesRef = ref(db, 'bling');
+    const snapshot = await get(companiesRef);
+    if (snapshot.exists()) {
+        const companies = snapshot.val();
+        const clientIds = Object.values(companies).map(company => company.client_id);
+        return !clientIds.includes(clientId);
+    } else {
+        return true; // Unique if no companies exist
+    }
 }
 
 // Handle form submission
@@ -98,14 +106,11 @@ cadastrar.addEventListener('submit', async (e) => {
             access_token: data.access_token,
             refresh_token: data.refresh_token
         });
-
-        // Save the new ID in the ids list
-        const idListRef = ref(db, 'bling/ids/' + newId);
-        await set(idListRef, newId);
-
+        
         alert('Item adicionado com sucesso!');
         cadastrar.reset();
     } catch (error) {
         alert('Erro ao adicionar item: ' + error);
     }
 });
+

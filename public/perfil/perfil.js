@@ -26,7 +26,12 @@ function displayBlings(blings) {
 
         refreshButton.onclick = async () => {
             try {
-                await refreshBlingToken(clientId, bling.client_secret, bling.refresh_token);
+                console.log(
+                    'Client ID: ', bling.client_id,
+                    '\nClient Secret: ', bling.client_secret,
+                    '\nRefresh Token: ', bling.refresh_token
+                )
+                await refreshBlingToken(bling.client_id, bling.client_secret, bling.refresh_token, bling.id);
                 alert('Token atualizado com sucesso!');
                 const updatedBlings = await fetchBlings();
                 displayBlings(updatedBlings);

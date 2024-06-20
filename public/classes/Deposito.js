@@ -2,7 +2,7 @@ import { BaseClass } from './BaseClass.js'
 
 const baseUrl = 'http://localhost:3000/api'
 
-class Deposito extends Bling {
+class Deposito extends BaseClass {
     constructor({
         id = null,
         idLoja = 0
@@ -41,6 +41,7 @@ class Deposito extends Bling {
                 let response = await responses[i].text();
                 try {
                     response = JSON.parse(response);
+                    console.log('response: ',response)
                 } catch (e) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
                     continue;
@@ -65,3 +66,16 @@ class Deposito extends Bling {
     }
     
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.getElementById('testButton').addEventListener('click', async () => {
+
+        const id = document.getElementById('parametro-funcao').value
+
+        const deposito = new Deposito();
+
+        const result = await deposito.getDeposito();
+        console.log('Result:', result);
+    });
+});

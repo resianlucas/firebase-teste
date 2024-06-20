@@ -40,7 +40,7 @@ export async function fetchBlings() {
     }
 }
 
-export async function refreshBlingToken(clientId, clientSecret, refreshToken) {
+export async function refreshBlingToken(clientId, clientSecret, refreshToken, id) {
     const url = 'http://localhost:3000/api/Api/v3'; // URL do proxy ou servidor que gerencia o refresh token
 
     const credentials = btoa(clientId + ":" + clientSecret);
@@ -76,11 +76,24 @@ export async function refreshBlingToken(clientId, clientSecret, refreshToken) {
         console.log('Parsed Response Data:', data);
 
         // Atualiza os tokens no Firebase
-        const itemRef = ref(db, 'bling/' + clientId);
-        await update(itemRef, {
-            access_token: data.access_token,
-            refresh_token: data.refresh_token
-        });
+        const companiesRef = ref(db, 'bling');
+        const snapshot = await get(companiesRef);
+        if (snapshot.exists()) {
+            const companies = snapshot.val();
+            const companyKey = Object.keys(companies).find(key => companies[key].id === id);
+
+            if (companyKey) {
+                const itemRef = ref(db, 'bling/' + companyKey);
+                await update(itemRef, {
+                    access_token: data.access_token,
+                    refresh_token: data.refresh_token
+                });
+            } else {
+                throw new Error('Company with the specified ID not found.');
+            }
+        } else {
+            throw new Error('No companies found in the database.');
+        }
 
     } catch (error) {
         console.error('Erro ao atualizar token:', error);
