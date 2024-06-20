@@ -2,7 +2,7 @@ import { BaseClass } from './BaseClass.js'
 
 const baseUrl = 'http://localhost:3000/api'
 
-class Deposito extends BaseClass {
+export class Deposito extends BaseClass {
     constructor({
         id = null,
         idLoja = 0
@@ -51,7 +51,7 @@ class Deposito extends BaseClass {
                 const depositoPadrao = response.data.find(deposito => deposito.padrao === true);
     
                 result[blingInfo.name] = {
-                    id: blingInfo.idLoja,
+                    id: blingInfo.id,
                     empresa: blingInfo.name,
                     dataHora: new Date().toISOString(),
                     method: 'getDeposito',

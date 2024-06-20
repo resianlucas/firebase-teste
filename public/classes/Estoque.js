@@ -1,4 +1,6 @@
+import { Deposito } from './Deposito.js'
 import { BaseClass } from './BaseClass.js'
+
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -194,14 +196,31 @@ class Estoque extends BaseClass {
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('testButton').addEventListener('click', async () => {
-        const estoque = new Estoque({
-            produto : {
-                id: 16239460759
-            },
-            operacao: 'B',
-            quantidade: 10
-        })
-        const result = await estoque.createEstoque();
-        console.log('Result:', result);
+
+        const deposito = new Deposito()
+        
+        const depositos = await deposito.getDeposito();
+
+        const idDeposito = Object.values(depositos).map(deposito => deposito.request.id);
+
+        
+        for (const id of idDeposito) {
+            
+            console.log('id: ',id)
+            const estoque = new Estoque({
+                produto : {
+                    id: 16239460759
+                },
+                depositos: {
+                    id: id
+                },
+                operacao: 'B',
+                quantidade: 20
+            })
+            const result = await estoque.createEstoque();
+            console.log('Result:', result);
+
+        }
+
     });
 });
