@@ -271,20 +271,21 @@ class PedidoVenda extends BaseClass {
         console.log('Access Token:', accessToken);
     
         try {
-            let requests = Object.keys(accessToken).map(id => {
+            let requests = []
+            for(let id in accessToken) {
                 const blingInfo = accessToken[id];
                 console.log('Bling Info: ', blingInfo)
-                return fetch(url, {
+                let request = fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${blingInfo.access_token}`
                     }
                 });
-            });
+                requests.push(request);
+            };
 
             console.log('REQUESTS: ', requests)
-    
             let responses = await Promise.all(requests);
             
             let result = {};
@@ -396,7 +397,7 @@ class PedidoVenda extends BaseClass {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('testButton').addEventListener('click', async () => {
         const pedidoVenda = new PedidoVenda({
-            idLoja: 1
+            idLoja: document.getElementById('parametro-funcao').value
         });
         const result = await pedidoVenda.getPedidoVenda();
         console.log('Result:', result);

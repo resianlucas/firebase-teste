@@ -10,15 +10,6 @@
 
 <body>
 
-    <button class="theme-toggle">Toggle Theme</button>
-    <!-- Restante do conteúdo -->
-    <script>
-        document.querySelector('.theme-toggle').addEventListener('click', () => {
-            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-        });
-    </script>
-
-
     <header>
         <nav>
             <ul>
@@ -26,20 +17,36 @@
             </ul>
         </nav>
     </header>
+
     <main>
+        <button id="theme-toggle">Toggle Theme</button>
         <form id="cadastroBling">
             <h1>Cadastrar Empresa</h1>
-            <label>Nome da Empresa</label>
-            <input type="text" id="nomeEmpresa" placeholder="">
-            <label>Client ID</label>
-            <input type="text" id="clientId" placeholder="">
-            <label>Client Secret</label>
-            <input type="text" id="clientSecret" placeholder="">
-            <label>Code</label>
-            <input type="text" id="code" placeholder="">
+            <div class="form-group">
+                <label for="nomeEmpresa">Nome da Empresa</label>
+                <input type="text" id="nomeEmpresa" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="clientId">Client ID</label>
+                <input type="text" id="clientId" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="clientSecret">Client Secret</label>
+                <input type="text" id="clientSecret" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="code">Code</label>
+                <input type="text" id="code" placeholder="">
+            </div>
             <button type="submit">Cadastrar</button>
         </form>
     </main>
+
+    <script>
+        document.querySelector('#theme-toggle').addEventListener('click', () => {
+            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+        });
+    </script>
     <script type="module" src="cadastro.js"></script>
 
 </body>
