@@ -101,23 +101,32 @@ export class Bling {
     }
 
     async getBling() {
-        const idLoja = String(this.idLoja);
+        const idLoja = String(this.idLoja); // Convert idLoja to a string
         const dbRef = ref(db, 'bling/');
+    
+        console.log('idLoja:', idLoja);
 
-        console.log(idLoja)
-
+        let bling = [];
         try {
             let snapshot;
             if (idLoja) {
+                console.log('Fetching data for specific idLoja...');
                 snapshot = await get(child(dbRef, idLoja));
-                console.log(snapshot.val())
+                console.log('Snapshot value for specific idLoja:', snapshot.val());
             } else {
+                console.log('Fetching all bling data...');
                 snapshot = await get(dbRef);
+                console.log('Snapshot value for all bling:', snapshot.val());
             }
             if (snapshot.exists()) {
                 const blings = snapshot.val();
                 console.log('Blings:', blings);
-                return blings;
+                if (blings.length) {
+                    return blings;
+                } else {
+                    bling.push(blings);
+                    return bling;
+                }  
             } else {
                 console.log('No bling data available');
                 return null;
@@ -125,6 +134,6 @@ export class Bling {
         } catch (error) {
             console.error('Erro ao buscar blings:', error);
         }
-    
     }
+    
 }
