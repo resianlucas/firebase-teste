@@ -127,65 +127,81 @@ class Estoque extends BaseClass {
     }
 
 
-    createEstoque() {
-        const endpoint = '/estoques'
+    async createEstoque() {
+        const endpoint = '/estoques';
         let url = baseUrl + endpoint;
-
-        let accessToken = this.getBling();
+    
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
+    
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                let request = {
-                    'url': url,
-                    'method': 'post',
-                    'payload': {
-                        'idProduto': this.produto.id,
-                        'idDeposito': this.depositos.id,
-                        "operacao": this.operacao,
-                        "quantidade": this.quantidade,
-                        "preco": 0,
-                        "custo": 0,
-                        "observacoes": "Atualizado pelo sistema de controle de estoque"
+                console.log('Bling Info:', blingInfo);
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     },
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
-                    }
-                }
-                requests.push(request);
-            }
-            let responses = UrlFetchApp.fetchAll(requests);
+                    body: JSON.stringify({
+                        idProduto: this.produto.id,
+                        idDeposito: this.depositos.id,
+                        operacao: this.operacao,
+                        quantidade: this.quantidade,
+                        preco: 0,
+                        custo: 0,
+                        observacoes: "Atualizado pelo sistema de controle de estoque"
+                    })
+                });
+            });
+    
+            console.log('REQUESTS:', requests);
+    
+            let responses = await Promise.all(requests);
+    
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
-
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                    console.log(response)
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
+    
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+    
                 // Salvar informações associadas à resposta
-                result[blingInfo.nome] = {
+                result[blingInfo.name] = {
                     id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
+                    empresa: blingInfo.name,
+                    dataHora: new Date().toISOString(),
                     method: 'createEstoque',
                     request: response.data
                 };
             }
-            return result
-
-        } catch (erro) {
-            throw new Error('Erro ao criar estoque: ' + erro);
+            return result;
+    
+        } catch (error) {
+            console.error('Erro ao criar estoque:', error);
+            throw new Error('Erro ao criar estoque: ' + error);
         }
     }
+    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('testButton').addEventListener('click', async () => {
         const estoque = new Estoque({
-            params: {
-                idsProdutos: [16225593493]
-            }
+            produto : {
+                id: 16239460759
+            },
+            operacao: 'B',
+            quantidade: 10
         })
-        const result = await estoque.getEstoque();
+        const result = await estoque.createEstoque();
         console.log('Result:', result);
     });
 });

@@ -11,50 +11,57 @@ class Deposito extends Bling {
         this.id = id;
     }
 
-    getDeposito() {
+    async getDeposito() {
         const endpoint = '/depositos';
         let url = baseUrl + endpoint;
-        let accessToken = this.getBling();
-        console.log('url: ', url)
+        console.log('URL:', url);
+    
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
+    
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                console.log('bling info: ', blingInfo)
-                let request = {
-                    'url': url,
-                    'method': 'get',
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
+                console.log('Bling Info:', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     }
-                }
-                console.log('request: ', request);
-                requests.push(request);
-            }
-            let responses = UrlFetchApp.fetchAll(requests);
+                });
+            });
+    
+            console.log('REQUESTS:', requests);
+    
+            let responses = await Promise.all(requests);
+    
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
+    
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
                 const depositoPadrao = response.data.find(deposito => deposito.padrao === true);
-
-                result = {
+    
+                result[blingInfo.name] = {
                     id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
+                    empresa: blingInfo.name,
+                    dataHora: new Date().toISOString(),
                     method: 'getDeposito',
                     request: depositoPadrao
                 };
             }
             return result;
         } catch (e) {
-            console.error('Erro no metodo getDeposito:', e.message);
-            if (e.response) {
-                console.error('Response code:', e.response.getResponseCode());
-                console.error('Response body:', e.response.getContentText());
-            }
-            return null
+            console.error('Erro no método getDeposito:', e.message);
+            return null;
         }
     }
+    
 }

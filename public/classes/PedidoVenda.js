@@ -310,9 +310,9 @@ class PedidoVenda extends BaseClass {
                     ]);
     
                     // Salvar informações associadas à resposta
-                    result[blingInfo.nome] = {
+                    result[blingInfo.name] = {
                         id: blingInfo.idLoja,
-                        empresa: blingInfo.nome,
+                        empresa: blingInfo.name,
                         dataHora: new Date().toISOString(),
                         method: 'getPedidoVenda',
                         request: pedidos
@@ -327,32 +327,43 @@ class PedidoVenda extends BaseClass {
     }
     
 
-    getPedidoVendaById(idPedidoVenda) {
+    async getPedidoVendaById(idPedidoVenda) {
         const endpoint = `/pedidos/vendas/${idPedidoVenda}`;
         let url = baseUrl + endpoint;
-        console.log('url: ', url);
-        let accessToken = this.getBling();
-
+        console.log('URL:', url);
+        
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
+        
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                let request = {
-                    'url': url,
-                    'method': 'get',
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
+                console.log('Bling Info:', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     }
-                };
-                requests.push(request);
-            }
-            let responses = UrlFetchApp.fetchAll(requests);
+                });
+            });
+    
+            console.log('REQUESTS:', requests);
+            
+            let responses = await Promise.all(requests);
+            
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
-
+                let response = await responses[i].text(); // Alterado para text() para pegar HTML
+                try {
+                    response = JSON.parse(response); // Tenta parsear como JSON
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
+    
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+                
                 var pedido = {
                     id: response.data.id,
                     numero: response.data.numero,
@@ -363,20 +374,20 @@ class PedidoVenda extends BaseClass {
                     itens: response.data.itens,
                     notaFiscal: response.data.notaFiscal,
                     idLoja: response.data.loja.id
-                }
-
+                };
+    
                 // Salvar informações associadas à resposta
-                result[blingInfo.nome] = {
+                result[blingInfo.name] = {
                     id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
+                    empresa: blingInfo.name,
+                    dataHora: new Date().toISOString(),
                     method: 'getPedidoVendaById',
                     request: pedido
                 };
             }
-            return result
+            return result;
         } catch (error) {
-            console.error('Erro gerado: ', error.stack);
+            console.error('Erro ao buscar pedido de venda por ID:', error);
             return null;
         }
     }
