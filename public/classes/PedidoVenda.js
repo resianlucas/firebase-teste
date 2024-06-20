@@ -395,7 +395,9 @@ class PedidoVenda extends BaseClass {
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('testButton').addEventListener('click', async () => {
-        const pedidoVenda = new PedidoVenda();
+        const pedidoVenda = new PedidoVenda({
+            idLoja: 1
+        });
         const result = await pedidoVenda.getPedidoVenda();
         console.log('Result:', result);
     });

@@ -101,9 +101,13 @@ export class Bling {
     }
 
     async getBling() {
+        const idLoja = this.idLoja;
+
+        console.log("idLoja: ", idLoja)
         const dbRef = ref(db);
         try {
-            const snapshot = await get(child(dbRef, 'bling/'));
+            const snapshot = await get(child(dbRef, 'bling/' + idLoja));
+            console.log('snapshot: ', snapshot)
             if (snapshot.exists()) {
                 const blings = snapshot.val();
                 console.log('Blings:', blings);
@@ -115,5 +119,22 @@ export class Bling {
         } catch (error) {
             console.error('Erro ao buscar blings:', error);
         }
+
+
+
+        // const dbRef = ref(db);
+        // try {
+        //     const snapshot = await get(child(dbRef, 'bling/'));
+        //     if (snapshot.exists()) {
+        //         const blings = snapshot.val();
+        //         console.log('Blings:', blings);
+        //         return blings;
+        //     } else {
+        //         console.log('No bling data available');
+        //         return null;
+        //     }
+        // } catch (error) {
+        //     console.error('Erro ao buscar blings:', error);
+        // }
     }
 }
