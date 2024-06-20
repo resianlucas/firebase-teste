@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDJTzpoFxQ9_W0JCGPXfwFasr_vdywwePs",
     authDomain: "hub-stock-control.firebaseapp.com",
@@ -16,12 +16,35 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+// Helper function to encode form data
 function encodeFormData(data) {
     return Object.keys(data)
         .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
         .join('&');
 }
 
+// Function to get the next available ID
+async function generateNextId() {
+    const idRef = ref(db, 'bling/ids');
+    const snapshot = await get(idRef);
+    if (snapshot.exists()) {
+        const ids = snapshot.val();
+        const lastId = Math.max(...Object.values(ids));
+        return lastId + 1;
+    } else {
+        return 1; // Start from 1 if no IDs exist
+    }
+}
+
+// Function to validate clientId uniqueness
+async function isClientIdUnique(clientId) {
+    const clientRef = ref(db, 'bling/' + clientId);
+    const snapshot = await get(clientRef);
+    return !snapshot.exists();
+}
+
+// Handle form submission
 const cadastrar = document.getElementById("cadastroBling");
 
 cadastrar.addEventListener('submit', async (e) => {
@@ -46,8 +69,8 @@ cadastrar.addEventListener('submit', async (e) => {
                 'code': code
             })
         };
-        console.log(url)
-        console.log(options)
+        console.log(url);
+        console.log(options);
 
         const response = await fetch(url, options);
         if (!response.ok) {
@@ -57,16 +80,28 @@ cadastrar.addEventListener('submit', async (e) => {
     }
 
     try {
+        const isUnique = await isClientIdUnique(clientId);
+        if (!isUnique) {
+            alert('clientId já está em uso!');
+            return;
+        }
+
         const data = await getToken();
-        const newItemRef = ref(db, 'bling/' + clientId); // assuming clientId is unique
+        const newId = await generateNextId();
+        const newItemRef = ref(db, 'bling/' + nomeEmpresa);
 
         await set(newItemRef, {
+            id: newId,
             name: nomeEmpresa,
             client_id: clientId,
             client_secret: clientSecret,
             access_token: data.access_token,
             refresh_token: data.refresh_token
         });
+
+        // Save the new ID in the ids list
+        const idListRef = ref(db, 'bling/ids/' + newId);
+        await set(idListRef, newId);
 
         alert('Item adicionado com sucesso!');
         cadastrar.reset();
