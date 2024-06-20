@@ -96,7 +96,7 @@ cadastrar.addEventListener('submit', async (e) => {
 
         const data = await getToken();
         const newId = await generateNextId();
-        const newItemRef = ref(db, 'bling/' + nomeEmpresa);
+        const newItemRef = ref(db, 'bling/' + newId);
 
         await set(newItemRef, {
             id: newId,
