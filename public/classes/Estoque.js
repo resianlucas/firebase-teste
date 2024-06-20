@@ -197,16 +197,17 @@ class Estoque extends BaseClass {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('testButton').addEventListener('click', async () => {
 
-        const deposito = new Deposito()
+
+        const idLoja = document.getElementById('parametro-funcao').value
+        const quantidade = document.getElementById('parametro-quantidade').value
+        const deposito = new Deposito({
+            idLoja: idLoja
+        })
         
         const depositos = await deposito.getDeposito();
-
         const idDeposito = Object.values(depositos).map(deposito => deposito.request.id);
-
         
         for (const id of idDeposito) {
-            
-            console.log('id: ',id)
             const estoque = new Estoque({
                 produto : {
                     id: 16239460759
@@ -215,7 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: id
                 },
                 operacao: 'B',
-                quantidade: 20
+                quantidade: parseFloat(quantidade),
+                idLoja: idLoja
             })
             const result = await estoque.createEstoque();
             console.log('Result:', result);

@@ -67,15 +67,15 @@ export class Deposito extends BaseClass {
     
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById('testButton').addEventListener('click', async () => {
+//     document.getElementById('testButton').addEventListener('click', async () => {
 
-        const id = document.getElementById('parametro-funcao').value
+//         const id = document.getElementById('parametro-funcao').value
 
-        const deposito = new Deposito();
+//         const deposito = new Deposito();
 
-        const result = await deposito.getDeposito();
-        console.log('Result:', result);
-    });
-});
+//         const result = await deposito.getDeposito();
+//         console.log('Result:', result);
+//     });
+// });

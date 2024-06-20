@@ -101,7 +101,7 @@ export class Bling {
     }
 
     async getBling() {
-        const idLoja = String(this.idLoja); // Convert idLoja to a string
+        let idLoja = this.idLoja;
         const dbRef = ref(db, 'bling/');
     
         console.log('idLoja:', idLoja);
@@ -110,6 +110,7 @@ export class Bling {
         try {
             let snapshot;
             if (idLoja) {
+                idLoja = String(this.idLoja); // Convert idLoja to a string
                 console.log('Fetching data for specific idLoja...');
                 snapshot = await get(child(dbRef, idLoja));
                 console.log('Snapshot value for specific idLoja:', snapshot.val());
