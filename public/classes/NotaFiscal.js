@@ -242,70 +242,107 @@ class NotaFiscal extends BaseClass {
     //////////////////////////////
     //METODOS DE COMUNICAÇÃO API//
     //////////////////////////////
-    getNFe() {
-        const endpoint = '/nfe'
+    async getNFe() {
+        const endpoint = '/nfe';
         let url = baseUrl + endpoint;
-        let queryString = this.buildQueryString(this.params)
+        let queryString = this.buildQueryString(this.params);
         if (queryString) {
             url += '?' + queryString;
         }
-        let options = {
-            'method': 'get',
-            'headers': {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Bearer ${this.getBling().accessToken}`
-            },
-            'muteHttpExceptions': true
-        }
-        let reqs = UrlFetchApp.fetch(url, options);
-        let ress = JSON.parse(reqs.getContentText());
-        var notas = [];
 
-        ress.data.forEach(dado => {
-            notas.push([
-                dado.id,
-                dado.numero
-            ])
-        })
-        return notas;
+        console.log('URL:', url);
+
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
+
+        try {
+            let requests = Object.keys(accessToken).map(id => {
+                const blingInfo = accessToken[id];
+                console.log('Bling Info: ', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
+                    },
+                    muteHttpExceptions: true
+                });
+            });
+
+            console.log('REQUESTS: ', requests);
+
+            let responses = await Promise.all(requests);
+
+            let notas = [];
+            for (let i = 0; i < responses.length; i++) {
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
+
+                if (response.data && response.data.length > 0) {
+                    response.data.forEach(dado => {
+                        notas.push([
+                            dado.id,
+                            dado.numero
+                        ]);
+                    });
+                }
+            }
+            return notas;
+        } catch (error) {
+            console.error('Erro ao buscar NF-e:', error);
+            return null;
+        }
     }
 
-    getNFeById(idNotaFiscal) {
+
+    async getNFeById(idNotaFiscal) {
         const endpoint = `/nfe/${idNotaFiscal}`;
         let url = baseUrl + endpoint;
-        let accessToken = this.getBling();
+        console.log('URL:', url);
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
         try {
-            let requests = [];
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                let request = {
-                    'url': url,
-                    'method': 'get',
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Bearer ${blingInfo.accessToken}`
+                console.log('Bling Info: ', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
                     }
-                };
-                requests.push(request);
-            }
-            let responses = UrlFetchApp.fetchAll(requests);
+                });
+            });
+            console.log('REQUESTS: ', requests);
+            let responses = await Promise.all(requests);
             let result = {};
             for (let i = 0; i < responses.length; i++) {
-                let response = JSON.parse(responses[i].getContentText());
-                let blingInfo = accessToken[i];
-
-                // Salvar informações associadas à resposta
-                result[blingInfo.nome] = {
-                    id: blingInfo.idLoja,
-                    empresa: blingInfo.nome,
-                    dataHora: dataHora,
-                    method: 'getNFeById',
-                    request: response.data
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+                if (response.data) {
+                    result[blingInfo.nome] = {
+                        id: blingInfo.idLoja,
+                        empresa: blingInfo.nome,
+                        dataHora: new Date().toISOString(),
+                        method: 'getNFeById',
+                        request: response.data
+                    };
                 };
             }
             return result;
         } catch (error) {
-            console.error('Erro gerado: ', error.stack);
+            console.error('Erro ao buscar NF-e por ID:', error);
             return null;
         }
     }

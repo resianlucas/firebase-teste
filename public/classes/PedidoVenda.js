@@ -312,7 +312,7 @@ class PedidoVenda extends BaseClass {
     
                     // Salvar informações associadas à resposta
                     result[blingInfo.name] = {
-                        id: blingInfo.idLoja,
+                        id: blingInfo.id,
                         empresa: blingInfo.name,
                         dataHora: new Date().toISOString(),
                         method: 'getPedidoVenda',
@@ -379,7 +379,7 @@ class PedidoVenda extends BaseClass {
     
                 // Salvar informações associadas à resposta
                 result[blingInfo.name] = {
-                    id: blingInfo.idLoja,
+                    id: blingInfo.id,
                     empresa: blingInfo.name,
                     dataHora: new Date().toISOString(),
                     method: 'getPedidoVendaById',

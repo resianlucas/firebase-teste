@@ -113,7 +113,7 @@ class Estoque extends BaseClass {
 
                     // Salvar informações associadas à resposta
                     result[blingInfo.name] = {
-                        id: blingInfo.idLoja,
+                        id: blingInfo.id,
                         empresa: blingInfo.name,
                         dataHora: new Date().toISOString(),
                         method: 'getEstoque',
@@ -177,7 +177,7 @@ class Estoque extends BaseClass {
     
                 // Salvar informações associadas à resposta
                 result[blingInfo.name] = {
-                    id: blingInfo.idLoja,
+                    id: blingInfo.id,
                     empresa: blingInfo.name,
                     dataHora: new Date().toISOString(),
                     method: 'createEstoque',
@@ -221,8 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             const result = await estoque.createEstoque();
             console.log('Result:', result);
-
         }
-
     });
 });

@@ -1160,7 +1160,7 @@ class Produto extends BaseClass {
                 if (response.data && response.data.length > 0) {
 
                     result[blingInfo.name] = {
-                        id: blingInfo.idLoja,
+                        id: blingInfo.id,
                         empresa: blingInfo.name,
                         dataHora: new Date().toISOString(),
                         method: 'getProduto',
@@ -1218,7 +1218,7 @@ class Produto extends BaseClass {
                 if (response.data) {
 
                     result[blingInfo.name] = {
-                        id: blingInfo.idLoja,
+                        id: blingInfo.id,
                         empresa: blingInfo.name,
                         dataHora: new Date().toISOString(),
                         method: 'getProdutoById',
@@ -1276,9 +1276,9 @@ class Produto extends BaseClass {
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];
 
                 if (response.data) {
-                    result[blingInfo.nome] = {
-                        id: blingInfo.idLoja,
-                        empresa: blingInfo.nome,
+                    result[blingInfo.name] = {
+                        id: blingInfo.id,
+                        empresa: blingInfo.name,
                         dataHora: new Date().toISOString(),
                         method: 'createProduct',
                         request: response.data
@@ -1333,9 +1333,9 @@ class Produto extends BaseClass {
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];
 
                 if (response.data) {
-                    result[blingInfo.nome] = {
-                        id: blingInfo.idLoja,
-                        empresa: blingInfo.nome,
+                    result[blingInfo.name] = {
+                        id: blingInfo.id,
+                        empresa: blingInfo.name,
                         dataHora: new Date().toISOString(),
                         method: 'altProduct',
                         request: response.data
