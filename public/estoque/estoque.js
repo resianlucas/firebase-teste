@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchEanButton.addEventListener('click', searchProductByEan);
     eanBar.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            
+            searchProductByEan()
         }
     });
     updateButton.addEventListener('click', updateAllQuantities);
@@ -32,7 +32,6 @@ async function cadastrar(ean) {
 
 async function searchProductByEan() {
     const ean = document.getElementById('ean-bar').value.trim();
-    console.log( '%s ean2 is valid: %s', eanBar, Barcoder.validate( eanBar ) );
     console.log(`Procurando produto com EAN: ${ean}`);
     if (!ean) {
         return alert("EAN não pode ser vazio");
