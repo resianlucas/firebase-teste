@@ -1,5 +1,6 @@
-import { Estoque } from '../classes/Estoque.js';
-import { PedidoVenda } from '../classes/PedidoVenda.js'
+import Estoque from '../classes/Estoque.js';
+import Deposito from '../classes/Deposito.js'
+import PedidoVenda from '../classes/PedidoVenda.js'
 
 function pegarEstoqueAtualizado() {
   const produtos = pegarTodosProdutos();
@@ -148,7 +149,7 @@ function atualizarEstoqueProduto() {
 }
 
 //alem de pedir o id, pedir tambem o sku para verificacao na tabela de produtos do hub
-export default function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
+export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
   const pedid = new PedidoVenda({
     idLoja: idLoja
@@ -161,7 +162,9 @@ export default function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
 
   // COLETA DO PEDIDO
-  const pedido = pedid.getPedidoVendaById(idPedidoVenda);
+  const pedido = await pedid.getPedidoVendaById(idPedidoVenda);
+
+  console.log('Pedido Unitário: ', pedido)
 
   // VERIFICAR SE É UM PEDIDO VÁLIDO
   //verificarPedido(idPedidoVenda, idLoja);
@@ -172,52 +175,52 @@ export default function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   console.log('itens pedido: ', itensPedido);
 
   // VERIFICAR SE PRODUTOS ESTÃO CADASTRADOS
-  var verificador = verificarPedido(idPedidoVenda, idLoja);
+  //var verificador = verificarPedido(idPedidoVenda, idLoja);
 
-  if (verificador) {
-    itensPedido.forEach(item => {
-      const estoque = {
-        sku: item.codigo,
-        nome: item.descricao,
-        qtd: item.quantidade
-      }
-      estoques.push(estoque);
-    });
+  // if (verificador) {
+  //   itensPedido.forEach(item => {
+  //     const estoque = {
+  //       sku: item.codigo,
+  //       nome: item.descricao,
+  //       qtd: item.quantidade
+  //     }
+  //     estoques.push(estoque);
+  //   });
 
-    //VERIFICA ESTOQUE NA TABELA
-    // estoques.forEach(estoque => {
-    //   var produtoEncontrado = produtos.find(produto => produto.sku === estoque.sku);
-    //   if (produtoEncontrado) {
-    //     var novaQuantidade = produtoEncontrado.qtd - estoque.qtd;
-    //     if (novaQuantidade < 0) {
-    //       ruptura(produtoEncontrado);
-    //       throw new Error('Estoque insuficiente para atender ao pedido\n Produto: ' + produtoEncontrado.sku);
-    //     }
-    //   }
-    // });
+  //   //VERIFICA ESTOQUE NA TABELA
+  //   // estoques.forEach(estoque => {
+  //   //   var produtoEncontrado = produtos.find(produto => produto.sku === estoque.sku);
+  //   //   if (produtoEncontrado) {
+  //   //     var novaQuantidade = produtoEncontrado.qtd - estoque.qtd;
+  //   //     if (novaQuantidade < 0) {
+  //   //       ruptura(produtoEncontrado);
+  //   //       throw new Error('Estoque insuficiente para atender ao pedido\n Produto: ' + produtoEncontrado.sku);
+  //   //     }
+  //   //   }
+  //   // });
 
-    //ATUALIZA ESTOQUE NA TABELA
-    estoques.forEach(estoque => {
-      var produtoEncontrado = produtos.find(produto => produto.sku === estoque.sku);
-      if (produtoEncontrado) {
-        var novaQuantidade = produtoEncontrado.qtd - estoque.qtd;
+  //   //ATUALIZA ESTOQUE NA TABELA
+  //   estoques.forEach(estoque => {
+  //     var produtoEncontrado = produtos.find(produto => produto.sku === estoque.sku);
+  //     if (produtoEncontrado) {
+  //       var novaQuantidade = produtoEncontrado.qtd - estoque.qtd;
 
-        if (novaQuantidade < 0) {
-          ruptura(produtoEncontrado);
-          throw new Error('Estoque insuficiente para atender ao pedido\n Produto: ' + produtoEncontrado.sku);
-        }
-        atualizarEstoqueAtualizado(produtoEncontrado.sku, novaQuantidade);
-      }
-    });
+  //       if (novaQuantidade < 0) {
+  //         ruptura(produtoEncontrado);
+  //         throw new Error('Estoque insuficiente para atender ao pedido\n Produto: ' + produtoEncontrado.sku);
+  //       }
+  //       atualizarEstoqueAtualizado(produtoEncontrado.sku, novaQuantidade);
+  //     }
+  //   });
 
 
-    // LOG DE PEDIDOS PROCESSADOS
-    registrarPedidos(idPedidoVenda, idLoja, 'finalizado');
+  //   // LOG DE PEDIDOS PROCESSADOS
+  //   registrarPedidos(idPedidoVenda, idLoja, 'finalizado');
 
-    //return //Browser.msgBox('Tabela atualizada');
-  } else {
-    return Browser.msgBox('Não foi possível completar a execução');
-  }
+  //   //return //Browser.msgBox('Tabela atualizada');
+  // } else {
+  //   return Browser.msgBox('Não foi possível completar a execução');
+  // }
 }
 
 function atualizarEstoqueAtualizado(sku = 'Oleo Doce 100ml', quantidade = 8) {
@@ -253,32 +256,32 @@ function atualizarEstoqueAtualizado(sku = 'Oleo Doce 100ml', quantidade = 8) {
   });
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('testButton').addEventListener('click', async () => {
+// document.addEventListener('DOMContentLoaded', () => {
+//   document.getElementById('testButton').addEventListener('click', async () => {
 
-    const idLoja = document.getElementById('parametro-funcao').value
-    const quantidade = document.getElementById('parametro-quantidade').value
-    const deposito = new Deposito({
-      idLoja: idLoja
-    })
+//     const idLoja = document.getElementById('parametro-funcao').value
+//     const quantidade = document.getElementById('parametro-quantidade').value
+//     const deposito = new Deposito({
+//       idLoja: idLoja
+//     })
 
-    const depositos = await deposito.getDeposito();
-    const idDeposito = Object.values(depositos).map(deposito => deposito.request.id);
+//     const depositos = await deposito.getDeposito();
+//     const idDeposito = Object.values(depositos).map(deposito => deposito.request.id);
 
-    for (const id of idDeposito) {
-      const estoque = new Estoque({
-        produto: {
-          id: 16239460759
-        },
-        depositos: {
-          id: id
-        },
-        operacao: 'B',
-        quantidade: parseFloat(quantidade),
-        idLoja: idLoja
-      })
-      const result = await estoque.createEstoque();
-      console.log('Result:', result);
-    }
-  });
-});
+//     for (const id of idDeposito) {
+//       const estoque = new Estoque({
+//         produto: {
+//           id: 16239460759
+//         },
+//         depositos: {
+//           id: id
+//         },
+//         operacao: 'B',
+//         quantidade: parseFloat(quantidade),
+//         idLoja: idLoja
+//       })
+//       const result = await estoque.createEstoque();
+//       console.log('Result:', result);
+//     }
+//   });
+// });

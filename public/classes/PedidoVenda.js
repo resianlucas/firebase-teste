@@ -365,7 +365,7 @@ export default class PedidoVenda extends BaseClass {
     
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];
                 
-                var pedido = {
+                let pedido = {
                     id: response.data.id,
                     numero: response.data.numero,
                     numeroLoja: response.data.numeroLoja,
@@ -394,12 +394,12 @@ export default class PedidoVenda extends BaseClass {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('testButton').addEventListener('click', async () => {
-        const pedidoVenda = new PedidoVenda({
-            idLoja: document.getElementById('parametro-funcao').value
-        });
-        const result = await pedidoVenda.getPedidoVenda();
-        console.log('Result:', result);
-    });
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     document.getElementById('testButton').addEventListener('click', async () => {
+//         const pedidoVenda = new PedidoVenda({
+//             idLoja: document.getElementById('parametro-funcao').value
+//         });
+//         const result = await pedidoVenda.getPedidoVenda();
+//         console.log('Result:', result);
+//     });
+// });

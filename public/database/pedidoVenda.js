@@ -1,6 +1,6 @@
 import PedidoVenda from '../classes/PedidoVenda.js';
 import { db } from '../script.js';
-import lancarEstoqueByPedidoVenda from './estoque.js';
+import { lancarEstoqueByPedidoVenda as lancarEstoque } from './estoque.js';
 
 function pegarPedidos() {
 
@@ -59,17 +59,36 @@ function pegarPedidos() {
 
 }
 
-function pegarPedidosMassa() {
+async function pegarPedidosMassa(pedido) {
 
-  pedidosData.forEach(ped => {
-    try {
-      lancarEstoqueByPedidoVenda(ped[0], ped[5]);
-    } catch (error) {
-      console.error('Erro ao processar pedido:', ped, error);
-      registrarErros(ped, error.stack)
+  const pedidos = await pedido.getPedidoVenda();
+
+  for (const chave in pedidos) {
+    if (pedidos.hasOwnProperty(chave)) {
+      const pedidoUnit = pedidos[chave];
+      if (!pedidoUnit.request.length < 1) {
+        const pedidosData = pedidoUnit.request;
+        pedidosData.forEach(ped => {
+          console.log(
+            'Detalhes dos pedidos: ',
+            '\nID: ', ped[0],
+            '\nID Loja: ', ped[5]
+          )
+
+          try {
+            lancarEstoque(ped[0], ped[5]);
+          } catch (error) {
+            console.error('Erro ao processar pedido:', ped, error);
+            //registrarErros(ped, error.stack)
+          }
+
+        });
+      }
     }
-  })
+  }
+
 }
+
 
 ////////////////////////////////////////////////////
 //METODOS DE VERIFICAÇÃO//
@@ -115,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('testButton').addEventListener('click', async () => {
 
     const idLoja = document.getElementById('parametro-funcao').value
-    
+
     const pedido = new PedidoVenda({
       idLoja: idLoja,
       params: {
@@ -123,17 +142,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     })
 
-    const pedidos = await pedido.getPedidoVenda();
+    await pegarPedidosMassa(pedido);
 
-    for (const chave in pedidos) {
-      if (pedidos.hasOwnProperty(chave)) {
-        const pedido = pedidos[chave];
-        if (!pedido.request.length < 1) {
-          console.log('requisição completa: ', pedido)
-          console.log('pedido: ', pedido.request);
-        }
-      }
-    }
+    // const pedidos = await pedido.getPedidoVenda();
+
+    // console.log('Pedidos: ', pedidos)
+
+    // for (const chave in pedidos) {
+    //   if (pedidos.hasOwnProperty(chave)) {
+    //     const pedido = pedidos[chave];
+    //     if (!pedido.request.length < 1) {
+    //       console.log('requisição completa: ', pedido)
+    //       console.log('pedido: ', pedido.request);
+    //     }
+    //   }
+    // }
 
     //console.log('Result:', result);
 
