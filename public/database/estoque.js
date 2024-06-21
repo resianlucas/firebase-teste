@@ -1,4 +1,5 @@
-import { Estoque } from '/public/classes/Estoque.js';
+import { Estoque } from '../classes/Estoque.js';
+import { PedidoVenda } from '../classes/PedidoVenda.js'
 
 function pegarEstoqueAtualizado() {
   const produtos = pegarTodosProdutos();
@@ -120,6 +121,7 @@ baseado no estoque dos produtos na planilha
 atualizar os estoques na planilha
 baseado no estoque dos produtos no bling
 */
+
 function atualizarEstoqueProduto() {
   const lastRow = sheetProduto.getLastRow();
   const produtos = sheetProduto.getRange(2, 1, lastRow - 1, 10).getValues();
@@ -147,20 +149,22 @@ function atualizarEstoqueProduto() {
 
 //alem de pedir o id, pedir tambem o sku para verificacao na tabela de produtos do hub
 export default function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
+
   const pedid = new PedidoVenda({
     idLoja: idLoja
   });
 
-  registrarPedidos(idPedidoVenda, idLoja, 'processando');
+  //registrarPedidos(idPedidoVenda, idLoja, 'processando');
 
-  const produtos = pegarEstoqueAtualizado();
-  const estoques = [];
+  // const produtos = pegarEstoqueAtualizado();
+  // const estoques = [];
+
 
   // COLETA DO PEDIDO
   const pedido = pedid.getPedidoVendaById(idPedidoVenda);
 
   // VERIFICAR SE É UM PEDIDO VÁLIDO
-  verificarPedido(idPedidoVenda, idLoja);
+  //verificarPedido(idPedidoVenda, idLoja);
 
   const empresa = Object.keys(pedido);
 

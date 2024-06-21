@@ -307,7 +307,7 @@ export default class PedidoVenda extends BaseClass {
                         dado.numeroLoja,
                         dado.data,
                         dado.loja.id,
-                        blingInfo.idLoja,
+                        blingInfo.id,
                     ]);
     
                     // Salvar informações associadas à resposta

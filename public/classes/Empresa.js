@@ -2,7 +2,7 @@ import { BaseClass } from './BaseClass.js'
 
 const baseUrl = 'http://localhost:3000/api'
 
-export class Empresa extends BaseClass {
+export default class Empresa extends BaseClass {
     constructor({
         nome = '',
         cnpj = '',

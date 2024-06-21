@@ -1,9 +1,10 @@
 import { Deposito } from './Deposito.js'
 import { BaseClass } from './BaseClass.js'
 
+
 const baseUrl = 'http://localhost:3000/api'
 
-export class Estoque extends BaseClass {
+export default class Estoque extends BaseClass {
     constructor({
         produto = {
             id: null

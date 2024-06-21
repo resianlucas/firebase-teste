@@ -4,7 +4,7 @@ import { ref, set, update, child ,onValue, get } from "https://www.gstatic.com/f
 
 const baseUrl = 'http://localhost:3000/api'
 
-export class Produto extends BaseClass {
+export default class Produto extends BaseClass {
     constructor({
         id = null,
         nome = '',

@@ -1,4 +1,4 @@
-import { PedidoVenda } from '/public/classes/PedidoVenda.js';
+import PedidoVenda from '../classes/PedidoVenda.js';
 import { db } from '../script.js';
 import lancarEstoqueByPedidoVenda from './estoque.js';
 
@@ -115,11 +115,27 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('testButton').addEventListener('click', async () => {
 
     const idLoja = document.getElementById('parametro-funcao').value
-    const quantidade = document.getElementById('parametro-quantidade').value
+    
+    const pedido = new PedidoVenda({
+      idLoja: idLoja,
+      params: {
+        limite: 10
+      }
+    })
 
+    const pedidos = await pedido.getPedidoVenda();
 
-    const result = await estoque.createEstoque();
-    console.log('Result:', result);
+    for (const chave in pedidos) {
+      if (pedidos.hasOwnProperty(chave)) {
+        const pedido = pedidos[chave];
+        if (!pedido.request.length < 1) {
+          console.log('requisição completa: ', pedido)
+          console.log('pedido: ', pedido.request);
+        }
+      }
+    }
+
+    //console.log('Result:', result);
 
   });
 });
