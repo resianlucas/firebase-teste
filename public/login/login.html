@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="login.css">
     <title>Login</title>
 </head>
+
 <body>
     <button class="theme-toggle">Toggle Theme</button>
-    <!-- Restante do conteúdo -->
     <script>
         document.querySelector('.theme-toggle').addEventListener('click', () => {
             document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
@@ -17,12 +18,28 @@
     <h1>Login</h1>
     <nav>
         <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="produtos.html">Produtos</a></li>
-            <li><a href="pedidos.html">Pedidos</a></li>
-            <li><a href="perfil.html">Perfil</a></li>
+            <li><a href="/public/index.html">Home</a></li>
         </ul>
     </nav>
-    <!-- Conteúdo da página de login -->
+    <main>
+        <div class="login-container">
+            <form>
+                <h2>FAÇA SEU LOGIN</h2>
+                <div class="campo">
+                    <label for="usuario">Usuário</label>
+                    <input type="text" id="usuario" placeholder="Digite o seu email">
+                </div>
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" placeholder="Digite a sua senha">
+                </div>
+                <button type="submit">Entrar</button>
+                <div class="forgot-password">
+                    <a href="#">Esqueci minha senha</a>
+                </div>
+            </form>
+        </div>
+    </main>
 </body>
+
 </html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caixa Eletrônico</title>
+    <link rel="stylesheet" href="caixa.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span>CPF:</span>
+            <span>CONSUMIDOR</span>
+        </div>
+        <div class="main-content">
+            <div class="logo-section">
+                <img id="product-image" src="https://i.ibb.co/9stvHsP/placeholder-sem-foto.png" alt="Logo">
+            </div>
+            <div class="details-section">
+                <textarea id="scanned-products" name="scanned-products" readonly></textarea>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="product-details">
+                <label for="product-code">CÓDIGO DO PRODUTO (F2):</label>
+                <input type="text" id="product-code" name="product-code" readonly>
+                <input type="text" id="ean-bar" placeholder="Digite ou scanneie o EAN">
+                <button id="search-ean-button">Buscar</button>
+                <div id="product-info">
+                    <span id="last-scanned">Último Produto Scanneado</span>
+                    <span id="quantity">Quantidade: 0</span>
+                    <span id="price">Preço: 0,00</span>
+                </div>
+            </div>
+            <div class="total">
+                <span>QTD. ITENS</span>
+                <span id="total-items">0</span>
+                <span>SUBTOTAL</span>
+                <span id="subtotal">0,00</span>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="caixa.js"></script>
+</body>
+</html>

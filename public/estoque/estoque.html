@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/estoque/estoque.css">
+    <script type="module" src="/public/estoque/estoque.js"></script>
+    <title>SGS Marketing e Informática - Estoque</title>
+</head>
+
+<body>
+    <header>
+        <button class="theme-toggle">Toggle Theme</button>
+        <h1>Estoque</h1>
+        <nav>
+            <ul>
+                <li><a href="/public/index.html">Home</a></li>
+                <li><a href="/public/produtos/produtos.html">Produtos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="search-filter">
+            <div class="search">
+                <input id="ean-bar" type="text" placeholder="Insira o código EAN">
+                <button id="search-ean-button">Buscar</button>
+            </div>
+        </section>
+        <section class="product-info">
+            <div id="product-details">
+                <img id="product-image" src="https://i.ibb.co/3FThFW5/placeholder-sem-foto-1.png"
+                    alt="Imagem do Produto">
+                <h2 id="product-name">Nome do Produto</h2>
+                <p id="product-quantity">Quantidade: <span id="product-quantity-value">0</span></p>
+            </div>
+        </section>
+        <button id="update-button">INFORMAR UNIDADES DECLARADAS</button>
+        <button id="delete-button">DELETAR</button>
+        <input type="file" id="xml-file-input" accept=".xml">
+        <button id="load-xml-button">Carregar XML</button>
+    </main>
+</body>
+
+</html>

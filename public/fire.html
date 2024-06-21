@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload CSV to Firebase</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script type="module">
+        import { db } from '/public/script.js';
+        import { ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        function validarSKU(sku) {
+            if (!sku || sku.trim() === '') {
+                throw new Error('SKU não pode estar em branco.');
+            }
+            return sku.replace(/[.#$[\]]/g, '-');
+        }
+
+        function converterPreco(preco) {
+            if (!preco) {
+                return 0.0;
+            }
+            const precoNumerico = parseFloat(preco.replace(',', '.').replace(/[^0-9.]/g, ''));
+            if (isNaN(precoNumerico)) {
+                throw new Error('Preço inválido.');
+            }
+            return parseFloat(precoNumerico.toFixed(2));
+        }
+
+        function converterQuantidade(quantidade) {
+            if (!quantidade) {
+                return 0;
+            }
+            const quantidadeNumerica = parseInt(quantidade.replace(/[^0-9]/g, ''), 10);
+            if (isNaN(quantidadeNumerica)) {
+                throw new Error('Quantidade inválida.');
+            }
+            return quantidadeNumerica;
+        }
+
+        document.getElementById('uploadCSV').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                Papa.parse(file, {
+                    header: true,
+                    complete: function (results) {
+                        const products = results.data;
+                        products.forEach(product => {
+                            try {
+                                const productData = {
+                                    name: product.PRODUTO ? product.PRODUTO.trim() : 'Produto sem nome',
+                                    sku: validarSKU(product.SKU),
+                                    ean: product.EAN ? product.EAN.trim() : 'EAN não informado',
+                                    category: product.CATEGORIA.trim(),
+                                    brand: product.MARCA ? product.MARCA.trim() : 'Marca não informada',
+                                    price: converterPreco(product.PRECO),
+                                    quantity: converterQuantidade(product.QUANTIDADE),
+                                    imageUrl: product.IMAGEM.trim(),
+                                    description: product.DESCRICAO.trim()
+                                };
+
+                                const newItemRef = ref(db, 'products/' + productData.sku);
+                                set(newItemRef, productData)
+                                    .then(() => {
+                                        console.log('Item adicionado com sucesso!');
+                                    })
+                                    .catch((error) => {
+                                        console.error('Erro ao adicionar item:', error);
+                                    });
+                            } catch (error) {
+                                console.error('Erro ao processar produto:', error.message);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+    </script>
+</head>
+
+<body>
+    <input type="file" id="uploadCSV" accept=".csv">
+</body>
+
+</html>
