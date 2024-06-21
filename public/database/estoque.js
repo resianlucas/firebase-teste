@@ -173,6 +173,7 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
   var itensPedido = pedido[empresa].request.itens;
   console.log('itens pedido: ', itensPedido);
+  
 
   // VERIFICAR SE PRODUTOS ESTÃO CADASTRADOS
   //var verificador = verificarPedido(idPedidoVenda, idLoja);

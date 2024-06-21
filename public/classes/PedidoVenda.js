@@ -268,13 +268,13 @@ export default class PedidoVenda extends BaseClass {
         console.log('URL:', url);
     
         let accessToken = await this.getBling();
-        console.log('Access Token:', accessToken);
+        //console.log('Access Token:', accessToken);
     
         try {
             let requests = []
             for(let id in accessToken) {
                 const blingInfo = accessToken[id];
-                console.log('Bling Info: ', blingInfo)
+                //console.log('Bling Info: ', blingInfo)
                 let request = fetch(url, {
                     method: 'GET',
                     headers: {
@@ -285,7 +285,7 @@ export default class PedidoVenda extends BaseClass {
                 requests.push(request);
             };
 
-            console.log('REQUESTS: ', requests)
+            //console.log('REQUESTS: ', requests)
             let responses = await Promise.all(requests);
             
             let result = {};
@@ -334,12 +334,12 @@ export default class PedidoVenda extends BaseClass {
         console.log('URL:', url);
         
         let accessToken = await this.getBling();
-        console.log('Access Token:', accessToken);
+        //console.log('Access Token:', accessToken);
         
         try {
             let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                console.log('Bling Info:', blingInfo);
+                //console.log('Bling Info:', blingInfo);
                 return fetch(url, {
                     method: 'GET',
                     headers: {
@@ -349,7 +349,7 @@ export default class PedidoVenda extends BaseClass {
                 });
             });
     
-            console.log('REQUESTS:', requests);
+            //console.log('REQUESTS:', requests);
             
             let responses = await Promise.all(requests);
             
@@ -365,6 +365,9 @@ export default class PedidoVenda extends BaseClass {
     
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];
                 
+
+                console.log("RESPONSE: ", response);
+
                 let pedido = {
                     id: response.data.id,
                     numero: response.data.numero,

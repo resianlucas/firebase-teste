@@ -68,15 +68,16 @@ async function pegarPedidosMassa(pedido) {
       const pedidoUnit = pedidos[chave];
       if (!pedidoUnit.request.length < 1) {
         const pedidosData = pedidoUnit.request;
-        pedidosData.forEach(ped => {
+        pedidosData.forEach(async ped => {
           console.log(
             'Detalhes dos pedidos: ',
             '\nID: ', ped[0],
+            '\nID multiloja: ', ped[4],
             '\nID Loja: ', ped[5]
           )
 
           try {
-            lancarEstoque(ped[0], ped[5]);
+            await lancarEstoque(ped[0], ped[5]);
           } catch (error) {
             console.error('Erro ao processar pedido:', ped, error);
             //registrarErros(ped, error.stack)
@@ -134,15 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('testButton').addEventListener('click', async () => {
 
     const idLoja = document.getElementById('parametro-funcao').value
+    const limite = document.getElementById('parametro-quantidade').value
 
     const pedido = new PedidoVenda({
       idLoja: idLoja,
       params: {
-        limite: 10
+        limite: limite,
+        idLoja: 204045472
       }
     })
 
-    await pegarPedidosMassa(pedido);
+    pegarPedidosMassa(pedido);
 
     // const pedidos = await pedido.getPedidoVenda();
 

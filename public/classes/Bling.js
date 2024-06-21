@@ -111,17 +111,15 @@ export class Bling {
             let snapshot;
             if (idLoja) {
                 idLoja = String(this.idLoja); // Convert idLoja to a string
-                console.log('Fetching data for specific idLoja...');
                 snapshot = await get(child(dbRef, idLoja));
-                console.log('Snapshot value for specific idLoja:', snapshot.val());
             } else {
-                console.log('Fetching all bling data...');
+               
                 snapshot = await get(dbRef);
-                console.log('Snapshot value for all bling:', snapshot.val());
+                
             }
             if (snapshot.exists()) {
                 const blings = snapshot.val();
-                console.log('Blings:', blings);
+    
                 if (blings.length) {
                     return blings;
                 } else {
