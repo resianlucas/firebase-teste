@@ -1,6 +1,8 @@
 import Estoque from '../classes/Estoque.js';
 import Deposito from '../classes/Deposito.js'
 import PedidoVenda from '../classes/PedidoVenda.js'
+import { db } from '../script.js';
+import { ref, get, update} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 function pegarEstoqueAtualizado() {
   const produtos = pegarTodosProdutos();
@@ -171,10 +173,50 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
   const empresa = Object.keys(pedido);
 
-  var itensPedido = pedido[empresa].request.itens;
+  let itensPedido = pedido[empresa].request.itens;
   console.log('itens pedido: ', itensPedido);
-  
 
+  const updates = {};
+  let operacaoInvalida = false;
+
+  for (const item of itensPedido) {
+    const sku = item.codigo; // ajuste para corresponder ao campo correto em seu objeto de item
+    const quantidadeSolicitada = item.quantidade; // ajuste para corresponder ao campo correto em seu objeto de item
+    const productRef = ref(db, `products/${sku}`);
+    const productSnapshot = await get(productRef);
+
+    if (productSnapshot.exists()) {
+      const quantidadeAtual = productSnapshot.val().quantity || 0;
+      const novaQuantidade = quantidadeAtual - quantidadeSolicitada; // Supondo que você queira adicionar a quantidade solicitada ao estoque atual
+
+      if (novaQuantidade < 0) {
+        console.error(`Operação inválida: quantidade negativa não permitida para SKU: ${sku}. Estoque atual: ${quantidadeAtual}, Quantidade solicitada: ${quantidadeSolicitada}`);
+        operacaoInvalida = true;
+        break; // Interrompe o loop se encontrar uma quantidade negativa
+      }
+
+      updates[`/products/${sku}/quantity`] = novaQuantidade;
+    } else {
+      console.error(`Produto com SKU: ${sku} não encontrado.`);
+      operacaoInvalida = true;
+      break; // Interrompe o loop se o produto não for encontrado
+    }
+  }
+
+  if (!operacaoInvalida) {
+    try {
+      console.log(`Atualizando quantidades no Firebase:`, updates);
+      await update(ref(db), updates);
+      console.log('Estoque atualizado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar estoque:', error);
+    }
+  } else {
+    console.error('A operação foi cancelada devido a uma validação inválida.');
+  }
+
+
+  
   // VERIFICAR SE PRODUTOS ESTÃO CADASTRADOS
   //var verificador = verificarPedido(idPedidoVenda, idLoja);
 
