@@ -60,9 +60,7 @@ function pegarPedidos() {
 }
 
 async function pegarPedidosMassa(pedido) {
-
   const pedidos = await pedido.getPedidoVenda();
-
   for (const chave in pedidos) {
     if (pedidos.hasOwnProperty(chave)) {
       const pedidoUnit = pedidos[chave];
@@ -75,14 +73,20 @@ async function pegarPedidosMassa(pedido) {
             '\nID multiloja: ', ped[4],
             '\nID Loja: ', ped[5]
           )
-
           try {
+
+
+
+
+
+
+
+            
             await lancarEstoque(ped[0], ped[5]);
           } catch (error) {
             console.error('Erro ao processar pedido:', ped, error);
             //registrarErros(ped, error.stack)
           }
-
         });
       }
     }

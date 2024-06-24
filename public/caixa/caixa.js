@@ -26,7 +26,7 @@ async function searchProductByEan() {
             const product = productSnapshot.val();
             products[product.sku] = product; // Adiciona o produto ao objeto products
             updateProductDetails(product);
-            incrementProductCounter(product.sku);
+            //incrementProductCounter(product.sku);
         } else {
             alert('Produto não encontrado.');
         }
@@ -56,24 +56,25 @@ function updateProductDetails(product) {
     document.getElementById('last-scanned').textContent = product.name;
     document.getElementById('quantity').textContent = `Quantidade: ${productCounters[product.sku] || 0}`;
     document.getElementById('price').textContent = `Preço: ${product.price}`;
+    document.getElementById('subtotal').textContent = `Preço: R$ ${product.price}`
 
     const scannedProducts = document.getElementById('scanned-products');
     scannedProducts.value += `${product.name}\n`;
 }
 
-function incrementProductCounter(sku) {
-    if (!productCounters[sku]) {
-        productCounters[sku] = 0;
-    }
-    productCounters[sku]++;
-    document.getElementById('quantity').textContent = `Quantidade: ${productCounters[sku]}`;
+// function incrementProductCounter(sku) {
+//     if (!productCounters[sku]) {
+//         productCounters[sku] = 0;
+//     }
+//     productCounters[sku]++;
+//     document.getElementById('quantity').textContent = `Quantidade: ${productCounters[sku]}`;
 
-    const totalItems = Object.values(productCounters).reduce((a, b) => a + b, 0);
-    document.getElementById('total-items').textContent = totalItems;
+//     const totalItems = Object.values(productCounters).reduce((a, b) => a + b, 0);
+//     document.getElementById('total-items').textContent = totalItems;
 
-    const subtotal = Object.entries(productCounters).reduce((total, [key, value]) => {
-        const product = products[key];
-        return total + (product.price * value);
-    }, 0);
-    document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-}
+//     const subtotal = Object.entries(productCounters).reduce((total, [key, value]) => {
+//         const product = products[key];
+//         return total + (product.price * value);
+//     }, 0);
+//     document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+// }

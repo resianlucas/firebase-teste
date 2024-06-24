@@ -1,5 +1,6 @@
 import Estoque from '../classes/Estoque.js';
 import Deposito from '../classes/Deposito.js'
+import Produto from '../classes/Produto.js'
 import PedidoVenda from '../classes/PedidoVenda.js'
 import { db } from '../script.js';
 import { ref, get, update} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -176,11 +177,25 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   let itensPedido = pedido[empresa].request.itens;
   console.log('itens pedido: ', itensPedido);
 
+  for (const item of itensPedido) {
+  }
+  
+  
   const updates = {};
   let operacaoInvalida = false;
-
+  
   for (const item of itensPedido) {
-    const sku = item.codigo; // ajuste para corresponder ao campo correto em seu objeto de item
+
+    const id = item.produto.id;
+    const produto = new Produto({
+      idLoja: idLoja
+    });
+    const prod = await produto.getProdutoById(id);
+    console.log('Produto: ', prod[empresa].request.estrutura.componentes[0].produto.id)
+    const produtoMestre = await produto.getProdutoById(prod[empresa].request.estrutura.componentes[0].produto.id)
+    console.log('Produto mestre: ', produtoMestre)
+
+    const sku = produtoMestre[empresa].request.codigo; // ajuste para corresponder ao campo correto em seu objeto de item
     const quantidadeSolicitada = item.quantidade; // ajuste para corresponder ao campo correto em seu objeto de item
     const productRef = ref(db, `products/${sku}`);
     const productSnapshot = await get(productRef);

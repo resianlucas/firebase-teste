@@ -1506,16 +1506,16 @@ async function pegarTodosIds(sku) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById('testButton').addEventListener('click', async () => {
+//     document.getElementById('testButton').addEventListener('click', async () => {
 
-        const id = document.getElementById('parametro-funcao').value
+//         const id = document.getElementById('parametro-funcao').value
 
-        const result = await pegarTodosIds(id);
-        console.log('Result:', result);
-    });
-});
+//         const result = await pegarTodosIds(id);
+//         console.log('Result:', result);
+//     });
+// });
 
 function pegarIdBySku(sku) {
     const ids = pegarTodosIds();
