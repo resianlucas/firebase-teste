@@ -7,36 +7,47 @@
     <link rel="stylesheet" href="./pedidos.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Pedidos</h1>
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Pesquisar pedidos...">
-            <button id="filterButton">Filtrar</button>
+    <header>
+        <button class="theme-toggle">Toggle Theme</button>
+        <h1>Produtos</h1>
+        <nav>
+            <ul>
+                <li><a href="/public/index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <h1>Pedidos</h1>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Pesquisar pedidos...">
+                <button id="filterButton">Filtrar</button>
+            </div>
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>ID Pedido</th>
+                        <th>Número Pedido</th>
+                        <th>Número Loja</th>
+                        <th>Data Pedido</th>
+                        <th>ID Loja</th>
+                        <th>ID Empresa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados dos pedidos serão inseridos aqui pelo JavaScript -->
+                </tbody>
+            </table>
         </div>
-        <table id="ordersTable">
-            <thead>
-                <tr>
-                    <th>ID Pedido</th>
-                    <th>Número Pedido</th>
-                    <th>Número Loja</th>
-                    <th>Data Pedido</th>
-                    <th>ID Loja</th>
-                    <th>ID Empresa</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Dados dos pedidos serão inseridos aqui pelo JavaScript -->
-            </tbody>
-        </table>
-    </div>
-
-    <div id="filterPopup" class="popup">
-        <div class="popup-content">
-            <span class="close">&times;</span>
-            <h2>Filtrar Pedidos</h2>
-            <!-- Elementos de filtro a serem definidos -->
+    
+        <div id="filterPopup" class="popup">
+            <div class="popup-content">
+                <span class="close">&times;</span>
+                <h2>Filtrar Pedidos</h2>
+                <!-- Elementos de filtro a serem definidos -->
+            </div>
         </div>
-    </div>
+    </main>
 
     <script src="./pedidos.js"></script>
 </body>

@@ -1,5 +1,6 @@
 import { db } from '/public/script.js';
 import { ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import Estoque from '../classes/Estoque';
 
 let productCounters = {};
 
@@ -235,6 +236,7 @@ function loadXml() {
             const produto = produtos[i];
             const ean = produto.getElementsByTagName("cEAN")[0].textContent;
             const quantidade = parseInt(produto.getElementsByTagName("qCom")[0].textContent, 10);
+            const price = parseFloat(produto.getElementsByTagName('vUnCom')[0].textContent);
 
             if (!productCounters[ean]) {
                 productCounters[ean] = 0;
@@ -252,6 +254,7 @@ function loadXml() {
                 await set(ref(db, `cadastrar/${ean}`), {
                     ean: ean,
                     quantity: quantidade,
+                    price: price,
                     sku: produto.getElementsByTagName("cProd")[0].textContent,
                     name: produto.getElementsByTagName("xProd")[0].textContent
                 });

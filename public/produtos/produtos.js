@@ -1,5 +1,7 @@
 import { db } from '/public/script.js';
 import { ref, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import Estoque from '../classes/Estoque';
+import Deposito from '../classes/Deposito';
 
 let produtos = [];
 const productsPerPage = 100;
@@ -138,6 +140,25 @@ async function atualizarEstoque(sku, quantidade) {
     await update(produtoRef, { quantity: quantidade });
     alert('Estoque atualizado com sucesso');
     console.log(`Stock updated for SKU: ${sku}`);
+
+    const deposito = new Deposito ();
+    const depositos = await deposito.getDeposito();
+    const idDeposito = Object.values(depositos).map(deposito => deposito.request.id);
+    
+    for (const id of idDeposito) {
+        const estoque = new Estoque({
+            produto : {
+                id: id
+            },
+            depositos: {
+                id: id
+            },
+            operacao: 'B',
+            quantidade: parseFloat(quantidade),
+        })
+        const result = await estoque.createEstoque();
+        console.log('Result:', result);
+    }
 }
 
 async function preencherFormulario(sku) {
@@ -161,3 +182,33 @@ async function preencherFormulario(sku) {
 
 window.atualizarEstoque = atualizarEstoque;
 window.searchProducts = searchProducts;
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('testButton').addEventListener('click', async () => {
+
+        const idLoja = document.getElementById('parametro-funcao').value
+        const quantidade = document.getElementById('parametro-quantidade').value
+        const deposito = new Deposito({
+            idLoja: idLoja
+        })
+        
+        const depositos = await deposito.getDeposito();
+        const idDeposito = Object.values(depositos).map(deposito => deposito.request.id);
+        
+        for (const id of idDeposito) {
+            const estoque = new Estoque({
+                produto : {
+                    id: 16239460759
+                },
+                depositos: {
+                    id: id
+                },
+                operacao: 'B',
+                quantidade: parseFloat(quantidade),
+                idLoja: idLoja
+            })
+            const result = await estoque.createEstoque();
+            console.log('Result:', result);
+        }
+    });
+});

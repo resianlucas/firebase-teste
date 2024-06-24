@@ -1,4 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
+import PedidoVenda from '../classes/PedidoVenda.js';
+
+document.addEventListener('DOMContentLoaded', async function() {
     const ordersTable = document.getElementById('ordersTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('searchInput');
     const filterButton = document.getElementById('filterButton');
@@ -6,12 +8,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const closePopup = document.querySelector('.popup .close');
     const themeToggle = document.getElementById('themeToggle');
 
-    // Dummy data for orders
-    const orders = [
-        {id: 1, numero: 1001, numeroLoja: 10, data: '2023-06-15', idLoja: 101, idEmpresa: 201},
-        {id: 2, numero: 1002, numeroLoja: 11, data: '2023-06-16', idLoja: 102, idEmpresa: 202},
-        // Adicione mais pedidos conforme necessário
-    ];
+    let orders = [];
+
+    async function fetchPedidos() {
+        const pedidoVenda = new PedidoVenda({ idLoja: null });
+        const result = await pedidoVenda.getPedidoVenda();
+        
+        if (result) {
+            orders = Object.values(result).flatMap(empresa => empresa.request.map(pedido => ({
+                id: pedido[0],
+                numero: pedido[1],
+                numeroLoja: pedido[2],
+                data: pedido[3],
+                idLoja: pedido[4],
+                idEmpresa: pedido[5]
+            })));
+            displayOrders(orders);
+        } else {
+            console.error('Erro ao buscar pedidos de venda');
+        }
+    }
 
     function displayOrders(orders) {
         ordersTable.innerHTML = '';
@@ -31,8 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initial display of orders
-    displayOrders(orders);
+    // Initial fetch and display of orders
+    await fetchPedidos();
 
     // Search functionality
     searchInput.addEventListener('keyup', function() {
