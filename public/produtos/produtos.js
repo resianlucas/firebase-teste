@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('testButto').addEventListener('click', async () => {
      
     
-    const produtos = getAllProducts();
+    const produtos = await getAllProduct();
     console.log('Resultado: ', produtos)
 
     })
