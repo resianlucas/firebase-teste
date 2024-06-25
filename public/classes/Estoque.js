@@ -1,7 +1,7 @@
 import Deposito from './Deposito.js';
 import { BaseClass } from './BaseClass.js';
 import { updateEstoque } from '../database/estoque.js';
-
+import { pegarIdBySku } from './Produto.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -471,7 +471,39 @@ function pegarEstoqueAtualizado() {
   }
 
   export async function atualizarEstoque(sku, quantidade) {
-    await updateEstoque()
+    await updateEstoque(sku, quantidade)
+
+    const deposito = new Deposito({
+      idLoja: idLoja
+    })
+
+    const depositos = await deposito.getDeposito();
+    const idDeposito = Object.values(depositos).map(deposito => deposito.request.id);
+
+
+    const estoque = new Estoque();
+    estoque.createEstoque()
+
+    const idLoja = document.getElementById('parametro-funcao').value
+    const quantidade = document.getElementById('parametro-quantidade').value
+
+
+    for (const id of idDeposito) {
+      const estoque = new Estoque({
+        produto: {
+          id: 16239460759
+        },
+        depositos: {
+          id: id
+        },
+        operacao: 'B',
+        quantidade: parseFloat(quantidade),
+        idLoja: idLoja
+      })
+      const result = await estoque.createEstoque();
+      console.log('Result:', result);
+    }
+
   }
   
   function atualizarEstoqueAtualizado(sku = 'Oleo Doce 100ml', quantidade = 8) {

@@ -1429,6 +1429,16 @@ export async function getProducto (sku) {
     }
 }
 
+export async function pegarIdBySku(sku) {
+    try {
+        const ids = await getProductIdsBySku(sku);
+        return ids
+    } catch (error) {
+        console.log('Erro ao pegar id dos produtos: ', error.message)
+        
+    }
+}
+
 // Function to fetch product IDs by SKU and save them to Firebase
 async function pegarIdsProdutoBySku(sku) {
 
