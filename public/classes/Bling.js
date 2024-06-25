@@ -86,37 +86,36 @@ export class Bling {
 
     async getBling() {
         let idLoja = this.idLoja;
-        const dbRef = ref(db, 'bling/');
+        idLoja = String(this.idLoja);
+        const bling = getNewBling(idLoja);
+        console.log('bling: ', bling)
+        
+        
+        // try {
+        //     let snapshot;
+        //     if (idLoja) {
+        //         idLoja = String(this.idLoja); // Convert idLoja to a string
+        //         snapshot = await get(child(dbRef, idLoja));
+        //     } else {
 
-        console.log('idLoja:', idLoja);
+        //         snapshot = await get(dbRef);
 
-        let bling = [];
-        try {
-            let snapshot;
-            if (idLoja) {
-                idLoja = String(this.idLoja); // Convert idLoja to a string
-                snapshot = await get(child(dbRef, idLoja));
-            } else {
+        //     }
+        //     if (snapshot.exists()) {
+        //         const blings = snapshot.val();
 
-                snapshot = await get(dbRef);
-
-            }
-            if (snapshot.exists()) {
-                const blings = snapshot.val();
-
-                if (blings.length) {
-                    return blings;
-                } else {
-                    bling.push(blings);
-                    return bling;
-                }
-            } else {
-                console.log('No bling data available');
-                return null;
-            }
-        } catch (error) {
-            console.error('Erro ao buscar blings:', error);
-        }
+        //         if (blings.length) {
+        //             return blings;
+        //         } else {
+        //             bling.push(blings);
+        //             return bling;
+        //         }
+        //     } else {
+        //         console.log('No bling data available');
+        //         return null;
+        //     }
+        // } catch (error) {
+        //     console.error('Erro ao buscar blings:', error);
+        // }
     }
-
 }
