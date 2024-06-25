@@ -1,23 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getNewBling, createBling, updateBling} from '../database/bling.js';
 
 const baseUrl = 'http://localhost:3000/api'
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDJTzpoFxQ9_W0JCGPXfwFasr_vdywwePs",
-    authDomain: "hub-stock-control.firebaseapp.com",
-    databaseURL: "https://hub-stock-control-default-rtdb.firebaseio.com",
-    projectId: "hub-stock-control",
-    storageBucket: "hub-stock-control.appspot.com",
-    messagingSenderId: "1006784039020",
-    appId: "1:1006784039020:web:5b824b2c2f0a2deed47049",
-    measurementId: "G-LDEPBP8926"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 
 function encodeFormData(data) {
     return Object.keys(data)
@@ -85,14 +68,15 @@ export class Bling {
             this.accessToken = data.access_token;
             this.refreshToken = data.refresh_token;
 
-            const newItemRef = ref(db, `bling/${this.clientId}`);
-            await set(newItemRef, {
+            const newBling = {
                 name: this.nome,
                 client_id: this.clientId,
                 client_secret: this.clientSecret,
                 access_token: this.accessToken,
                 refresh_token: this.refreshToken
-            });
+            }
+
+            createBling(newBling);
 
             console.log('Tokens updated and saved to Firebase:', data);
         } catch (error) {
@@ -103,7 +87,7 @@ export class Bling {
     async getBling() {
         let idLoja = this.idLoja;
         const dbRef = ref(db, 'bling/');
-    
+
         console.log('idLoja:', idLoja);
 
         let bling = [];
@@ -113,19 +97,19 @@ export class Bling {
                 idLoja = String(this.idLoja); // Convert idLoja to a string
                 snapshot = await get(child(dbRef, idLoja));
             } else {
-               
+
                 snapshot = await get(dbRef);
-                
+
             }
             if (snapshot.exists()) {
                 const blings = snapshot.val();
-    
+
                 if (blings.length) {
                     return blings;
                 } else {
                     bling.push(blings);
                     return bling;
-                }  
+                }
             } else {
                 console.log('No bling data available');
                 return null;
@@ -134,5 +118,5 @@ export class Bling {
             console.error('Erro ao buscar blings:', error);
         }
     }
-    
+
 }
