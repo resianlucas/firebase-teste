@@ -22,10 +22,10 @@ export async function updateProduct(sku, updates) {
   await update(produtoRef, updates);
 }
 
-export async function fetchAllProducts() {
+export async function getAllProducts() {
   const produtos = [];
-  const dbRef = ref(db, 'products');
-  const snapshot = await get(dbRef);
+  const produtoRef = ref(db, 'products');
+  const snapshot = await get(produtoRef);
   snapshot.forEach((childSnapshot) => {
       produtos.push(childSnapshot.val());
   });

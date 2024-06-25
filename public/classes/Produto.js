@@ -1,6 +1,5 @@
-import { BaseClass } from './BaseClass.js'
-import { db } from '/public/script.js';
-import { ref, set, update, child, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { BaseClass } from './BaseClass.js';
+import { getProduct, getAllProducts, createProduct, updateProduct, getProductIdsBySku } from '../database/produto.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -1122,7 +1121,6 @@ export default class Produto extends BaseClass {
         if (queryString) {
             url += '?' + queryString;
         }
-
         console.log('URL:', url);
 
         let accessToken = await this.getBling();
@@ -1176,13 +1174,10 @@ export default class Produto extends BaseClass {
         }
     }
 
-
     async getProdutoById(idProduto) {
         const endpoint = `/produtos/${idProduto}`;
         let url = baseUrl + endpoint;
-
         console.log('URL:', url);
-
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
 
@@ -1738,91 +1733,6 @@ function todosIds(produto) {
     };
 }
 
-////////////////////////////////////////////////////
-//METODOS DE VERIFICAÇÃO//
-////////////////////////////////////////////////////
-// function verificarProduto(itensPedido, idLoja) {
-//   const lastRow  = sheetProduto.getLastRow();
-//   const produtosData = sheetProduto.getRange(2, 1, lastRow - 1, 10).getValues();
-
-//   for (var i = 0; i < produtosData.length; i++) {
-//     var produto = produtosData[i];
-//     // Verificar se os dados nas colunas obrigatórias (1, 2, 3, 4, 5, 6) estão preenchidos
-//     for (var j = 0; j < produto.length; j++) {
-//       if ((j === 0 || j === 1 || j === 2 || j === 3 || j === 4 || j === 5 ) && (produto[j] === '' || produto[j] === null || produto[j] === undefined)) {
-//         throw new Error('Dados incompletos na linha ' + (i + 2) + ', coluna ' + (j + 1));
-//       }
-//     }
-//   }
-//   var produtos = pegarTodosProdutos();
-
-//   var item = [];
-
-//   itensPedido.forEach(itens => {
-//     var id = itens.produto.id;
-//     var codigo = itens.codigo;
-//     var qtd = itens.quantidade;
-//     var prod = {
-//       id: id,
-//       sku: codigo,
-//       qtd: qtd
-//     }
-//     item.push(prod);
-//   });
-//   var produtoNaoEncontrado = [];
-
-//   //VERIFICA SE OS PRODUTOS CONTEM ESTOQUE OU SE ESTÃO ZERADOS
-//   //VERIFICA SE O PRODUTO ESTÁ REGISTRADO NA TABELA
-//   for (var i = 0; i < item.length; i++) {
-//     var sku = item[i].sku;
-//     var produtoEncontrado = produtos.find(produto => produto.sku === sku);
-
-//     if (produtoEncontrado) {
-//       if(!produtoEncontrado.qtd || produtoEncontrado.qtd === 0 || produtoEncontrado.qtd < 0) {
-//         console.log('ruptura(produtoEncontrado)')
-//         throw new Error('Quantidade de produto inválida ou estoque zerado' + produtoEncontrado.sku)
-//       }
-//     } else {
-//       produtoNaoEncontrado.push({sku: sku});
-//     }
-//   }
-
-//   //VERIFICA QUANTIDADES DOS PRODUTOS ANTES DE LANCAR O ESTOQUE
-//   for (var j = 0; j < item.length; j++) {
-//     var id = item[j].id
-//     var sku = item[j].sku;
-//     var quantidade = item[j].qtd;
-//     var produtoEncontrado = produtos.find(produto => produto.sku === sku);
-
-//     if (produtoEncontrado) {
-//       var novaQuantidade = produtoEncontrado.qtd - quantidade;
-//       if (novaQuantidade < 0) {
-//         ruptura(produtoEncontrado)
-//         throw new Error('Estoque insufiente para atender ao pedido\n Produto: ' + produtoEncontrado.sku)
-//       }
-//     } else {
-//       var resposta = Browser.inputBox('O produto ' + sku + ' não foi encontrado.\\n\\nO que você deseja fazer?\\nA - IMPORTAR\\nB - SEPARAR\\nC - CANCELAR');
-//       if (resposta.toUpperCase() == 'A') {
-//         pegarProdutosById(id, idLoja);
-//       } else if (resposta.toUpperCase() == 'B') {
-//         separarProduto(itensPedido, id);
-//       } else {
-//         throw new Error('Operação cancelada pelo usuário');
-//       }
-//     }
-//   }
-
-//   if (produtoNaoEncontrado.length <= 0) {
-//     return true
-//   } else {
-//     var msg = 'Alguns produtos não foram encontrados:'
-//     produtoNaoEncontrado.forEach(produto => {
-//       msg += '\nID do produto: ' + produto.sku;
-//     })
-//     throw new Error(msg)
-//   }
-// }
-
 function criarProduto() {
     const produto = new Produto({
         payload: {
@@ -1868,17 +1778,6 @@ function verificarProduto(sku) {
     } else {
         produtoNaoEncontrado.push({ sku: sku });
     }
-
-    // if (!produtoEncontrado) {
-    //   var resposta = Browser.inputBox('O produto ' + sku + ' não foi encontrado.\\n\\nO que você deseja fazer?\\nA - IMPORTAR\\nB - SEPARAR\\nC - CANCELAR');
-    //   if (resposta.toUpperCase() == 'A') {
-    //     pegarProdutosById(id, idLoja);
-    //   } else if (resposta.toUpperCase() == 'B') {
-    //     separarProduto(itensPedido, id);
-    //   } else {
-    //     throw new Error('Operação cancelada pelo usuário');
-    //   }
-    // }
 
     if (produtoNaoEncontrado.length <= 0) {
         return true
