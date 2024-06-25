@@ -1,5 +1,6 @@
 import Deposito from './Deposito.js';
 import { BaseClass } from './BaseClass.js';
+import { updateEstoque } from '../database/estoque.js';
 
 
 const baseUrl = 'http://localhost:3000/api'
@@ -263,42 +264,41 @@ function pegarEstoqueAtualizado() {
   //       .addItem('Atualizar Estoque', 'showDialog')
   //       .addToUi();
   // }
-  
-  
+
   
   //////////////OK/////////////////////
-  function atualizarEstoque() {
-    const lastRow = sheetEstoque.getLastRow();
-    const consultaData = sheetEstoque.getRange(2, 1, lastRow - 1, 2).getValues();
-    const produtos = pegarEstoqueAtualizado();
-    const consulta = consultaData.map(prod => ({
-      sku: prod[0],
-      qtd: prod[1]
-    }));
+  // function atualizarEstoque() {
+  //   const lastRow = sheetEstoque.getLastRow();
+  //   const consultaData = sheetEstoque.getRange(2, 1, lastRow - 1, 2).getValues();
+  //   const produtos = pegarEstoqueAtualizado();
+  //   const consulta = consultaData.map(prod => ({
+  //     sku: prod[0],
+  //     qtd: prod[1]
+  //   }));
   
-    let mensagem = 'Os seguintes produtos serão atualizados:\n\n';
-    consulta.forEach(prod => {
-      const produtoEncontrado = produtos.find(produto => produto.sku === prod.sku);
-      if (produtoEncontrado) {
-        mensagem += `${produtoEncontrado.sku}\nstock atual: ${produtoEncontrado.qtd}\nnew stock: ${prod.qtd}\n\n`;
-      } else {
-        mensagem += `Produto não encontrado: ${prod.sku}\n\n`;
-      }
-    });
-    //const resposta = Browser.msgBox(mensagem + 'Deseja atualizar todos os produtos?', Browser.Buttons.YES_NO);
-    const resposta = 'YES'
-    if (resposta.toUpperCase() === 'YES') {
-      consulta.forEach(prod => {
-        const produtoEncontrado = produtos.find(produto => produto.sku === prod.sku);
-        if (produtoEncontrado) {
-          atualizarEstoqueAtualizado(produtoEncontrado.sku, prod.qtd);
-        }
-      });
-      Browser.msgBox('Todos os estoques foram atualizados');
-    } else {
-      Browser.msgBox('Nenhum estoque foi atualizado');
-    }
-  };
+  //   let mensagem = 'Os seguintes produtos serão atualizados:\n\n';
+  //   consulta.forEach(prod => {
+  //     const produtoEncontrado = produtos.find(produto => produto.sku === prod.sku);
+  //     if (produtoEncontrado) {
+  //       mensagem += `${produtoEncontrado.sku}\nstock atual: ${produtoEncontrado.qtd}\nnew stock: ${prod.qtd}\n\n`;
+  //     } else {
+  //       mensagem += `Produto não encontrado: ${prod.sku}\n\n`;
+  //     }
+  //   });
+  //   //const resposta = Browser.msgBox(mensagem + 'Deseja atualizar todos os produtos?', Browser.Buttons.YES_NO);
+  //   const resposta = 'YES'
+  //   if (resposta.toUpperCase() === 'YES') {
+  //     consulta.forEach(prod => {
+  //       const produtoEncontrado = produtos.find(produto => produto.sku === prod.sku);
+  //       if (produtoEncontrado) {
+  //         atualizarEstoqueAtualizado(produtoEncontrado.sku, prod.qtd);
+  //       }
+  //     });
+  //     Browser.msgBox('Todos os estoques foram atualizados');
+  //   } else {
+  //     Browser.msgBox('Nenhum estoque foi atualizado');
+  //   }
+  // };
   
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -468,6 +468,10 @@ function pegarEstoqueAtualizado() {
     // } else {
     //   return Browser.msgBox('Não foi possível completar a execução');
     // }
+  }
+
+  export async function atualizarEstoque(sku, quantidade) {
+    await updateEstoque()
   }
   
   function atualizarEstoqueAtualizado(sku = 'Oleo Doce 100ml', quantidade = 8) {

@@ -13,6 +13,7 @@ export async function getEstoque(sku) {
 }
 
 export async function updateEstoque(sku, quantidade) {
+    console.log('funcao ativa')
     const updates = {};
     const estoqueRef = ref(db, '/products' + sku)
     const snapshot = await get(estoqueRef)
@@ -28,6 +29,4 @@ export async function updateEstoque(sku, quantidade) {
     }
     console.log(`Atualizando quantidades no Firebase:`, updates);
     await update(ref(db), updates);
-
-    
 }

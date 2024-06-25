@@ -1,7 +1,7 @@
 import { db } from '/public/script.js';
 import { ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { updateEstoque } from '../database/estoque';
-import Estoque from '../classes/Estoque';
+import { updateEstoque } from '../database/estoque.js';
+import Estoque from '../classes/Estoque.js';
 
 let productCounters = {};
 
@@ -99,7 +99,7 @@ async function updateAllQuantities() {
     try {
         for (const sku in productCounters) {
             const declaredQuantity = productCounters[sku];
-            updateEstoque(sku, declaredQuantity);
+            await updateEstoque(sku, declaredQuantity);
         }
 
         // Mostrar janela pop-up com produtos atualizados
