@@ -1,119 +1,117 @@
-import {getAllProduct} from "../classes/Produto.js";
+import { getAllProduct, getProducto } from "../classes/Produto.js";
 
 let produtos = [];
 const productsPerPage = 100;
 let currentPage = 1;
 let totalProducts = 0;
 let totalPages = 0;
-let searchBar;
 
-// document.addEventListener('DOMContentLoaded', async () => {
+const searchBar = document.getElementById('search-bar');
+const firstPageButton = document.querySelector('button[onclick="goToPage(\'first\')"]');
+const prevPageButton = document.querySelector('button[onclick="goToPage(\'prev\')"]');
+const nextPageButton = document.querySelector('button[onclick="goToPage(\'next\')"]');
+const lastPageButton = document.querySelector('button[onclick="goToPage(\'last\')"]');
+const productTableBody = document.getElementById('productTableBody');
+const currentPageDisplay = document.getElementById('currentPage');
 
-//     console.log('DOM content loaded');
+document.addEventListener('DOMContentLoaded', async () => {
 
-//     // Theme toggle
-//     document.querySelector('.theme-toggle').addEventListener('click', () => {
-//         document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-//     });
+    console.log('DOM content loaded');
 
-//     searchBar = document.getElementById('search-bar');
-//     const firstPageButton = document.querySelector('button[onclick="goToPage(\'first\')"]');
-//     const prevPageButton = document.querySelector('button[onclick="goToPage(\'prev\')"]');
-//     const nextPageButton = document.querySelector('button[onclick="goToPage(\'next\')"]');
-//     const lastPageButton = document.querySelector('button[onclick="goToPage(\'last\')"]');
-//     const productTableBody = document.getElementById('productTableBody');
-//     const currentPageDisplay = document.getElementById('currentPage');
+    // Theme toggle
+    document.querySelector('.theme-toggle').addEventListener('click', () => {
+        document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+    });
 
-//     if (searchBar && firstPageButton && prevPageButton && nextPageButton && lastPageButton && productTableBody && currentPageDisplay) {
-//         console.log('All necessary elements are present in the DOM');
-//         produtos = await fetchAllProducts();
-//         renderProductTable(currentPage);
+    if (searchBar && firstPageButton && prevPageButton && nextPageButton && lastPageButton && productTableBody && currentPageDisplay) {
+        console.log('All necessary elements are present in the DOM');
+        produtos = await getAllProduct();
+        renderProductTable(currentPage);
 
-//         firstPageButton.addEventListener('click', () => goToPage('first'));
-//         prevPageButton.addEventListener('click', () => goToPage('prev'));
-//         nextPageButton.addEventListener('click', () => goToPage('next'));
-//         lastPageButton.addEventListener('click', () => goToPage('last'));
+        firstPageButton.addEventListener('click', () => goToPage('first'));
+        prevPageButton.addEventListener('click', () => goToPage('prev'));
+        nextPageButton.addEventListener('click', () => goToPage('next'));
+        lastPageButton.addEventListener('click', () => goToPage('last'));
+        searchBar.addEventListener('input', searchProducts);
 
-//         searchBar.addEventListener('input', searchProducts);
-//     } else {
-//         console.error('One or more elements are missing from the DOM');
-//     }
+    } else {
+        console.error('One or more elements are missing from the DOM');
+    }
 
-//     // Check if there's a SKU in the URL and fill the form
-//     const urlParams = new URLSearchParams(window.location.search);
-//     const sku = urlParams.get('sku');
-//     if (sku) {
-//         preencherFormulario(sku);
-//     }
-// });
+    // Check if there's a SKU in the URL and fill the form
+    const urlParams = new URLSearchParams(window.location.search);
+    const sku = urlParams.get('sku');
+    if (sku) {
+        preencherFormulario(sku);
+    }
+});
 
-// function renderProductTable(page = 1, products = produtos) {
-//     console.log(`Rendering product table for page ${page}`);
-//     totalProducts = products.length;
-//     totalPages = Math.ceil(totalProducts / productsPerPage);
-//     const start = (page - 1) * productsPerPage;
-//     const end = start + productsPerPage;
-//     const productsToShow = products.slice(start, end);
+function renderProductTable(page = 1, products = produtos) {
+    console.log(`Rendering product table for page ${page}`);
+    totalProducts = products.length;
+    totalPages = Math.ceil(totalProducts / productsPerPage);
+    const start = (page - 1) * productsPerPage;
+    const end = start + productsPerPage;
+    const productsToShow = products.slice(start, end);
 
-//     const tbody = document.getElementById('productTableBody');
-//     tbody.innerHTML = '';
+    const tbody = document.getElementById('productTableBody');
+    tbody.innerHTML = '';
 
-//     productsToShow.forEach(produto => {
-//         const row = document.createElement('tr');
-//         row.setAttribute('data-sku', produto.sku);
-//         row.innerHTML = `
-//         <td><img src="${produto.imageUrl}" alt="${produto.name}" onError="this.onerror=null;this.src='placeholder.jpg';"></td>
-//         <td>${produto.name}</td>
-//         <td>${produto.sku}</td>
-//         <td>${produto.brand}</td>
-//         <td>${produto.price}</td>
-//         <td><input type="number" value="${produto.quantity}" onchange="atualizarEstoque('${produto.sku}', this.value)"></td>
-//       `;
-//         tbody.appendChild(row);
+    productsToShow.forEach(produto => {
+        const row = document.createElement('tr');
+        row.setAttribute('data-sku', produto.sku);
+        row.innerHTML = `
+        <td><img src="${produto.imageUrl}" alt="${produto.name}" onError="this.onerror=null;this.src='placeholder.jpg';"></td>
+        <td>${produto.name}</td>
+        <td>${produto.sku}</td>
+        <td>${produto.brand}</td>
+        <td>${produto.price}</td>
+        <td><input type="number" value="${produto.quantity}" onchange="atualizarEstoque('${produto.sku}', this.value)"></td>
+      `;
+        tbody.appendChild(row);
 
-//         // Adicionar event listener apenas para a célula de quantidade
-//         row.querySelector('input[type="number"]').addEventListener('click', (event) => {
-//             event.stopPropagation(); // Impede a propagação do evento para evitar redirecionamento
-//         });
+        // Adicionar event listener apenas para a célula de quantidade
+        row.querySelector('input[type="number"]').addEventListener('click', (event) => {
+            event.stopPropagation(); // Impede a propagação do evento para evitar redirecionamento
+        });
 
-//         // Adicionar event listener para redirecionar ao clicar na linha (exceto na célula de quantidade)
-//         row.addEventListener('click', () => {
-//             window.location.href = `produto.html?sku=${produto.sku}`;
-//         });
-//     });
+        // Adicionar event listener para redirecionar ao clicar na linha (exceto na célula de quantidade)
+        row.addEventListener('click', () => {
+            window.location.href = `produto.html?sku=${produto.sku}`;
+        });
+    });
 
-//     document.getElementById('currentPage').textContent = page;
-// }
+    document.getElementById('currentPage').textContent = page;
+}
 
-// function goToPage(action) {
-//     console.log(`Going to page ${action}`);
-//     if (action === 'first') {
-//         currentPage = 1;
-//     } else if (action === 'prev' && currentPage > 1) {
-//         currentPage--;
-//     } else if (action === 'next' && currentPage < totalPages) {
-//         currentPage++;
-//     } else if (action === 'last') {
-//         currentPage = totalPages;
-//     }
-//     renderProductTable(currentPage);
-// }
+function goToPage(action) {
+    console.log(`Going to page ${action}`);
+    if (action === 'first') {
+        currentPage = 1;
+    } else if (action === 'prev' && currentPage > 1) {
+        currentPage--;
+    } else if (action === 'next' && currentPage < totalPages) {
+        currentPage++;
+    } else if (action === 'last') {
+        currentPage = totalPages;
+    }
+    renderProductTable(currentPage);
+}
 
-// function searchProducts() {
-//     const term = searchBar.value.toLowerCase();
-//     console.log(`Searching products with term: ${term}`);
+function searchProducts() {
+    const term = searchBar.value.toLowerCase();
+    console.log(`Searching products with term: ${term}`);
+    const filteredProducts = produtos.filter(produto => {
+        const name = produto.name ? produto.name.toLowerCase() : '';
+        const sku = produto.sku ? produto.sku.toLowerCase() : '';
+        const brand = produto.brand ? produto.brand.toLowerCase() : '';
+        const ean = produto.ean ? produto.ean.toLowerCase() : '';
 
-//     const filteredProducts = produtos.filter(produto => {
-//         const name = produto.name ? produto.name.toLowerCase() : '';
-//         const sku = produto.sku ? produto.sku.toLowerCase() : '';
-//         const brand = produto.brand ? produto.brand.toLowerCase() : '';
-//         const ean = produto.ean ? produto.ean.toLowerCase() : '';
+        return name.includes(term) || sku.includes(term) || brand.includes(term) || ean.includes(term);
+    });
 
-//         return name.includes(term) || sku.includes(term) || brand.includes(term) || ean.includes(term);
-//     });
-
-//     renderProductTable(1, filteredProducts);
-// }
+    renderProductTable(1, filteredProducts);
+}
 
 // async function atualizarEstoque(sku, quantidade) {
 //     quantidade = parseInt(quantidade, 10);
@@ -150,32 +148,21 @@ let searchBar;
 //     }
 // }
 
-// async function preencherFormulario(sku) {
-//     const produto = await getProduct(sku);
-//     if (produto) {
-//         document.getElementById('name').value = produto.name;
-//         document.getElementById('sku').value = produto.sku;
-//         document.getElementById('ean').value = produto.ean;
-//         document.getElementById('category').value = produto.category;
-//         document.getElementById('brand').value = produto.brand;
-//         document.getElementById('price').value = produto.price;
-//         document.getElementById('quantity').value = produto.quantity;
-//         document.getElementById('url-image').value = produto.imageUrl;
-//         document.getElementById('product-preview-image').src = produto.imageUrl;
-//         document.getElementById('description').value = produto.description;
-//     }
-// }
+async function preencherFormulario(sku) {
+    const produto = await getProducto(sku);
+    if (produto) {
+        document.getElementById('name').value = produto.name;
+        document.getElementById('sku').value = produto.sku;
+        document.getElementById('ean').value = produto.ean;
+        document.getElementById('category').value = produto.category;
+        document.getElementById('brand').value = produto.brand;
+        document.getElementById('price').value = produto.price;
+        document.getElementById('quantity').value = produto.quantity;
+        document.getElementById('url-image').value = produto.imageUrl;
+        document.getElementById('product-preview-image').src = produto.imageUrl;
+        document.getElementById('description').value = produto.description;
+    }
+}
 
-// window.atualizarEstoque = atualizarEstoque;
-// window.searchProducts = searchProducts;
-
-document.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById('testButto').addEventListener('click', async () => {
-     
-    
-    const produtos = await getAllProduct();
-    console.log('Resultado: ', produtos)
-
-    })
-    
-});
+window.atualizarEstoque = atualizarEstoque;
+window.searchProducts = searchProducts;

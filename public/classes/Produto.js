@@ -1420,6 +1420,15 @@ export async function getAllProduct() {
     }
 }
 
+export async function getProducto (sku) {
+    try {
+        return await getProduct(sku);
+    } catch (error) {
+        console.error('Erro ao pegar o produto: ', error.message);
+        return null
+    }
+}
+
 // Function to fetch product IDs by SKU and save them to Firebase
 async function pegarIdsProdutoBySku(sku) {
 
