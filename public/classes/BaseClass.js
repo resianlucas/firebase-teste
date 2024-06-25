@@ -1,4 +1,4 @@
-import { Bling } from "./bling.js";
+import { Bling } from "./Bling.js";
 
 export class BaseClass extends Bling {
     buildQueryString(params) {

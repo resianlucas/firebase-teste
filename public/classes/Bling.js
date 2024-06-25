@@ -10,7 +10,7 @@ function encodeFormData(data) {
 
 export class Bling {
     constructor({
-        idLoja = 0,
+        idLoja = null   ,
         nome = '',
         code = '',
         accessToken = '',
@@ -86,36 +86,18 @@ export class Bling {
 
     async getBling() {
         let idLoja = this.idLoja;
-        idLoja = String(this.idLoja);
-        const bling = getNewBling(idLoja);
-        console.log('bling: ', bling)
-        
-        
-        // try {
-        //     let snapshot;
-        //     if (idLoja) {
-        //         idLoja = String(this.idLoja); // Convert idLoja to a string
-        //         snapshot = await get(child(dbRef, idLoja));
-        //     } else {
-
-        //         snapshot = await get(dbRef);
-
-        //     }
-        //     if (snapshot.exists()) {
-        //         const blings = snapshot.val();
-
-        //         if (blings.length) {
-        //             return blings;
-        //         } else {
-        //             bling.push(blings);
-        //             return bling;
-        //         }
-        //     } else {
-        //         console.log('No bling data available');
-        //         return null;
-        //     }
-        // } catch (error) {
-        //     console.error('Erro ao buscar blings:', error);
-        // }
+        const bling = await getNewBling(idLoja);
+        return bling;
     }
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('testButto').addEventListener('click', async () => {
+        const id = document.getElementById('parametro-funca').value
+        const bling = new Bling({
+            idLoja: id
+        })
+        const teste = await bling.getBling();
+        console.log('result: ',teste);
+    })
+})

@@ -4,17 +4,21 @@ import { ref, set, get, child, update } from "https://www.gstatic.com/firebasejs
 export async function getNewBling(idLoja) {
     const blingRef = ref(db, 'bling/');
     if (idLoja) {
-        const bling = await get(child(blingRef, idLoja))
-        return bling
+        idLoja = String(idLoja);
+        console.log('ID Loja: ', idLoja)
+        const snapshot = await get(child(blingRef, idLoja))
+        return snapshot.val()
     } else {
-        const bling = await get(blingRef)
-        return bling
+        console.log('Não possui idLoja')
+        const snapshot = await get(blingRef)
+        return snapshot.val()
     }
 }
 
 export async function createBling(bling) {
     const blingRef = ref(db, '/bling' + bling.client_id);
-    const bling = set(blingRef, bling)
+    const newBling = set(blingRef, bling)
+    console.log(newBling)
     return true;
 }
 
