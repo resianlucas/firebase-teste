@@ -1,6 +1,5 @@
-import { db } from '/public/script.js';
-import { ref, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import Estoque from '../classes/Estoque.js ';
+import { fetchAllProducts, getProduct, updateProduct, getProductIdsBySku } from './database.js';
+import Estoque from '../classes/Estoque.js';
 import Deposito from '../classes/Deposito.js';
 
 let produtos = [];
@@ -10,7 +9,7 @@ let totalProducts = 0;
 let totalPages = 0;
 let searchBar;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM content loaded');
 
     // Theme toggle
@@ -28,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (searchBar && firstPageButton && prevPageButton && nextPageButton && lastPageButton && productTableBody && currentPageDisplay) {
         console.log('All necessary elements are present in the DOM');
-        fetchProducts();
+        produtos = await fetchAllProducts();
+        renderProductTable(currentPage);
 
         firstPageButton.addEventListener('click', () => goToPage('first'));
         prevPageButton.addEventListener('click', () => goToPage('prev'));
@@ -47,19 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         preencherFormulario(sku);
     }
 });
-
-async function fetchProducts() {
-    console.log('Fetching products from Firebase');
-    const dbRef = ref(db, 'products');
-    onValue(dbRef, (snapshot) => {
-        produtos = [];
-        snapshot.forEach((childSnapshot) => {
-            produtos.push(childSnapshot.val());
-        });
-        console.log(`Fetched ${produtos.length} products from Firebase`);
-        renderProductTable(currentPage);
-    });
-}
 
 function renderProductTable(page = 1, products = produtos) {
     console.log(`Rendering product table for page ${page}`);
@@ -136,12 +123,11 @@ async function atualizarEstoque(sku, quantidade) {
         alert('Quantidade inválida');
         return;
     }
-    const produtoRef = ref(db, 'products/' + sku);
-    await update(produtoRef, { quantity: quantidade });
+    await updateProduct(sku, { quantity: quantidade });
     alert('Estoque atualizado com sucesso');
     console.log(`Stock updated for SKU: ${sku}`);
 
-    const ids = pegarIdsProdutoBySku(sku);
+    const ids = await getProductIdsBySku(sku);
 
     const deposito = new Deposito();
     const depositos = await deposito.getDeposito();
@@ -158,7 +144,7 @@ async function atualizarEstoque(sku, quantidade) {
                 },
                 operacao: 'B',
                 quantidade: parseFloat(quantidade),
-            })
+            });
             const result = await estoque.createEstoque();
             console.log('Result:', result);
         }
@@ -166,11 +152,8 @@ async function atualizarEstoque(sku, quantidade) {
 }
 
 async function preencherFormulario(sku) {
-    const produtoRef = ref(db, 'products/' + sku);
-    const snapshot = await get(produtoRef);
-
-    if (snapshot.exists()) {
-        const produto = snapshot.val();
+    const produto = await getProduct(sku);
+    if (produto) {
         document.getElementById('name').value = produto.name;
         document.getElementById('sku').value = produto.sku;
         document.getElementById('ean').value = produto.ean;
@@ -186,21 +169,3 @@ async function preencherFormulario(sku) {
 
 window.atualizarEstoque = atualizarEstoque;
 window.searchProducts = searchProducts;
-
-async function pegarIdsProdutoBySku(sku) {
-    const produtoRef = ref(db, 'ids/' + sku);
-    try {
-        const snapshot = await get(produtoRef);
-        if (snapshot.exists()) {
-            const produto = snapshot.val();
-            console.log('Produto encontrado:', produto);
-            const id = Object.keys(produto);
-            console.log(`IDs encontrados para o sku ${sku}: IDS: ${id}`)
-            return id;
-        } else {
-            console.log('Nenhum produto encontrado com o SKU fornecido.');
-        }
-    } catch (error) {
-        console.error('Erro ao buscar produto no Firebase:', error);
-    }
-}
