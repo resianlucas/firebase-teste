@@ -83,4 +83,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         const currentTheme = document.body.getAttribute('data-theme');
         document.body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
     });
+
+    
 });

@@ -1419,13 +1419,16 @@ export default class Produto extends BaseClass {
 async function fetchProducts() {
     console.log('Fetching products from Firebase');
     const dbRef = ref(db, 'products');
-    let produtos = []
-    onValue(dbRef, (snapshot) => {
-        snapshot.forEach((childSnapshot) => {
-            produtos.push(childSnapshot.val());
-        });
+    let produtos = [];
+    
+    // Usar get para buscar os dados de uma vez
+    const snapshot = await get(dbRef);
+    snapshot.forEach((childSnapshot) => {
+        produtos.push(childSnapshot.val());
     });
+    
     console.log("Produtos: ", produtos);
+    console.log(produtos.length)
     return produtos;
 }
 
@@ -1446,7 +1449,8 @@ async function pegarIdsProdutoBySku(sku) {
                     const productData = {
                         requestCode: bling.request[0].codigo,
                         requestId: bling.request[0].id,
-                        chave: chave
+                        chave: chave,
+                        id: bling.id
                     };
 
                     const newItemRef = ref(db, `ids/${bling.request[0].codigo}/${bling.request[0].id}`);
@@ -1506,16 +1510,17 @@ async function pegarTodosIds(sku) {
     }
 }
 
-// document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
-//     document.getElementById('testButton').addEventListener('click', async () => {
+    document.getElementById('testButto').addEventListener('click', async () => {
 
-//         const id = document.getElementById('parametro-funcao').value
+        //const id = document.getElementById('parametro-funca').value
 
-//         const result = await pegarTodosIds(id);
-//         console.log('Result:', result);
-//     });
-// });
+        const result = await todosIds();
+        
+        console.log('Result:', result);
+    });
+});
 
 function pegarIdBySku(sku) {
     const ids = pegarTodosIds();
@@ -1525,16 +1530,26 @@ function pegarIdBySku(sku) {
 
 }
 
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function todosIds() {
     console.log('Pegando produtos');
-    const produtos = await fetchProducts();
+    const produto = await fetchProducts();
 
-    const promise = produtos.map(async (produto) => {
-        await pegarIdsProdutoBySku(produto.sku);
-    })
+    let produtos = await Promise.all(produto)
 
-    let results = await Promise.all(promise);
+    if (produtos.length > 1800) {
 
-    console.log('All product IDs have been fetched');
-    return results;
+        console.log('Quantidade de produtos: ', produtos.length)
+
+        for (let i = 0; i < produtos.length; i++) {
+            console.log('sku: ',produtos[i].sku);
+            await pegarIdsProdutoBySku(produtos[i].sku);
+            await delay(400); // Atraso de 333ms para garantir no máximo 3 requisições por segundo
+        }
+        console.log('All product IDs have been fetched');
+        return true; // Você pode retornar o resultado adequado aqui
+    }
 }

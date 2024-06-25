@@ -1,5 +1,6 @@
 import PedidoVenda from '../classes/PedidoVenda.js';
 import { db } from '../script.js';
+import { ref, get, update} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { lancarEstoqueByPedidoVenda as lancarEstoque } from './estoque.js';
 
 function pegarPedidos() {
@@ -135,37 +136,69 @@ function verificarPedido(idPedidoVenda = 20341264936, idLoja = 1) {
   return true
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('testButton').addEventListener('click', async () => {
+// document.addEventListener('DOMContentLoaded', () => {
+//   document.getElementById('testButton').addEventListener('click', async () => {
 
-    const idLoja = document.getElementById('parametro-funcao').value
-    const limite = document.getElementById('parametro-quantidade').value
+//     const idLoja = document.getElementById('parametro-funcao').value
+//     const limite = document.getElementById('parametro-quantidade').value
 
-    const pedido = new PedidoVenda({
-      idLoja: idLoja,
-      params: {
-        limite: limite,
-        idLoja: 204045472
-      }
-    })
+//     const pedido = new PedidoVenda({
+//       idLoja: idLoja,
+//       params: {
+//         limite: limite,
+//         idLoja: 204045472
+//       }
+//     })
 
-    pegarPedidosMassa(pedido);
+//     pegarPedidosMassa(pedido);
 
-    // const pedidos = await pedido.getPedidoVenda();
+//     // const pedidos = await pedido.getPedidoVenda();
 
-    // console.log('Pedidos: ', pedidos)
+//     // console.log('Pedidos: ', pedidos)
 
-    // for (const chave in pedidos) {
-    //   if (pedidos.hasOwnProperty(chave)) {
-    //     const pedido = pedidos[chave];
-    //     if (!pedido.request.length < 1) {
-    //       console.log('requisição completa: ', pedido)
-    //       console.log('pedido: ', pedido.request);
-    //     }
-    //   }
-    // }
+//     // for (const chave in pedidos) {
+//     //   if (pedidos.hasOwnProperty(chave)) {
+//     //     const pedido = pedidos[chave];
+//     //     if (!pedido.request.length < 1) {
+//     //       console.log('requisição completa: ', pedido)
+//     //       console.log('pedido: ', pedido.request);
+//     //     }
+//     //   }
+//     // }
 
-    //console.log('Result:', result);
+//     //console.log('Result:', result);
 
-  });
-});
+//   });
+// });
+
+// document.addEventListener('DOMContentLoaded', () => {
+//   document.getElementById('testButto').addEventListener('click', async () => {
+//       // const pedidoVenda = new PedidoVenda({
+//       //     idLoja: document.getElementById('parametro-funcao').value
+//       // });
+//       // const result = await pedidoVenda.getPedidoVenda();
+//       // console.log('Result:', result);
+
+//       const sku = document.getElementById('parametro-funca').value;
+//       console.log(sku)
+
+//       pegarIdsProdutoBySku(sku)
+
+//       async function pegarIdsProdutoBySku(sku) {
+//           const produtoRef = ref(db, 'ids/' + sku);
+//           try {
+//               const snapshot = await get(produtoRef);
+//               if (snapshot.exists()) {
+//                   const produto = snapshot.val();
+//                   console.log('Produto encontrado:', produto);
+//                   const id = Object.keys(produto);
+//               } else {
+//                   console.log('Nenhum produto encontrado com o SKU fornecido.');
+//               }
+//           } catch (error) {
+//               console.error('Erro ao buscar produto no Firebase:', error);
+//           }
+//       }
+
+//   });
+// });
