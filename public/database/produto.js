@@ -42,24 +42,3 @@ export async function getProductIdsBySku(sku) {
       return [];
   }
 }
-
-
-// export async function create(produto) {
-//   const produtoRef = ref(db, 'products/' )
-//   const produto = set(produtoRef, {
-//     name: produto.name,
-//     sku: produto.sku,
-//     ean: produto.ean,
-//     category: produto.category,
-//     brand: produto.brand,
-//     price: produto.price,
-//     quantity: produto.quantity,
-//     imageUrl: produto.imageUrl,
-//     description: produto.description
-//   })
-// }
-
-// export async function update(updates) {
-//   const produtoRef = ref(db, 'produtos/')
-//   const produto = update(produtoRef, updates)
-// }
