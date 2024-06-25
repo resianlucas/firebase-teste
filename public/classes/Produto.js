@@ -1411,8 +1411,13 @@ export default class Produto extends BaseClass {
     
 }
 
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+export async function getAllProduct() {
+    try {
+        return await getAllProducts();
+    } catch (error) {
+        console.error('Erro ao pegar os produtos: ', error.message);
+        return null
+    }
 }
 
 // Function to fetch product IDs by SKU and save them to Firebase
