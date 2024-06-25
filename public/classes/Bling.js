@@ -90,14 +90,3 @@ export class Bling {
         return bling;
     }
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById('testButto').addEventListener('click', async () => {
-        const id = document.getElementById('parametro-funca').value
-        const bling = new Bling({
-            idLoja: id
-        })
-        const teste = await bling.getBling();
-        console.log('result: ',teste);
-    })
-})
