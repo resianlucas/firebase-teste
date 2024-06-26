@@ -266,37 +266,8 @@ export async function novoEstoque(sku, quantidade) {
         console.log('Result:', result);
       }
     }
-
-
-
   } catch (error) {
     console.log('Erro ao criar novo estoque: ', error.message)
-  }
-}
-
-
-function atualizarEstoqueProduto() {
-  const lastRow = sheetProduto.getLastRow();
-  const produtos = sheetProduto.getRange(2, 1, lastRow - 1, 10).getValues();
-  const estoques = [];
-  try {
-    produtos.forEach(prod => {
-      const id = prod[0]
-
-      const estoque = new Estoque({
-        params: {
-          idsProdutos: [id]
-        }
-      })
-      var aux = estoque.getEstoque(estoque.params);
-      estoques.push(aux);
-    })
-    for (i = 0; i < estoques.length; i++) {
-      var qtd = estoques[i].data[0].saldoFisicoTotal;
-      sheetProduto.getRange(i + 2, 10).setValue(qtd);
-    }
-  } catch (erro) {
-    console.error('Erro ao atualizar estoque na planilha:', erro);
   }
 }
 
@@ -328,7 +299,6 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
   for (const item of itensPedido) {
   }
-
 
   const updates = {};
   let operacaoInvalida = false;
@@ -379,117 +349,4 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
     console.error('A operação foi cancelada devido a uma validação inválida.');
   }
 
-
-
-  // VERIFICAR SE PRODUTOS ESTÃO CADASTRADOS
-  //var verificador = verificarPedido(idPedidoVenda, idLoja);
-
-  // if (verificador) {
-  //   itensPedido.forEach(item => {
-  //     const estoque = {
-  //       sku: item.codigo,
-  //       nome: item.descricao,
-  //       qtd: item.quantidade
-  //     }
-  //     estoques.push(estoque);
-  //   });
-
-  //   //VERIFICA ESTOQUE NA TABELA
-  //   // estoques.forEach(estoque => {
-  //   //   var produtoEncontrado = produtos.find(produto => produto.sku === estoque.sku);
-  //   //   if (produtoEncontrado) {
-  //   //     var novaQuantidade = produtoEncontrado.qtd - estoque.qtd;
-  //   //     if (novaQuantidade < 0) {
-  //   //       ruptura(produtoEncontrado);
-  //   //       throw new Error('Estoque insuficiente para atender ao pedido\n Produto: ' + produtoEncontrado.sku);
-  //   //     }
-  //   //   }
-  //   // });
-
-  //   //ATUALIZA ESTOQUE NA TABELA
-  //   estoques.forEach(estoque => {
-  //     var produtoEncontrado = produtos.find(produto => produto.sku === estoque.sku);
-  //     if (produtoEncontrado) {
-  //       var novaQuantidade = produtoEncontrado.qtd - estoque.qtd;
-
-  //       if (novaQuantidade < 0) {
-  //         ruptura(produtoEncontrado);
-  //         throw new Error('Estoque insuficiente para atender ao pedido\n Produto: ' + produtoEncontrado.sku);
-  //       }
-  //       atualizarEstoqueAtualizado(produtoEncontrado.sku, novaQuantidade);
-  //     }
-  //   });
-
-
-  //   // LOG DE PEDIDOS PROCESSADOS
-  //   registrarPedidos(idPedidoVenda, idLoja, 'finalizado');
-
-  //   //return //Browser.msgBox('Tabela atualizada');
-  // } else {
-  //   return Browser.msgBox('Não foi possível completar a execução');
-  // }
 }
-
-
-function atualizarEstoqueAtualizado(sku = 'Oleo Doce 100ml', quantidade = 8) {
-  const produtos = pegarTodosProdutos();
-  const produto = produtos.find(produto => produto.sku === sku);
-  if (produto) {
-    var linha = produtos.indexOf(produto) + 2;
-    sheetProduto.getRange(linha, 9).setValue(quantidade);
-  };
-
-  const id = pegarIdBySku(sku);
-  id.forEach(produto => {
-    const operacao = 'B';
-    const deposito = new Deposito({
-      idLoja: produto.idLoja
-    });
-    const depositoData = deposito.getDeposito();
-    const idDeposito = depositoData.request.id;
-
-    const estoque = new Estoque({
-      produto: { id: produto.id },
-      operacao: operacao,
-      depositos: { id: idDeposito },
-      quantidade: quantidade,
-      idLoja: produto.idLoja
-    });
-    try {
-      estoque.createEstoque();
-      console.log('produto atualizado');
-    } catch (error) {
-      console.error('Erro ao atualizar estoque no Bling:', error);
-    };
-  });
-};
-
-// document.addEventListener('DOMContentLoaded', () => {
-//   document.getElementById('testButton').addEventListener('click', async () => {
-
-//     const idLoja = document.getElementById('parametro-funcao').value
-//     const quantidade = document.getElementById('parametro-quantidade').value
-//     const deposito = new Deposito({
-//       idLoja: idLoja
-//     })
-
-//     const depositos = await deposito.getDeposito();
-//     const idDeposito = Object.values(depositos).map(deposito => deposito.request.id);
-
-//     for (const id of idDeposito) {
-//       const estoque = new Estoque({
-//         produto: {
-//           id: 16239460759
-//         },
-//         depositos: {
-//           id: id
-//         },
-//         operacao: 'B',
-//         quantidade: parseFloat(quantidade),
-//         idLoja: idLoja
-//       })
-//       const result = await estoque.createEstoque();
-//       console.log('Result:', result);
-//     }
-//   });
-// });
