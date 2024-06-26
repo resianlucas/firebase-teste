@@ -398,24 +398,6 @@ export default class PedidoVenda extends BaseClass {
 }
 
 function pegarPedidos() {
-
-    // var dataInit = sheetPedido.getRange('J2').getValue();//parametros
-    // var dataInitial = new Date(dataInit);//parametros
-    // var dataHoje = Utilities.formatDate(data, Session.getScriptTimeZone(), 'yyyy-MM-dd');//parametros
-    // var dataInicial = Utilities.formatDate(dataInitial, Session.getScriptTimeZone(), 'yyyy-MM-dd');//parametros
-    // const idLoja = sheetPedido.getRange('H2').getValue();//parametros
-    // let status = sheetPedido.getRange('I2').getValue();//parametros
-
-    // if (status === 'Aberto') {
-    //   status = 6;
-    // } else if (status === 'Atendido') {
-    //   status = 9;
-    // } else if (status === 'Cancelado') {
-    //   status = 12;
-    // } else if (status === 'Andamento') {
-    //   status = 15;
-    // }
-
     const pedido = new PedidoVenda({
         idLoja: idLoja,
         params: {

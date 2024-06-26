@@ -1,6 +1,6 @@
 import PedidoVenda from '../classes/PedidoVenda.js';
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     const ordersTable = document.getElementById('ordersTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('searchInput');
     const filterButton = document.getElementById('filterButton');
@@ -9,11 +9,31 @@ document.addEventListener('DOMContentLoaded', async function() {
     const themeToggle = document.getElementById('themeToggle');
 
     let orders = [];
+    // const data = new Date('24-06-2024')
+    // const day =
+    // const month =
+    // const year = 
+    // const data = `${day}-${month}-${year}`
+
+    const date = new Date('2024-06-24');
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() retorna 0-11
+    const year = date.getFullYear();
+    const dataInicial = `${day}-${month}-${year}`;
+    console.log(dataInicial);  // Saída: "24-06-2024"
+
 
     async function fetchPedidos() {
-        const pedidoVenda = new PedidoVenda({ idLoja: null });
+        const pedidoVenda = new PedidoVenda({
+            idLoja: null,
+            params: {
+                dataInicial: dataInicial
+            }
+        });
         const result = await pedidoVenda.getPedidoVenda();
-        
+
+        console.log(result)
+
         if (result) {
             orders = Object.values(result).flatMap(empresa => empresa.request.map(pedido => ({
                 id: pedido[0],
@@ -51,9 +71,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     await fetchPedidos();
 
     // Search functionality
-    searchInput.addEventListener('keyup', function() {
+    searchInput.addEventListener('keyup', function () {
         const searchTerm = searchInput.value.toLowerCase();
-        const filteredOrders = orders.filter(order => 
+        const filteredOrders = orders.filter(order =>
             order.numero.toString().includes(searchTerm) ||
             order.numeroLoja.toString().includes(searchTerm) ||
             order.data.toLowerCase().includes(searchTerm) ||
@@ -83,6 +103,4 @@ document.addEventListener('DOMContentLoaded', async function() {
         const currentTheme = document.body.getAttribute('data-theme');
         document.body.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
     });
-
-    
 });
