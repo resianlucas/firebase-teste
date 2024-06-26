@@ -12,21 +12,75 @@ export async function getEstoque(sku) {
     }
 }
 
-export async function updateEstoque(sku, quantidade) {
-    console.log('funcao ativa')
+export async function createEstoque(sku, quantidade) {
+    console.log('função ativa');
+    console.log(`quantidade: ${quantidade}, tipo: ${typeof quantidade}`);
     const updates = {};
-    const estoqueRef = ref(db, '/products' + sku)
-    const snapshot = await get(estoqueRef)
-    if (snapshot.exists()) {
-        const currentQuantity = snapshot.val().quantity || 0;
-        const newQuantity = currentQuantity + quantidade;
-        if (newQuantity < 0) {
-            alert(`Quantidade negativa não permitida para SKU: ${sku}`);
+    const estoqueRef = ref(db, `/products/${sku}`);
+    console.log('referência de estoque:', estoqueRef);
+
+    try {
+        const snapshot = await get(estoqueRef);
+        console.log('snapshot:', snapshot);
+
+        if (snapshot.exists()) {
+            const quantidadeInt = parseInt(quantidade, 10);
+            const newQuantity = quantidadeInt;
+            console.log(`nova quantidade: ${newQuantity}, tipo: ${typeof newQuantity}`);
+
+            if (newQuantity < 0) {
+                console.error(`Quantidade negativa não permitida para SKU: ${sku}`);
+                return; // Interrompe a execução da função se a quantidade for negativa
+            }
+
+            updates[`/products/${sku}/quantity`] = newQuantity;
+        } else {
+            console.error(`Produto com SKU: ${sku} não encontrado.`);
+            return; // Interrompe a execução da função se o produto não for encontrado
         }
-        updates[`/products/${sku}/quantity`] = newQuantity;
-    } else {
-        alert(`Produto com SKU: ${sku} não encontrado.`);
+
+        console.log(`Atualizando quantidades no Firebase:`, updates);
+        await update(ref(db), updates);
+        console.log('Quantidade atualizada com sucesso.');
+    } catch (error) {
+        console.error('Erro ao atualizar quantidade no Firebase:', error);
     }
-    console.log(`Atualizando quantidades no Firebase:`, updates);
-    await update(ref(db), updates);
 }
+
+export async function updateEstoque(sku, quantidade) {
+    console.log('função ativa');
+    console.log(`quantidade: ${quantidade}, tipo: ${typeof quantidade}`);
+    const updates = {};
+    const estoqueRef = ref(db, `/products/${sku}`);
+    console.log('referência de estoque:', estoqueRef);
+
+    try {
+        const snapshot = await get(estoqueRef);
+        console.log('snapshot:', snapshot);
+
+        if (snapshot.exists()) {
+            const currentQuantity = parseInt(snapshot.val().quantity, 10) || 0;
+            const quantidadeInt = parseInt(quantidade, 10);
+
+            const newQuantity = currentQuantity + quantidadeInt;
+            console.log(`nova quantidade: ${newQuantity}, tipo: ${typeof newQuantity}`);
+
+            if (newQuantity < 0) {
+                console.error(`Quantidade negativa não permitida para SKU: ${sku}`);
+                return; // Interrompe a execução da função se a quantidade for negativa
+            }
+
+            updates[`/products/${sku}/quantity`] = newQuantity;
+        } else {
+            console.error(`Produto com SKU: ${sku} não encontrado.`);
+            return; // Interrompe a execução da função se o produto não for encontrado
+        }
+
+        console.log(`Atualizando quantidades no Firebase:`, updates);
+        await update(ref(db), updates);
+        console.log('Quantidade atualizada com sucesso.');
+    } catch (error) {
+        console.error('Erro ao atualizar quantidade no Firebase:', error);
+    }
+}
+

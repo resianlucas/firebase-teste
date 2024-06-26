@@ -1,4 +1,5 @@
 import { getAllProduct, getProducto } from "../classes/Produto.js";
+import { atualizarEstoque, novoEstoque } from "../classes/Estoque.js";
 
 let produtos = [];
 const productsPerPage = 100;
@@ -65,8 +66,8 @@ function renderProductTable(page = 1, products = produtos) {
         <td>${produto.name}</td>
         <td>${produto.sku}</td>
         <td>${produto.brand}</td>
-        <td>${produto.price}</td>
-        <td><input type="number" value="${produto.quantity}" onchange="atualizarEstoque('${produto.sku}', this.value)"></td>
+        <td>${produto.price}</td>   
+        <td><input type="number" value="${produto.quantity}" onchange="novoEstoque('${produto.sku}', this.value)"></td>
       `;
         tbody.appendChild(row);
 
@@ -164,5 +165,5 @@ async function preencherFormulario(sku) {
     }
 }
 
-window.atualizarEstoque = atualizarEstoque;
+window.novoEstoque = novoEstoque;
 window.searchProducts = searchProducts;

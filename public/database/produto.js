@@ -33,7 +33,7 @@ export async function getAllProducts() {
 }
 
 export async function getProductIdsBySku(sku) {
-  const produtoRef = ref(db, 'ids/' + sku);
+  const produtoRef = ref(db, '/ids/' + sku);
   const snapshot = await get(produtoRef);
   if (snapshot.exists()) {
       return Object.keys(snapshot.val());

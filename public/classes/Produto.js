@@ -1420,7 +1420,7 @@ export async function getAllProduct() {
     }
 }
 
-export async function getProducto (sku) {
+export async function getProducto(sku) {
     try {
         return await getProduct(sku);
     } catch (error) {
@@ -1435,7 +1435,6 @@ export async function pegarIdBySku(sku) {
         return ids
     } catch (error) {
         console.log('Erro ao pegar id dos produtos: ', error.message)
-        
     }
 }
 
