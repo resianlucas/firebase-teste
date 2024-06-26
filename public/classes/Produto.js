@@ -1474,24 +1474,28 @@ async function pegarIdsProdutoBySku(sku) {
 }
 
 
-function criarProduto() {
-    const produto = new Produto({
-        payload: {
-            nome: 'Gel Fixador Deslumbre Lowell 180ml',
-            codigo: 'Gel Deslumbre 180ml Lowell',
-            gtin: '7898556752879',
-            marca: 'Lowell',
-            descricaoCurta: 'Fixação forte e flexível com efeito brilho molhado.',
-            preco: 36.6,
-            midia: {
-                imagens: { externas: { link: 'https://i.ibb.co/VNn4Xyp/7898556752879.png' } }
-            },
-        }
-    })
-    console.log(produto.payload)
-    const produtoCriado = produto.createProduct();
-    console.log(produtoCriado);
-    console.log(todosIds(produto.payload));
+export async function criarProduto(produto) {
+
+    await createProduct(produto);
+
+    // const produto = new Produto({
+    //     payload: {
+    //         nome: 'Gel Fixador Deslumbre Lowell 180ml',
+    //         codigo: 'Gel Deslumbre 180ml Lowell',
+    //         gtin: '7898556752879',
+    //         marca: 'Lowell',
+    //         descricaoCurta: 'Fixação forte e flexível com efeito brilho molhado.',
+    //         preco: 36.6,
+    //         midia: {
+    //             imagens: { externas: { link: 'https://i.ibb.co/VNn4Xyp/7898556752879.png' } }
+    //         },
+    //     }
+    // })
+
+    // console.log(produto.payload)
+    // const produtoCriado = produto.createProduct();
+    // console.log(produtoCriado);
+    // console.log(todosIds(produto.payload));
 }
 
 function verificarProduto(sku) {

@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="produto.css">
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
-    <script type="module" src="produto.js"></script>
+    <script type="module" src="produto.js" defer></script>
     <title>Produtos</title>
 </head>
 
@@ -77,11 +75,5 @@
             </div>
         </footer>
     </form>
-    <script>
-        // Alternar entre temas claro e escuro
-        document.querySelector('.theme-toggle').addEventListener('click', () => {
-            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-        });
-    </script>
 </body>
 </html>
