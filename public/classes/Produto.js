@@ -1478,6 +1478,32 @@ export async function criarProduto(produto) {
 
     await createProduct(produto);
 
+    const product = new Produto({
+        payload: {
+            nome: produto.name,
+            codigo: produto.sku,
+            tipo: 'P',
+            situacao: 'A',
+            formato: 'S',
+            gtin: produto.ean,
+            marca: produto.brand,
+            preco: produto.price,
+            descricaoCurta: produto.description,
+            midia: {
+                imagens: {
+                    externas: {
+                        link: produto.imagemURL
+                    }
+                }
+            }
+
+            
+        }
+    })
+
+    const produtoCriado = await product.createProduct();
+    console.log(produtoCriado);
+
     // const produto = new Produto({
     //     payload: {
     //         nome: 'Gel Fixador Deslumbre Lowell 180ml',

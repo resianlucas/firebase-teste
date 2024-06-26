@@ -15,8 +15,18 @@ function converterQuantidade(quantidade) {
 document.querySelector('.theme-toggle').addEventListener('click', () => {
     document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
 });
+document.getElementById('url-image').addEventListener('input', function() {
+    const imageUrl = this.value;
+    const imagePreview = document.getElementById('product-preview-image');
+    
+    if (imageUrl) {
+        imagePreview.src = imageUrl;
+    } else {
+        imagePreview.src = 'placeholder.jpg';
+    }
+});
 
-addItemForm.addEventListener('submit', (e) => {
+addItemForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const product = {
         name: document.getElementById("name").value,
@@ -32,7 +42,7 @@ addItemForm.addEventListener('submit', (e) => {
 
     console.log('Produto a ser armazenado:', product);
 
-    criarProduto(product)
+    await criarProduto(product)
         .then(() => {
             console.log('Item adicionado com sucesso!');
             alert('Item adicionado com sucesso!');
