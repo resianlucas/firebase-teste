@@ -1,7 +1,7 @@
 import Deposito from './Deposito.js';
 import { BaseClass } from './BaseClass.js';
 import { updateEstoque } from '../database/estoque.js';
-import { pegarIdBySku } from './Produto.js';
+import { pegarIdBySku, getAllProduct } from './Produto.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -195,39 +195,14 @@ export default class Estoque extends BaseClass {
     
 }
 
-function pegarEstoqueAtualizado() {
-    const produtos = pegarTodosProdutos();
-    const estoques = produtos.map(produto => ({
-      sku: produto.sku,
-      qtd: produto.qtd
-    }));
-    return estoques;
-  };
-  
-  //////////////OK/////////////////////
-  function pegarTodosEstoques() {
-    const estoques = pegarEstoqueAtualizado();
-    const dados = estoques.map(produto => ([produto.sku, produto.qtd]))
-    sheetEstoque.getRange(2, 1, dados.length, dados[0].length).setValues(dados);
-  };
-  
-  //////////////OK/////////////////////
-  function pegarEstoque() {
-    const lastRow = sheetEstoque.getLastRow();
-    const consulta = sheetEstoque.getRange(2, 1, lastRow - 1).getValues();
-    const estoques = pegarEstoqueAtualizado();
-    consulta.forEach((prod, index) => {
-      const produto = estoques.find(produto => produto.sku === prod[0]);
-      sheetEstoque.getRange(index + 2, 2).setValue(produto.qtd);
-    });
-  };
-  
-  // function showDialog() {
-  //   const htmlOutput = HtmlService.createHtmlOutputFromFile('index')
-  //       .setWidth(400)
-  //       .setHeight(300);
-  //   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Atualizar Estoque');
-  // }
+export async function pegarEstoque() {
+  const produtos = await getAllProduct();
+  const estoques = produtos.map(produto => ({
+    sku: produto.sku,
+    qtd: produto.qtd
+  }));
+  return estoques;
+}
   
   // function atualizarEstoque() {
   //   const lastRow = sheetEstoque.getLastRow();
