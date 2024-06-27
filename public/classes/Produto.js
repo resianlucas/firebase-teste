@@ -1,5 +1,5 @@
 import { BaseClass } from './BaseClass.js';
-import { getProduct, getAllProducts, createProduct, updateProduct, getProductIdsBySku } from '../database/produto.js';
+import { getProduct, getAllProducts, createProduct, updateProduct, getProductIdsBySku, setProductId } from '../database/produto.js';
 import { novoEstoque } from './Estoque.js';
 
 const baseUrl = 'http://localhost:3000/api'
@@ -1440,45 +1440,9 @@ export async function pegarIdBySku(sku) {
     }
 }
 
-// Function to fetch product IDs by SKU and save them to Firebase
-async function pegarIdsProdutoBySku(sku) {
-
-    console.log("Pegando id dos produtos")
-    try {
-        const produto = new Produto({ params: { criterio: 5, codigo: sku } });
-        const produtos = await produto.getProduto();
-
-        console.log('Produto encontrado:', produtos);
-
-        for (const chave in produtos) {
-            if (produtos.hasOwnProperty(chave)) {
-                const bling = produtos[chave];
-                if (bling.request.length > 0) {
-                    const productData = {
-                        requestCode: bling.request[0].codigo,
-                        requestId: bling.request[0].id,
-                        chave: chave,
-                        id: bling.id
-                    };
-
-                    const newItemRef = ref(db, `ids/${bling.request[0].codigo}/${bling.request[0].id}`);
-                    await set(newItemRef, productData);
-
-                    console.log('Informações do produto salvas no Firebase:', productData);
-                }
-            }
-        }
-
-        console.log('Todos os produtos foram salvos no Firebase com sucesso!');
-    } catch (error) {
-        console.error('Erro ao buscar e salvar produtos:', error);
-    }
-}
-
-
 export async function criarProduto(produto) {
 
-    await createProduct(produto);
+    //await createProduct(produto);
 
     console.log('Produto para subir: ', produto)
 
@@ -1503,33 +1467,50 @@ export async function criarProduto(produto) {
         }
     })
 
-    
+    console.log('Produto para subir: ', product.payload)
 
-    const produtoCriado = await product.createProduct();
-    if(produtoCriado) {
-        await novoEstoque(product.payload.codigo, produto.quantity)
-    }
-    console.log(produtoCriado);
+    // const produtoCriado = await product.createProduct();
+    // await pegarIdsProdutoBySku(produto.sku)  
 
-    // const produto = new Produto({
-    //     payload: {
-    //         nome: 'Gel Fixador Deslumbre Lowell 180ml',
-    //         codigo: 'Gel Deslumbre 180ml Lowell',
-    //         gtin: '7898556752879',
-    //         marca: 'Lowell',
-    //         descricaoCurta: 'Fixação forte e flexível com efeito brilho molhado.',
-    //         preco: 36.6,
-    //         midia: {
-    //             imagens: { externas: { link: 'https://i.ibb.co/VNn4Xyp/7898556752879.png' } }
-    //         },
-    //     }
-    // })
-
-    // console.log(produto.payload)
-    // const produtoCriado = produto.createProduct();
+    // if(produtoCriado) {
+    //     await novoEstoque(product.payload.codigo, produto.quantity)
+    // }
     // console.log(produtoCriado);
-    // console.log(todosIds(produto.payload));
 }
+
+async function pegarIdsProdutoBySku(sku) {
+
+    console.log("Pegando id dos produtos")
+    try {
+        const produto = new Produto({ params: { criterio: 5, codigo: sku } });
+        const produtos = await produto.getProduto();
+
+        console.log('Produto encontrado:', produtos);
+
+        for (const chave in produtos) {
+            if (produtos.hasOwnProperty(chave)) {
+                const bling = produtos[chave];
+                if (bling.request.length > 0) {
+                    const productData = {
+                        requestCode: bling.request[0].codigo,
+                        requestId: bling.request[0].id,
+                        chave: chave,
+                        id: bling.id
+                    };
+
+                    await setProductId(bling.request[0].codigo,bling.request[0].id,productData)
+
+                    console.log('Informações do produto salvas no Firebase:', productData);
+                }
+            }
+        }
+
+        console.log('Todos os produtos foram salvos no Firebase com sucesso!');
+    } catch (error) {
+        console.error('Erro ao buscar e salvar produtos:', error);
+    }
+}
+
 
 function verificarProduto(sku) {
     const lastRow = sheetProduto.getLastRow();
