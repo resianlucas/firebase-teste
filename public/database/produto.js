@@ -42,3 +42,11 @@ export async function getProductIdsBySku(sku) {
       return [];
   }
 }
+
+export async function setProductId( sku ,id ) {
+  const produtoRef = ref(db, `/ids/${id}`);
+  await set(produtoRef, {
+
+  })
+  
+}

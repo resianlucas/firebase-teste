@@ -1,5 +1,6 @@
 import { BaseClass } from './BaseClass.js';
 import { getProduct, getAllProducts, createProduct, updateProduct, getProductIdsBySku } from '../database/produto.js';
+import { novoEstoque } from './Estoque.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -1262,6 +1263,7 @@ export default class Produto extends BaseClass {
             for (let i = 0; i < responses.length; i++) {
                 let response = await responses[i].text();
                 try {
+                    console.log('response: ',response)
                     response = JSON.parse(response);
                 } catch (e) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
@@ -1478,6 +1480,8 @@ export async function criarProduto(produto) {
 
     await createProduct(produto);
 
+    console.log('Produto para subir: ', produto)
+
     const product = new Produto({
         payload: {
             nome: produto.name,
@@ -1491,17 +1495,20 @@ export async function criarProduto(produto) {
             descricaoCurta: produto.description,
             midia: {
                 imagens: {
-                    externas: {
+                    externas: [{
                         link: produto.imagemURL
-                    }
+                    }]
                 }
             }
-
-            
         }
     })
 
+    
+
     const produtoCriado = await product.createProduct();
+    if(produtoCriado) {
+        await novoEstoque(product.payload.codigo, produto.quantity)
+    }
     console.log(produtoCriado);
 
     // const produto = new Produto({
@@ -1560,3 +1567,14 @@ function verificarProduto(sku) {
         throw new Error(msg)
     }
 }
+
+// document.addEventListener('DOMContentLoaded', ()=>{
+//     document.getElementById('testButto').addEventListener('click', async () => {
+
+//         const id = parseInt(document.getElementById('parametro-funca').value)
+//         const produto = new Produto();
+//         const dados = await produto.getProdutoById(id);
+//         console.log('resultado: ', dados);
+
+//     })
+// })
