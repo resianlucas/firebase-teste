@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Pedido</title>
+    <link rel="stylesheet" href="./pedidoDetalhes.css">
+</head>
+<body>
+    <header>
+        <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+        <h1>Detalhes do Pedido</h1>
+        <nav>
+            <ul>
+                <li><a href="/public/index.html">Home</a></li>
+                <li><a href="/public/pedidos/pedidos.html">Pedidos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="pedido-detalhes-container">
+            <h2>Pedido ID: <span id="pedidoId"></span></h2>
+            <div class="pedido-info">
+                <p><strong>Número do Pedido:</strong> <span id="numeroPedido"></span></p>
+                <p><strong>Número da Loja:</strong> <span id="numeroLoja"></span></p>
+                <p><strong>Data do Pedido:</strong> <span id="dataPedido"></span></p>
+                <p><strong>Total do Pedido:</strong> <span id="totalPedido"></span></p>
+                <p><strong>Situação do Pedido:</strong> <span id="situacaoPedido"></span></p>
+                <p><strong>ID da Loja:</strong> <span id="idLoja"></span></p>
+                <p><strong>ID da Empresa:</strong> <span id="idEmpresa"></span></p>
+            </div>
+            <h3>Itens do Pedido</h3>
+            <table id="itemsTable">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Nome do Produto</th>
+                        <th>Quantidade</th>
+                        <th>Preço</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados dos itens do pedido serão inseridos aqui pelo JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script type="module" src="./pedidoDetalhes.js"></script>
+</body>
+</html>

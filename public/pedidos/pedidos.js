@@ -1,4 +1,4 @@
-import PedidoVenda from '../classes/PedidoVenda.js';
+import PedidoVenda, { pegarPedidoPeloID } from '../classes/PedidoVenda.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
     const ordersTable = document.getElementById('ordersTable').getElementsByTagName('tbody')[0];
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 <td>${order.idEmpresa}</td>
             `;
             row.addEventListener('click', () => {
-                window.location.href = `pedidoDetalhes.html?id=${order.id}`;
+                window.location.href = `pedidoDetalhes.html?id=${order.id}&empresa=${order.idEmpresa}`;
             });
         });
     }

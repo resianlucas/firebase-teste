@@ -334,22 +334,21 @@ export default class PedidoVenda extends BaseClass {
         console.log('URL:', url);
 
         let accessToken = await this.getBling();
+        console.log(accessToken)
         //console.log('Access Token:', accessToken);
 
         try {
-            let requests = Object.keys(accessToken).map(id => {
-                const blingInfo = accessToken[id];
-                //console.log('Bling Info:', blingInfo);
-                return fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${blingInfo.access_token}`
-                    }
-                });
+            let requests = []
+            const blingInfo = accessToken;
+            console.log('Bling Info:', blingInfo.access_token);
+            let request = fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${blingInfo.access_token}`
+                }
             });
-
-            //console.log('REQUESTS:', requests);
+            requests.push(request);
 
             let responses = await Promise.all(requests);
 
@@ -358,15 +357,17 @@ export default class PedidoVenda extends BaseClass {
                 let response = await responses[i].text(); // Alterado para text() para pegar HTML
                 try {
                     response = JSON.parse(response); // Tenta parsear como JSON
+                    console.log("response: ", response)
                 } catch (e) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
                     continue;
                 }
 
-                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+                let blingInfo = accessToken;
+            
 
 
-                console.log("RESPONSE: ", response);
+                console.log("RESPONSE: ", blingInfo);
 
                 let pedido = {
                     id: response.data.id,
@@ -388,6 +389,7 @@ export default class PedidoVenda extends BaseClass {
                     method: 'getPedidoVendaById',
                     request: pedido
                 };
+                console.log(result)
             }
             return result;
         } catch (error) {
@@ -397,7 +399,7 @@ export default class PedidoVenda extends BaseClass {
     }
 }
 
-function pegarPedidos() {
+export async function pegarPedidos() {
     const pedido = new PedidoVenda({
         idLoja: idLoja,
         params: {
@@ -433,7 +435,18 @@ function pegarPedidos() {
             Browser.msgBox('Estoque não foi lançado')
         }
     }
+}
 
+export async function pegarPedidoPeloID(idPedidoVenda, idLoja) {
+    try {
+        const pedido = new PedidoVenda({
+            idLoja: idLoja
+        })
+        const pedidos = await pedido.getPedidoVendaById(idPedidoVenda)
+        return pedidos
+    } catch (error) {
+        console.log("Erro ao pegar o pedido de venda pelo id: ", error)    
+    }    
 }
 
 async function pegarPedidosMassa(pedido) {
@@ -451,14 +464,6 @@ async function pegarPedidosMassa(pedido) {
                         '\nID Loja: ', ped[5]
                     )
                     try {
-
-
-
-
-
-
-
-
                         await lancarEstoque(ped[0], ped[5]);
                     } catch (error) {
                         console.error('Erro ao processar pedido:', ped, error);

@@ -1255,7 +1255,7 @@ export default class Produto extends BaseClass {
                 });
             });
 
-            console.log('REQUESTS: ', requests);
+            console.log('REQUESTS: ', requests);    
 
             let responses = await Promise.all(requests);
 
@@ -1459,9 +1459,13 @@ export async function criarProduto(produto) {
             descricaoCurta: produto.description,
             midia: {
                 imagens: {
+                    internas: [],
                     externas: [{
-                        link: produto.imagemURL
+                        link: produto.imageUrl
                     }]
+                },
+                video: {
+                    url: ""
                 }
             }
         }
@@ -1469,13 +1473,13 @@ export async function criarProduto(produto) {
 
     console.log('Produto para subir: ', product.payload)
 
-    // const produtoCriado = await product.createProduct();
-    // await pegarIdsProdutoBySku(produto.sku)  
+    const produtoCriado = await product.createProduct();
+    //await pegarIdsProdutoBySku(produto.sku)  
 
     // if(produtoCriado) {
     //     await novoEstoque(product.payload.codigo, produto.quantity)
     // }
-    // console.log(produtoCriado);
+    console.log(produtoCriado);
 }
 
 async function pegarIdsProdutoBySku(sku) {
