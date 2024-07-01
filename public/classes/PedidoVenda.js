@@ -268,10 +268,9 @@ export default class PedidoVenda extends BaseClass {
         console.log('URL:', url);
 
         let accessToken = await this.getBling();
-        //console.log('Access Token:', accessToken);
-
+        console.log('Access Token:', accessToken);
+        let requests = []
         try {
-            let requests = []
             for (let id in accessToken) {
                 const blingInfo = accessToken[id];
                 console.log('Bling Info: ', blingInfo)

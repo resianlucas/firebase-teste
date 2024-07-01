@@ -7,7 +7,7 @@ export async function getNewBling(idLoja) {
         idLoja = String(idLoja);
         console.log('ID Loja: ', idLoja)
         const snapshot = await get(child(blingRef, idLoja))
-        return snapshot.val()
+        return [snapshot.val()]
     } else {
         console.log('Não possui idLoja')
         const snapshot = await get(blingRef)
