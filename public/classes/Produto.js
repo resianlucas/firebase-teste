@@ -1125,19 +1125,20 @@ export default class Produto extends BaseClass {
 
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
-
+        let requests = []
         try {
-            let requests = Object.keys(accessToken).map(id => {
+            for (let id in accessToken) {
                 const blingInfo = accessToken[id];
                 console.log('Bling Info: ', blingInfo);
-                return fetch(url, {
+                let request = fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${blingInfo.access_token}`
                     }
                 });
-            });
+                requests.push(request);
+            };
 
             console.log('REQUESTS: ', requests);
 
@@ -1180,19 +1181,20 @@ export default class Produto extends BaseClass {
         console.log('URL:', url);
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
-
+        let requests = [];
         try {
-            let requests = Object.keys(accessToken).map(id => {
+            for (let id in accessToken) {
                 const blingInfo = accessToken[id];
                 console.log('Bling Info: ', blingInfo);
-                return fetch(url, {
+                let request = fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${blingInfo.access_token}`
                     }
                 });
-            });
+                requests.push(request)
+            };
 
             console.log('REQUESTS: ', requests);
 
@@ -1256,7 +1258,7 @@ export default class Produto extends BaseClass {
 
             console.log(requests.body)
 
-            console.log('REQUESTS: ', requests);    
+            console.log('REQUESTS: ', requests);
 
             let responses = await Promise.all(requests);
 
@@ -1264,7 +1266,7 @@ export default class Produto extends BaseClass {
             for (let i = 0; i < responses.length; i++) {
                 let response = await responses[i].text();
                 try {
-                    console.log('response: ',response)
+                    console.log('response: ', response)
                     response = JSON.parse(response);
                 } catch (e) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
@@ -1411,7 +1413,7 @@ export default class Produto extends BaseClass {
             return null;
         }
     }
-    
+
 }
 
 export async function getAllProduct() {
@@ -1503,7 +1505,7 @@ async function pegarIdsProdutoBySku(sku) {
                         id: bling.id
                     };
 
-                    await setProductId(bling.request[0].codigo,bling.request[0].id,productData)
+                    await setProductId(bling.request[0].codigo, bling.request[0].id, productData)
 
                     console.log('Informações do produto salvas no Firebase:', productData);
                 }
