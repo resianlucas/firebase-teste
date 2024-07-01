@@ -363,8 +363,6 @@ export default class PedidoVenda extends BaseClass {
 
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];;
 
-
-
                 console.log("RESPONSE: ", blingInfo);
 
                 let pedido = {

@@ -84,3 +84,17 @@ export async function updateEstoque(sku, quantidade) {
     }
 }
 
+export async function verificarEstoque(sku, quantidadeSolicitada) {
+    const productRef = ref(db, `products/${sku}`);
+    const productSnapshot = await get(productRef);
+
+    if (productSnapshot.exists()) {
+        const quantidadeAtual = productSnapshot.val().quantity || 0;
+        const novaQuantidade = quantidadeAtual - quantidadeSolicitada;
+        return novaQuantidade >= 0;
+    } else {
+        console.error(`Produto com SKU: ${sku} não encontrado.`);
+        return false;
+    }
+}
+

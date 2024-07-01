@@ -1,7 +1,9 @@
 import Deposito from './Deposito.js';
 import { BaseClass } from './BaseClass.js';
-import { updateEstoque, createEstoque } from '../database/estoque.js';
-import { pegarIdBySku, getAllProduct } from './Produto.js';
+import PedidoVenda from './PedidoVenda.js';
+import Produto, { pegarIdBySku, getAllProduct } from './Produto.js';
+import { updateEstoque, createEstoque, verificarEstoque } from '../database/estoque.js';
+import { registrarLancamento, verificarLancamentoDuplicado } from '../database/pedido.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -271,82 +273,87 @@ export async function novoEstoque(sku, quantidade) {
   }
 }
 
-//alem de pedir o id, pedir tambem o sku para verificacao na tabela de produtos do hub
 export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
+  const pedid = new PedidoVenda({ idLoja: idLoja });
 
-  const pedid = new PedidoVenda({
-    idLoja: idLoja
-  });
-
-  //registrarPedidos(idPedidoVenda, idLoja, 'processando');
-
-  // const produtos = pegarEstoqueAtualizado();
-  // const estoques = [];
-
-
-  // COLETA DO PEDIDO
-  const pedido = await pedid.getPedidoVendaById(idPedidoVenda);
-
-  console.log('Pedido Unitário: ', pedido)
-
-  // VERIFICAR SE É UM PEDIDO VÁLIDO
-  //verificarPedido(idPedidoVenda, idLoja);
-
-  const empresa = Object.keys(pedido);
-
-  let itensPedido = pedido[empresa].request.itens;
-  console.log('itens pedido: ', itensPedido);
-
-  for (const item of itensPedido) {
+  // Verifica se o pedido já foi lançado
+  const pedidoLancado = await verificarLancamentoDuplicado(idPedidoVenda);
+  if (pedidoLancado) {
+    console.error(`Pedido de venda com ID ${idPedidoVenda} já foi lançado.`);
+    return;
   }
 
-  const updates = {};
+  // Coleta do pedido
+  const pedido = await pedid.getPedidoVendaById(idPedidoVenda);
+  console.log('Pedido Unitário: ', pedido);
+
+  // Verifica se o pedido possui nota fiscal
+  if (pedido.notaFiscal.id === 0) {
+    console.error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
+    return;
+  }
+
+  const empresa = Object.keys(pedido)[0]; // Assumindo que o objeto empresa está na primeira chave
+  let itensPedido = pedido[empresa].request.itens;
+  console.log('Itens do pedido: ', itensPedido);
+
   let operacaoInvalida = false;
+  let itensNaoCadastrados = [];
 
   for (const item of itensPedido) {
-
     const id = item.produto.id;
-    const produto = new Produto({
-      idLoja: idLoja
-    });
+    const produto = new Produto({ idLoja: idLoja });
     const prod = await produto.getProdutoById(id);
-    console.log('Produto: ', prod[empresa].request.estrutura.componentes[0].produto.id)
-    const produtoMestre = await produto.getProdutoById(prod[empresa].request.estrutura.componentes[0].produto.id)
-    console.log('Produto mestre: ', produtoMestre)
+    if (!prod) {
+      console.error(`Produto com ID ${id} não encontrado.`);
+      itensNaoCadastrados.push(id);
+      continue;
+    }
+    const produtoMestre = await produto.getProdutoById(prod[empresa].request.estrutura.componentes[0].produto.id);
+    if (!produtoMestre) {
+      console.error(`Produto mestre para o produto com ID ${id} não encontrado.`);
+      itensNaoCadastrados.push(id);
+      continue;
+    }
 
-    const sku = produtoMestre[empresa].request.codigo; // ajuste para corresponder ao campo correto em seu objeto de item
-    const quantidadeSolicitada = item.quantidade; // ajuste para corresponder ao campo correto em seu objeto de item
-    const productRef = ref(db, `products/${sku}`);
-    const productSnapshot = await get(productRef);
+    const sku = produtoMestre[empresa].request.codigo;
+    const quantidadeSolicitada = item.quantidade;
 
-    if (productSnapshot.exists()) {
-      const quantidadeAtual = productSnapshot.val().quantity || 0;
-      const novaQuantidade = quantidadeAtual - quantidadeSolicitada; // Supondo que você queira adicionar a quantidade solicitada ao estoque atual
-
-      if (novaQuantidade < 0) {
-        console.error(`Operação inválida: quantidade negativa não permitida para SKU: ${sku}. Estoque atual: ${quantidadeAtual}, Quantidade solicitada: ${quantidadeSolicitada}`);
-        operacaoInvalida = true;
-        break; // Interrompe o loop se encontrar uma quantidade negativa
-      }
-
-      updates[`/products/${sku}/quantity`] = novaQuantidade;
-    } else {
-      console.error(`Produto com SKU: ${sku} não encontrado.`);
+    const estoqueValido = await verificarEstoque(sku, quantidadeSolicitada);
+    if (!estoqueValido) {
+      console.error(`Operação inválida: quantidade negativa não permitida para SKU: ${sku}.`);
       operacaoInvalida = true;
-      break; // Interrompe o loop se o produto não for encontrado
+      break; // Interrompe o loop se encontrar uma quantidade negativa
     }
   }
 
   if (!operacaoInvalida) {
     try {
-      console.log(`Atualizando quantidades no Firebase:`, updates);
-      await update(ref(db), updates);
+      for (const item of itensPedido) {
+        const id = item.produto.id;
+        const produto = new Produto({ idLoja: idLoja });
+        const prod = await produto.getProdutoById(id);
+        const produtoMestre = await produto.getProdutoById(prod[empresa].request.estrutura.componentes[0].produto.id);
+        const sku = produtoMestre[empresa].request.codigo;
+        const quantidadeSolicitada = item.quantidade;
+
+        console.log(`Atualizando quantidade para SKU: ${sku} com quantidade: ${quantidadeSolicitada}`);
+        await atualizarEstoque(sku, -quantidadeSolicitada);
+      }
+
+      // Registrar que o pedido foi lançado
+      await registrarLancamento(idPedidoVenda, idLoja);
       console.log('Estoque atualizado com sucesso!');
+
+      if (itensNaoCadastrados.length > 0) {
+        console.warn('Itens não cadastrados encontrados:', itensNaoCadastrados);
+        // Lógica adicional para lidar com itens não cadastrados, se necessário
+      }
     } catch (error) {
       console.error('Erro ao atualizar estoque:', error);
     }
   } else {
     console.error('A operação foi cancelada devido a uma validação inválida.');
   }
-
 }
+
