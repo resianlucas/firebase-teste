@@ -269,20 +269,18 @@ export default class PedidoVenda extends BaseClass {
 
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
-        let requests = []
         try {
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
                 console.log('Bling Info: ', blingInfo)
-                let request = fetch(url, {
+                return fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${blingInfo.access_token}`
                     }
                 });
-                requests.push(request);
-            };
+            });
 
             console.log('REQUESTS: ', requests)
             let responses = await Promise.all(requests);
@@ -335,20 +333,20 @@ export default class PedidoVenda extends BaseClass {
 
         let accessToken = await this.getBling();
         console.log(accessToken)
-        //console.log('Access Token:', accessToken);
+        console.log('Access Token:', accessToken);
 
         try {
-            let requests = []
-            const blingInfo = accessToken;
-            console.log('Bling Info:', blingInfo.access_token);
-            let request = fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${blingInfo.access_token}`
-                }
+            let requests = Object.keys(accessToken).map(id => {
+                const blingInfo = accessToken[id];
+                console.log('Bling Info:', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
+                    }
+                });
             });
-            requests.push(request);
 
             let responses = await Promise.all(requests);
 
@@ -364,7 +362,7 @@ export default class PedidoVenda extends BaseClass {
                 }
 
                 let blingInfo = accessToken;
-            
+
 
 
                 console.log("RESPONSE: ", blingInfo);
@@ -445,8 +443,8 @@ export async function pegarPedidoPeloID(idPedidoVenda, idLoja) {
         const pedidos = await pedido.getPedidoVendaById(idPedidoVenda)
         return pedidos
     } catch (error) {
-        console.log("Erro ao pegar o pedido de venda pelo id: ", error)    
-    }    
+        console.log("Erro ao pegar o pedido de venda pelo id: ", error)
+    }
 }
 
 async function pegarPedidosMassa(pedido) {

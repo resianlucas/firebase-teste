@@ -1125,20 +1125,18 @@ export default class Produto extends BaseClass {
 
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
-        let requests = []
         try {
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
                 console.log('Bling Info: ', blingInfo);
-                let request = fetch(url, {
+                return fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${blingInfo.access_token}`
                     }
                 });
-                requests.push(request);
-            };
+            });
 
             console.log('REQUESTS: ', requests);
 
@@ -1181,20 +1179,19 @@ export default class Produto extends BaseClass {
         console.log('URL:', url);
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
-        let requests = [];
+
         try {
-            for (let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
                 console.log('Bling Info: ', blingInfo);
-                let request = fetch(url, {
+                return fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${blingInfo.access_token}`
                     }
                 });
-                requests.push(request)
-            };
+            });
 
             console.log('REQUESTS: ', requests);
 
