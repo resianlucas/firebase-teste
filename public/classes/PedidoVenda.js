@@ -361,7 +361,7 @@ export default class PedidoVenda extends BaseClass {
                     continue;
                 }
 
-                let blingInfo = accessToken;
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];;
 
 
 

@@ -13,10 +13,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     async function fetchPedidos() {
         const pedidoVenda = new PedidoVenda({
-            idLoja: null,
-            // params: {
-            //     dataInicial: dataInicial
-            // }
+            idLoja: null
         });
         const result = await pedidoVenda.getPedidoVenda();
 
@@ -30,6 +27,23 @@ document.addEventListener('DOMContentLoaded', async function () {
                 idEmpresa: pedido[5],
                 situacao: pedido[6] // Supondo que a posição 6 seja o status do pedido
             })));
+
+            orders.forEach(order => {
+                if (order.idLoja === 203913945) {
+                    order.idLoja = 'Frente Caixa' 
+                } else if (order.idLoja === 203744342) {
+                    order.idLoja = 'Shopee' 
+                } else if (order.idLoja === 204036006) {
+                    order.idLoja = 'Mercado Livre'
+                }
+            })
+
+            orders.forEach(order => {
+                if (order.numeroLoja === "") {
+                    order.numeroLoja === "Sem número"
+                }
+            })
+            
             displayOrders(orders);
         } else {
             console.error('Erro ao buscar pedidos de venda');
@@ -41,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         orders.forEach(order => {
             let row = ordersTable.insertRow();
             row.innerHTML = `
-                <td>${order.id}</td>
                 <td>${order.numero}</td>
                 <td>${order.numeroLoja}</td>
                 <td>${order.data}</td>
@@ -90,31 +103,38 @@ document.addEventListener('DOMContentLoaded', async function () {
     filterForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
-        const status = document.getElementById('status').value;
         const dataInicial = document.getElementById('dataInicial').value;
         const dataFinal = document.getElementById('dataFinal').value;
         const idLoja = document.getElementById('idLoja').value;
         const idEmpresa = document.getElementById('idEmpresa').value;
+        const status = document.getElementById('status').value === 'Todos' ? null : document.getElementById('status').value;
 
+
+        
         console.log('Status: ', status);
         console.log('Data Inicial: ', dataInicial.toString());
         console.log('Data Final: ', dataFinal);
         console.log('ID Loja: ', idLoja);
         console.log('ID Empresa: ', idEmpresa);
 
+        const params = {
+            dataInicial: dataInicial,
+            dataFinal: dataFinal,
+            idLoja: idLoja
+        };
+        
+        if (status !== null) {
+            params.idsSituacoes = [status];
+        }
+
         const pedidoVenda = new PedidoVenda({
             idLoja: idEmpresa,
-            params: {
-                dataInicial: dataInicial,
-                dataFinal: dataFinal,
-                idLoja: idLoja,
-                idsSituacoes: [status]
-            }
+            params: params
         });
         const result = await pedidoVenda.getPedidoVenda();
 
         if (result) {
-            const filteredOrders = Object.values(result).flatMap(empresa => empresa.request.map(pedido => ({
+            orders = Object.values(result).flatMap(empresa => empresa.request.map(pedido => ({
                 id: pedido[0],
                 numero: pedido[1],
                 numeroLoja: pedido[2],
@@ -123,7 +143,24 @@ document.addEventListener('DOMContentLoaded', async function () {
                 idEmpresa: pedido[5],
                 situacao: pedido[6] // Supondo que a posição 6 seja o status do pedido
             })));
-            displayOrders(filteredOrders);
+
+            orders.forEach(order => {
+                if (order.idLoja === 203913945) {
+                    order.idLoja = 'Frente Caixa' 
+                } else if (order.idLoja === 203744342) {
+                    order.idLoja = 'Shopee' 
+                } else if (order.idLoja === 204036006) {
+                    order.idLoja = 'Mercado Livre'
+                }
+            })
+
+            orders.forEach(order => {
+                if (order.numeroLoja === "") {
+                    order.numeroLoja === "Sem número"
+                }
+            })
+
+            displayOrders(orders);
         } else {
             console.error('Erro ao buscar pedidos de venda');
         }

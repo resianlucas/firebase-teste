@@ -298,8 +298,8 @@ export default class NotaFiscal extends BaseClass {
             return null;
         }
     }
-
-
+    
+    
     async getNFeById(idNotaFiscal) {
         const endpoint = `/nfe/${idNotaFiscal}`;
         let url = baseUrl + endpoint;
@@ -343,6 +343,62 @@ export default class NotaFiscal extends BaseClass {
             return result;
         } catch (error) {
             console.error('Erro ao buscar NF-e por ID:', error);
+            return null;
+        }
+    }
+    
+    async getNFc() {
+        const endpoint = '/nfce';
+        let url = baseUrl + endpoint;
+        let queryString = this.buildQueryString(this.params);
+        if (queryString) {
+            url += '?' + queryString;
+        }
+    
+        console.log('URL:', url);
+        let accessToken = await this.getBling();
+        console.log('Access Token:', accessToken);
+    
+        try {
+            let requests = Object.keys(accessToken).map(id => {
+                const blingInfo = accessToken[id];
+                console.log('Bling Info: ', blingInfo);
+                return fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${blingInfo.access_token}`
+                    },
+                    muteHttpExceptions: true
+                });
+            });
+    
+            console.log('REQUESTS: ', requests);
+    
+            let responses = await Promise.all(requests);
+    
+            let result = [];
+            for (let i = 0; i < responses.length; i++) {
+                let response = await responses[i].text();
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    continue;
+                }
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];
+                if (response.data) {
+                    result[blingInfo.nome] = {
+                        id: blingInfo.idLoja,
+                        empresa: blingInfo.nome,
+                        dataHora: new Date().toISOString(),
+                        method: 'getNFce',
+                        request: response.data
+                    };
+                }
+            } return result;
+        } catch (error) {
+            console.error('Erro ao buscar Nota Fiscal de Consumidor:', error);
             return null;
         }
     }
