@@ -274,7 +274,7 @@ export default class PedidoVenda extends BaseClass {
             let requests = []
             for (let id in accessToken) {
                 const blingInfo = accessToken[id];
-                //console.log('Bling Info: ', blingInfo)
+                console.log('Bling Info: ', blingInfo)
                 let request = fetch(url, {
                     method: 'GET',
                     headers: {
@@ -285,7 +285,7 @@ export default class PedidoVenda extends BaseClass {
                 requests.push(request);
             };
 
-            //console.log('REQUESTS: ', requests)
+            console.log('REQUESTS: ', requests)
             let responses = await Promise.all(requests);
 
             let result = {};

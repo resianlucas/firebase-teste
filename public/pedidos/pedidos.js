@@ -10,11 +10,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const themeToggle = document.getElementById('themeToggle');
 
     let orders = [];
-    const date = new Date('2024-07-01');
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() retorna 0-11
-    const year = date.getFullYear();
-    const dataInicial = `${day}-${month}-${year}`;
 
     async function fetchPedidos() {
         const pedidoVenda = new PedidoVenda({
@@ -56,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             row.addEventListener('click', () => {
                 window.location.href = `pedidoDetalhes.html?id=${order.id}&empresa=${order.idEmpresa}`;
             });
-        }); 
+        });
         console.log(orders)
     }
 
@@ -92,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     // Apply filters
-    filterForm.addEventListener('submit', function (event) {
+    filterForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
         const status = document.getElementById('status').value;
@@ -101,18 +96,37 @@ document.addEventListener('DOMContentLoaded', async function () {
         const idLoja = document.getElementById('idLoja').value;
         const idEmpresa = document.getElementById('idEmpresa').value;
 
-        console.log(status);
+        console.log('Status: ', status);
+        console.log('Data Inicial: ', dataInicial.toString());
+        console.log('Data Final: ', dataFinal);
+        console.log('ID Loja: ', idLoja);
+        console.log('ID Empresa: ', idEmpresa);
 
-        const filteredOrders = orders.filter(order => {
-            const statusMatch = !status || order.situacao == status;
-            const dataMatch = (!dataInicial || new Date(order.data) >= new Date(dataInicial)) &&
-                              (!dataFinal || new Date(order.data) <= new Date(dataFinal));
-            const idLojaMatch = !idLoja || order.idLoja == idLoja;
-            const idEmpresaMatch = !idEmpresa || order.idEmpresa == idEmpresa;
-            return statusMatch && dataMatch && idLojaMatch && idEmpresaMatch;
+        const pedidoVenda = new PedidoVenda({
+            idLoja: idEmpresa,
+            params: {
+                dataInicial: dataInicial,
+                dataFinal: dataFinal,
+                idLoja: idLoja,
+                idsSituacoes: [status]
+            }
         });
+        const result = await pedidoVenda.getPedidoVenda();
 
-        displayOrders(filteredOrders);
+        if (result) {
+            const filteredOrders = Object.values(result).flatMap(empresa => empresa.request.map(pedido => ({
+                id: pedido[0],
+                numero: pedido[1],
+                numeroLoja: pedido[2],
+                data: pedido[3],
+                idLoja: pedido[4],
+                idEmpresa: pedido[5],
+                situacao: pedido[6] // Supondo que a posição 6 seja o status do pedido
+            })));
+            displayOrders(filteredOrders);
+        } else {
+            console.error('Erro ao buscar pedidos de venda');
+        }
         filterPopup.style.display = 'none';
     });
 
