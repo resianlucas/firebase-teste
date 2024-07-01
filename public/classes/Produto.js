@@ -174,7 +174,7 @@ export default class Produto extends BaseClass {
             midia: {
                 video: { url: '' },
                 imagens: {
-                    externas: [{ link: '' }],
+                    externas: [{ link: "" }],
                     internas: [{
                         linkMiniatura: '',
                         validade: '',
@@ -279,12 +279,11 @@ export default class Produto extends BaseClass {
             },
             midia: {
                 video: {
-                    value: "<Error: Too many levels of nesting to fake this schema>"
+                    url: ""
                 },
                 imagens: {
-                    externas: [
-                        { link: '' }
-                    ]
+                    internas: [],
+                    externas: [{ link: '' }]
                 }
             },
             linhaProduto: {
@@ -1255,6 +1254,8 @@ export default class Produto extends BaseClass {
                 });
             });
 
+            console.log(requests.body)
+
             console.log('REQUESTS: ', requests);    
 
             let responses = await Promise.all(requests);
@@ -1442,7 +1443,7 @@ export async function pegarIdBySku(sku) {
 
 export async function criarProduto(produto) {
 
-    //await createProduct(produto);
+    await createProduct(produto);
 
     console.log('Produto para subir: ', produto)
 
@@ -1459,10 +1460,10 @@ export async function criarProduto(produto) {
             descricaoCurta: produto.description,
             midia: {
                 imagens: {
-                    internas: [],
                     externas: [{
-                        link: produto.imageUrl
-                    }]
+                        link: toString(produto.imageUrl)
+                    }],
+                    internas: []
                 },
                 video: {
                     url: ""
