@@ -371,15 +371,15 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('testButto').addEventListener('click', async () => {
+// document.addEventListener('DOMContentLoaded', () => {
+//   document.getElementById('testButto').addEventListener('click', async () => {
 
-    const id = parseInt(document.getElementById('parametro-funca').value)
-    const empresa = document.getElementById('parametro-quantidad').value
-    try {
-      lancarEstoqueByPedidoVenda(id, empresa);
-    } catch (e) {
-      console.log('Erro causado ao lancar estoque: ', e)
-    }
-  })
-})
+//     const id = parseInt(document.getElementById('parametro-funca').value)
+//     const empresa = document.getElementById('parametro-quantidad').value
+//     try {
+//       lancarEstoqueByPedidoVenda(id, empresa);
+//     } catch (e) {
+//       console.log('Erro causado ao lancar estoque: ', e)
+//     }
+//   })
+// })

@@ -57,11 +57,7 @@ addItemForm.addEventListener('submit', async (e) => {
 
 async function preencherFormulario(sku) {
     const produto = await getProducto(sku)
-    // const produtoRef = ref(db, 'products/' + sku);
-    // const snapshot = await get(produtoRef);
-
-    // if (snapshot.exists()) {
-    //const produto = snapshot.val();
+    
     document.getElementById('name').value = produto.name;
     document.getElementById('sku').value = produto.sku;
     document.getElementById('ean').value = produto.ean;

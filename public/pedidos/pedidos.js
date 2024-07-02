@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const closePopup = document.querySelector('.popup .close');
     const filterForm = document.getElementById('filterForm');
     const themeToggle = document.getElementById('themeToggle');
+    const buttonLaunch = document.getElementById('lancar');
 
     let orders = [];
 
@@ -99,6 +100,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
+    buttonLaunch.addEventListener('click', async function(event) {
+        event.preventDefault();
+    });
+    
+
     // Apply filters
     filterForm.addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -108,8 +114,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         const idLoja = document.getElementById('idLoja').value;
         const idEmpresa = document.getElementById('idEmpresa').value;
         const status = document.getElementById('status').value === 'Todos' ? null : document.getElementById('status').value;
-
-
         
         console.log('Status: ', status);
         console.log('Data Inicial: ', dataInicial.toString());

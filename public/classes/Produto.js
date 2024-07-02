@@ -1147,6 +1147,7 @@ export default class Produto extends BaseClass {
                 let response = await responses[i].text();
                 try {
                     response = JSON.parse(response);
+                    console.log(response)
                 } catch (e) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
                     continue;
@@ -1226,7 +1227,6 @@ export default class Produto extends BaseClass {
             return null;
         }
     }
-
 
     //metodo para criar um produto, recebe o payload
     async createProduct() {
@@ -1486,7 +1486,7 @@ async function pegarIdsProdutoBySku(sku) {
 
     console.log("Pegando id dos produtos")
     try {
-        const produto = new Produto({ params: { criterio: 5, codigo: sku } });
+        const produto = new Produto({ params: { criterio: 5, codigo: sku.toString()} });
         const produtos = await produto.getProduto();
 
         console.log('Produto encontrado:', produtos);
@@ -1555,11 +1555,15 @@ function verificarProduto(sku) {
 
 // document.addEventListener('DOMContentLoaded', ()=>{
 //     document.getElementById('testButto').addEventListener('click', async () => {
-
-//         const id = parseInt(document.getElementById('parametro-funca').value)
-//         const produto = new Produto();
-//         const dados = await produto.getProdutoById(id);
-//         console.log('resultado: ', dados);
-
+//         try {
+//             const produtos = await getAllProduct()
+//             for(let produto in produtos) {
+//                 console.log(produto.sku)
+//                 await pegarIdsProdutoBySku(produto.sku)
+//             }
+//             console.log('Operação finalizada');
+//         } catch (error) {
+//             console.log("Erro ao pegar produtos: ",error)
+//         }
 //     })
 // })
