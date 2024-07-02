@@ -1,4 +1,5 @@
-import { BaseClass } from './BaseClass.js'
+import { BaseClass } from './BaseClass.js';
+import {lancarEstoqueByPedidoVenda as lancarEstoque} from './Estoque.js';
 
 const baseUrl = 'http://localhost:3000/api'
 

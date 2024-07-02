@@ -288,15 +288,15 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   console.log('Pedido Unitário: ', pedido);
 
   // Verifica se o pedido possui nota fiscal
-  if (pedido.notaFiscal.id === 0) {
-    console.error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
-    return;
-  }
 
   const empresa = Object.keys(pedido)[0]; // Assumindo que o objeto empresa está na primeira chave
   let itensPedido = pedido[empresa].request.itens;
   console.log('Itens do pedido: ', itensPedido);
 
+  if (pedido[empresa].request.notaFiscal.id === 0) {
+    console.error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
+    return;
+  }
   let operacaoInvalida = false;
   let itensNaoCadastrados = [];
 
@@ -309,14 +309,19 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
       itensNaoCadastrados.push(id);
       continue;
     }
-    const produtoMestre = await produto.getProdutoById(prod[empresa].request.estrutura.componentes[0].produto.id);
-    if (!produtoMestre) {
-      console.error(`Produto mestre para o produto com ID ${id} não encontrado.`);
+
+    let sku;
+    const produtoMestre = await produto.getProdutoById(id);
+    if (produtoMestre && produtoMestre[empresa].request.codigo) {
+      sku = produtoMestre[empresa].request.codigo;
+    } else if (prod[empresa].request.estrutura && prod[empresa].request.estrutura.componentes.length > 0) {
+      sku = prod[empresa].request.estrutura.componentes[0].produto.codigo;
+    } else {
+      console.error(`Produto mestre ou estrutura para o produto com ID ${id} não encontrado.`);
       itensNaoCadastrados.push(id);
       continue;
     }
 
-    const sku = produtoMestre[empresa].request.codigo;
     const quantidadeSolicitada = item.quantidade;
 
     const estoqueValido = await verificarEstoque(sku, quantidadeSolicitada);
@@ -332,15 +337,24 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
       for (const item of itensPedido) {
         const id = item.produto.id;
         const produto = new Produto({ idLoja: idLoja });
-        const prod = await produto.getProdutoById(id);
-        const produtoMestre = await produto.getProdutoById(prod[empresa].request.estrutura.componentes[0].produto.id);
-        const sku = produtoMestre[empresa].request.codigo;
-        const quantidadeSolicitada = item.quantidade;
+        let prod = await produto.getProdutoById(id);
+        let sku;
 
+        const produtoMestre = await produto.getProdutoById(id);
+        if (produtoMestre && produtoMestre[empresa].request.codigo) {
+          sku = produtoMestre[empresa].request.codigo;
+        } else if (prod[empresa].request.estrutura && prod[empresa].request.estrutura.componentes.length > 0) {
+          sku = prod[empresa].request.estrutura.componentes[0].produto.codigo;
+        } else {
+          console.error(`Produto mestre ou estrutura para o produto com ID ${id} não encontrado.`);
+          itensNaoCadastrados.push(id);
+          continue;
+        }
+
+        const quantidadeSolicitada = item.quantidade;
         console.log(`Atualizando quantidade para SKU: ${sku} com quantidade: ${quantidadeSolicitada}`);
         await atualizarEstoque(sku, -quantidadeSolicitada);
       }
-
       // Registrar que o pedido foi lançado
       await registrarLancamento(idPedidoVenda, idLoja);
       console.log('Estoque atualizado com sucesso!');
@@ -357,3 +371,15 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('testButto').addEventListener('click', async () => {
+
+    const id = parseInt(document.getElementById('parametro-funca').value)
+    const empresa = document.getElementById('parametro-quantidad').value
+    try {
+      lancarEstoqueByPedidoVenda(id, empresa);
+    } catch (e) {
+      console.log('Erro causado ao lancar estoque: ', e)
+    }
+  })
+})
