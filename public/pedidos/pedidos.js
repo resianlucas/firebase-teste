@@ -100,9 +100,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    buttonLaunch.addEventListener('click', async function(event) {
-        event.preventDefault();
-    });
+    // buttonLaunch.addEventListener('click', async function(event) {
+    //     event.preventDefault();
+    // });
     
 
     // Apply filters

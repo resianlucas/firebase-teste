@@ -236,6 +236,8 @@ export async function atualizarEstoque(sku, quantidade) {
 }
 
 export async function novoEstoque(sku, quantidade) {
+  console.log('sku:', sku)
+  console.log('quantidade: ', quantidade)
   try {
     await createEstoque(sku, quantidade);
     console.log(`Estoque criado/atualizado para SKU: ${sku} com quantidade: ${quantidade}`);
@@ -262,7 +264,7 @@ export async function novoEstoque(sku, quantidade) {
             id: id
           },
           operacao: 'B',
-          quantidade: parseInt(quantidade.replace(/[^0-9]/g, ''), 10)
+          quantidade: parseInt(quantidade, 10)
         })
         const result = await estoque.createEstoque();
         console.log('Result:', result);

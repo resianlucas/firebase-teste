@@ -61,6 +61,7 @@ export class Bling {
 
         try {
             const response = await fetch(url, options);
+            console.log(response)
             if (!response.ok) {
                 throw new Error(`Erro na solicitação de token: ${response.statusText}`);
             }

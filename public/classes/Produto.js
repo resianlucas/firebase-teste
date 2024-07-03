@@ -1479,16 +1479,17 @@ export async function criarProduto(produto) {
     await pegarIdsProdutoBySku(produto.sku)  
 
     if(produtoCriado) {
+        console.log('Colocando estoque para o produto: ')
         await novoEstoque(product.payload.codigo, produto.quantity)
     }
-    console.log(produtoCriado);
+    console.log('exibindo o produto criado, ultima etapa do processo: ', produtoCriado);
 }
 
 async function pegarIdsProdutoBySku(sku) {
 
     console.log("Pegando id dos produtos")
     try {
-        const produto = new Produto({ params: { criterio: 5, codigo: sku } });
+        const produto = new Produto({ params: { criterio: 2, codigo: sku } });
         console.log('fazendo o objeto para pegar o produto')
         const produtos = await produto.getProduto();
         console.log('Produto encontrado:', produtos);
@@ -1557,28 +1558,28 @@ function verificarProduto(sku) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('testButto').addEventListener('click', async () => {
-        try {
-            const produtos = await getAllProduct()
-            //console.log('produtos para cadastrar: ', produtos)
+// document.addEventListener('DOMContentLoaded', () => {
+//     document.getElementById('testButto').addEventListener('click', async () => {
+//         try {
+//             const produtos = await getAllProduct()
+//             //console.log('produtos para cadastrar: ', produtos)
 
-            for (const produto of produtos) {
-                console.log(produto.sku)
-                await sleep(1000)
-                await pegarIdsProdutoBySku(produto.sku)
-                await sleep(1000)
-            }
-            const sku = document.getElementById('parametro-funca').value
-            console.log("produto a ser processado: ", sku)
-            console.log('sku do produto a ser encontrado: ', sku)
+//             for (const produto of produtos) {
+//                 console.log(produto.sku)
+//                 await sleep(1000)
+//                 await pegarIdsProdutoBySku(produto.sku)
+//                 await sleep(1000)
+//             }
+//             const sku = document.getElementById('parametro-funca').value
+//             console.log("produto a ser processado: ", sku)
+//             console.log('sku do produto a ser encontrado: ', sku)
             
-            console.log('Operação finalizada');
-        } catch (error) {
-            console.log("Erro ao pegar produtos: ", error)
-        }
-    })
-})
+//             console.log('Operação finalizada');
+//         } catch (error) {
+//             console.log("Erro ao pegar produtos: ", error)
+//         }
+//     })
+// })
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
