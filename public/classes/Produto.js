@@ -1124,7 +1124,6 @@ export default class Produto extends BaseClass {
         console.log('URL:', url);
 
         let accessToken = await this.getBling();
-        console.log('Access Token:', accessToken);
         try {
             let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
@@ -1147,7 +1146,7 @@ export default class Produto extends BaseClass {
                 let response = await responses[i].text();
                 try {
                     response = JSON.parse(response);
-                    console.log(response)
+                    console.log('response de getProduto', response)
                 } catch (e) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
                     continue;
@@ -1415,6 +1414,7 @@ export default class Produto extends BaseClass {
 
 export async function getAllProduct() {
     try {
+        console.log('funcao pegar todos os produtos')
         return await getAllProducts();
     } catch (error) {
         console.error('Erro ao pegar os produtos: ', error.message);
@@ -1474,11 +1474,13 @@ export async function criarProduto(produto) {
     console.log('Produto para subir: ', product.payload)
 
     const produtoCriado = await product.createProduct();
-    //await pegarIdsProdutoBySku(produto.sku)  
 
-    // if(produtoCriado) {
-    //     await novoEstoque(product.payload.codigo, produto.quantity)
-    // }
+    await sleep(10000)
+    await pegarIdsProdutoBySku(produto.sku)  
+
+    if(produtoCriado) {
+        await novoEstoque(product.payload.codigo, produto.quantity)
+    }
     console.log(produtoCriado);
 }
 
@@ -1486,10 +1488,12 @@ async function pegarIdsProdutoBySku(sku) {
 
     console.log("Pegando id dos produtos")
     try {
-        const produto = new Produto({ params: { criterio: 5, codigo: sku.toString()} });
+        const produto = new Produto({ params: { criterio: 5, codigo: sku } });
+        console.log('fazendo o objeto para pegar o produto')
         const produtos = await produto.getProduto();
-
         console.log('Produto encontrado:', produtos);
+        await sleep(1000)
+        console.log('Aplicando intervalo')
 
         for (const chave in produtos) {
             if (produtos.hasOwnProperty(chave)) {
@@ -1553,17 +1557,29 @@ function verificarProduto(sku) {
     }
 }
 
-// document.addEventListener('DOMContentLoaded', ()=>{
-//     document.getElementById('testButto').addEventListener('click', async () => {
-//         try {
-//             const produtos = await getAllProduct()
-//             for(let produto in produtos) {
-//                 console.log(produto.sku)
-//                 await pegarIdsProdutoBySku(produto.sku)
-//             }
-//             console.log('Operação finalizada');
-//         } catch (error) {
-//             console.log("Erro ao pegar produtos: ",error)
-//         }
-//     })
-// })
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('testButto').addEventListener('click', async () => {
+        try {
+            const produtos = await getAllProduct()
+            //console.log('produtos para cadastrar: ', produtos)
+
+            for (const produto of produtos) {
+                console.log(produto.sku)
+                await sleep(1000)
+                await pegarIdsProdutoBySku(produto.sku)
+                await sleep(1000)
+            }
+            const sku = document.getElementById('parametro-funca').value
+            console.log("produto a ser processado: ", sku)
+            console.log('sku do produto a ser encontrado: ', sku)
+            
+            console.log('Operação finalizada');
+        } catch (error) {
+            console.log("Erro ao pegar produtos: ", error)
+        }
+    })
+})
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
