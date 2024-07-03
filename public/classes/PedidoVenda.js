@@ -1,4 +1,5 @@
-import { BaseClass } from './BaseClass.js'
+import { BaseClass } from './BaseClass.js';
+import {lancarEstoqueByPedidoVenda as lancarEstoque} from './Estoque.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -264,30 +265,27 @@ export default class PedidoVenda extends BaseClass {
         if (queryString) {
             url += '?' + queryString;
         }
-    
+
         console.log('URL:', url);
-    
+
         let accessToken = await this.getBling();
-        //console.log('Access Token:', accessToken);
-    
+        console.log('Access Token:', accessToken);
         try {
-            let requests = []
-            for(let id in accessToken) {
+            let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                //console.log('Bling Info: ', blingInfo)
-                let request = fetch(url, {
+                console.log('Bling Info: ', blingInfo)
+                return fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${blingInfo.access_token}`
                     }
                 });
-                requests.push(request);
-            };
+            });
 
-            //console.log('REQUESTS: ', requests)
+            console.log('REQUESTS: ', requests)
             let responses = await Promise.all(requests);
-            
+
             let result = {};
             for (let i = 0; i < responses.length; i++) {
                 let response = await responses[i].text(); // Alterado para text() para pegar HTML
@@ -297,9 +295,9 @@ export default class PedidoVenda extends BaseClass {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
                     continue;
                 }
-    
+
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];
-    
+
                 if (response.data && response.data.length > 0) {
                     const pedidos = response.data.map(dado => [
                         dado.id,
@@ -308,8 +306,9 @@ export default class PedidoVenda extends BaseClass {
                         dado.data,
                         dado.loja.id,
                         blingInfo.id,
+                        dado.situacao.id
                     ]);
-    
+
                     // Salvar informações associadas à resposta
                     result[blingInfo.name] = {
                         id: blingInfo.id,
@@ -326,20 +325,21 @@ export default class PedidoVenda extends BaseClass {
             return null;
         }
     }
-    
+
 
     async getPedidoVendaById(idPedidoVenda) {
         const endpoint = `/pedidos/vendas/${idPedidoVenda}`;
         let url = baseUrl + endpoint;
         console.log('URL:', url);
-        
+
         let accessToken = await this.getBling();
-        //console.log('Access Token:', accessToken);
-        
+        console.log(accessToken)
+        console.log('Access Token:', accessToken);
+
         try {
             let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                //console.log('Bling Info:', blingInfo);
+                console.log('Bling Info:', blingInfo);
                 return fetch(url, {
                     method: 'GET',
                     headers: {
@@ -348,25 +348,23 @@ export default class PedidoVenda extends BaseClass {
                     }
                 });
             });
-    
-            //console.log('REQUESTS:', requests);
-            
+
             let responses = await Promise.all(requests);
-            
+
             let result = {};
             for (let i = 0; i < responses.length; i++) {
                 let response = await responses[i].text(); // Alterado para text() para pegar HTML
                 try {
                     response = JSON.parse(response); // Tenta parsear como JSON
+                    console.log("response: ", response)
                 } catch (e) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
                     continue;
                 }
-    
-                let blingInfo = accessToken[Object.keys(accessToken)[i]];
-                
 
-                console.log("RESPONSE: ", response);
+                let blingInfo = accessToken[Object.keys(accessToken)[i]];;
+
+                console.log("RESPONSE: ", blingInfo);
 
                 let pedido = {
                     id: response.data.id,
@@ -379,7 +377,7 @@ export default class PedidoVenda extends BaseClass {
                     notaFiscal: response.data.notaFiscal,
                     idLoja: response.data.loja.id
                 };
-    
+
                 // Salvar informações associadas à resposta
                 result[blingInfo.name] = {
                     id: blingInfo.id,
@@ -388,6 +386,7 @@ export default class PedidoVenda extends BaseClass {
                     method: 'getPedidoVendaById',
                     request: pedido
                 };
+                console.log(result)
             }
             return result;
         } catch (error) {
@@ -395,4 +394,122 @@ export default class PedidoVenda extends BaseClass {
             return null;
         }
     }
+}
+
+export async function pegarPedidos() {
+    const pedido = new PedidoVenda({
+        idLoja: idLoja,
+        params: {
+            dataInicial: dataInicial,
+            dataFinal: dataHoje,
+        }
+    })
+
+    const pedidos = pedido.getPedidoVenda();
+    if (!pedidos || pedidos === '' || pedidos === 'undefined' || pedidos === null || pedidos.length <= 0) {
+        throw new Error('Nenhum pedido encontrado')
+    }
+
+    sheetPedido.getRange(2, 1, 200, 6).clearContent();
+
+    for (const chave in pedidos) {
+        if (pedidos.hasOwnProperty(chave)) {
+            const pedido = pedidos[chave];
+            if (!pedido.request.length < 1) {
+                console.log('pedido: ', pedido.request);
+                console.log(pedido.request[0].length);
+                sheetPedido.getRange(2, 1, pedido.request.length, pedido.request[0].length).setValues(pedido.request);
+            }
+        }
+    }
+
+    if (status === 9) {
+        var resposta = Browser.msgBox('Deseja lançar estoque?', Browser.Buttons.YES_NO)
+        console.log(resposta.toUpperCase())
+        if (resposta.toUpperCase() === 'YES') {
+            pegarPedidosMassa()
+        } else if (resposta.toUpperCase() === 'NO') {
+            Browser.msgBox('Estoque não foi lançado')
+        }
+    }
+}
+
+export async function pegarPedidoPeloID(idPedidoVenda, idLoja) {
+    try {
+        const pedido = new PedidoVenda({
+            idLoja: idLoja
+        })
+        const pedidos = await pedido.getPedidoVendaById(idPedidoVenda)
+        return pedidos
+    } catch (error) {
+        console.log("Erro ao pegar o pedido de venda pelo id: ", error)
+    }
+}
+
+async function pegarPedidosMassa(pedido) {
+    const pedidos = await pedido.getPedidoVenda();
+    for (const chave in pedidos) {
+        if (pedidos.hasOwnProperty(chave)) {
+            const pedidoUnit = pedidos[chave];
+            if (!pedidoUnit.request.length < 1) {
+                const pedidosData = pedidoUnit.request;
+                pedidosData.forEach(async ped => {
+                    console.log(
+                        'Detalhes dos pedidos: ',
+                        '\nID: ', ped[0],
+                        '\nID multiloja: ', ped[4],
+                        '\nID Loja: ', ped[5]
+                    )
+                    try {
+                        await lancarEstoque(ped[0], ped[5]);
+                    } catch (error) {
+                        console.error('Erro ao processar pedido:', ped, error);
+                        //registrarErros(ped, error.stack)
+                    }
+                });
+            }
+        }
+    }
+
+}
+
+
+////////////////////////////////////////////////////
+//METODOS DE VERIFICAÇÃO//
+////////////////////////////////////////////////////
+function verificarPedido(idPedidoVenda = 20341264936, idLoja = 1) {
+    const pedidoVenda = new PedidoVenda({
+        idLoja: idLoja
+    });
+    const pedido = pedidoVenda.getPedidoVendaById(idPedidoVenda);
+    const empresa = Object.keys(pedido);
+    const itens = pedido[empresa].request.itens;
+    const notaFiscal = pedido[empresa].request.notaFiscal;
+
+    if (!notaFiscal.id || notaFiscal.id === 0) {
+        throw new Error('Pedido sem nota fiscal' + pedido[empresa].request.id);
+    }
+
+    //verifica se o pedido contém itens
+    if (!itens) {
+        throw new Error('Esse pedido não possui itens' + pedido[empresa].request.id);
+    }
+
+    // // //arrumar no construtor de parametros para o pedido de venda (status cancelado)
+    // // //verificar se é um pedido valido
+    // // if (pedido[empresa].request.situacao.valor !== 1) {
+    // //   throw new Error('Esse pedido não é valido');
+    // // }
+
+    itens.forEach(prod => {
+        if (prod.produto.id === 0) {
+            separarProduto(itens, prod.produto.id);
+            throw new Error('O produto não tem id, id igual a zero: ' + prod.codigo);
+        }
+    })
+
+    itens.forEach(item => {
+        verificarProduto(item.codigo);
+    });
+    return true
 }

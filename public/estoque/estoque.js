@@ -1,6 +1,7 @@
 import { db } from '/public/script.js';
 import { ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import Estoque from '../classes/Estoque';
+import { updateEstoque } from '../database/estoque.js';
+import Estoque from '../classes/Estoque.js';
 
 let productCounters = {};
 
@@ -95,27 +96,11 @@ function incrementProductCounter(sku) {
 }
 
 async function updateAllQuantities() {
-    const updates = {};
-
     try {
         for (const sku in productCounters) {
             const declaredQuantity = productCounters[sku];
-            const productRef = ref(db, `products/${sku}`);
-            const productSnapshot = await get(productRef);
-
-            if (productSnapshot.exists()) {
-                const currentQuantity = productSnapshot.val().quantity || 0;
-                const newQuantity = currentQuantity + declaredQuantity;
-                updates[`/products/${sku}/quantity`] = newQuantity;
-            } else {
-                const cadastrarRef = ref(db, `cadastrar/${sku}`);
-                await set(cadastrarRef, { ean: sku, quantity: declaredQuantity });
-            }
+            await updateEstoque(sku, declaredQuantity);
         }
-
-        console.log(`Atualizando quantidades no Firebase:`, updates);
-        await update(ref(db), updates);
-        console.log('Quantidades atualizadas com sucesso!');
 
         // Mostrar janela pop-up com produtos atualizados
         mostrarJanelaPopup();

@@ -8,7 +8,7 @@
 </head>
 <body>
     <header>
-        <button class="theme-toggle">Toggle Theme</button>
+        <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
         <h1>Produtos</h1>
         <nav>
             <ul>
@@ -26,7 +26,6 @@
             <table id="ordersTable">
                 <thead>
                     <tr>
-                        <th>ID Pedido</th>
                         <th>Número Pedido</th>
                         <th>Número Loja</th>
                         <th>Data Pedido</th>
@@ -39,16 +38,34 @@
                 </tbody>
             </table>
         </div>
-    
+
         <div id="filterPopup" class="popup">
             <div class="popup-content">
                 <span class="close">&times;</span>
                 <h2>Filtrar Pedidos</h2>
-                <!-- Elementos de filtro a serem definidos -->
+                <form id="filterForm">
+                    <label for="status">Status:</label>
+                    <select id="status">
+                        <option>Todos</option>
+                        <option value="6">Aberto</option>
+                        <option value="9">Atendido</option>
+                        <option value="12">Cancelado</option>
+                        <option value="15">Andamento</option>
+                    </select>
+                    <label for="dataInicial">Data Inicial:</label>
+                    <input type="date" id="dataInicial">
+                    <label for="dataFinal">Data Final:</label>
+                    <input type="date" id="dataFinal">
+                    <label for="idLoja">ID Loja:</label>
+                    <input type="number" id="idLoja">
+                    <label for="idEmpresa">ID Empresa:</label>
+                    <input type="number" id="idEmpresa">
+                    <button type="submit">Aplicar Filtros</button>
+                </form>
             </div>
         </div>
     </main>
 
-    <script src="./pedidos.js"></script>
+    <script type="module" src="./pedidos.js"></script>
 </body>
 </html>

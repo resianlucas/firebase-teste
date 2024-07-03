@@ -5,10 +5,10 @@ export async function getProduct(sku) {
   const produtoRef = ref(db, 'products/' + sku);
   const snapshot = await get(produtoRef);
   if (snapshot.exists()) {
-      return snapshot.val();
+    return snapshot.val();
   } else {
-      console.log('Produto não encontrado');
-      return null;
+    console.log('Produto não encontrado');
+    return null;
   }
 }
 
@@ -22,23 +22,28 @@ export async function updateProduct(sku, updates) {
   await update(produtoRef, updates);
 }
 
-export async function fetchAllProducts() {
+export async function getAllProducts() {
   const produtos = [];
-  const dbRef = ref(db, 'products');
-  const snapshot = await get(dbRef);
+  const produtoRef = ref(db, 'products');
+  const snapshot = await get(produtoRef);
   snapshot.forEach((childSnapshot) => {
-      produtos.push(childSnapshot.val());
+    produtos.push(childSnapshot.val());
   });
   return produtos;
 }
 
 export async function getProductIdsBySku(sku) {
-  const produtoRef = ref(db, 'ids/' + sku);
+  const produtoRef = ref(db, '/ids/' + sku);
   const snapshot = await get(produtoRef);
   if (snapshot.exists()) {
-      return Object.keys(snapshot.val());
+    return Object.keys(snapshot.val());
   } else {
-      console.log('Nenhum produto encontrado com o SKU fornecido.');
-      return [];
+    console.log('Nenhum produto encontrado com o SKU fornecido.');
+    return [];
   }
+}
+
+export async function setProductId(sku, id, data) {
+  const produtoRef = ref(db, `/ids/${sku}/${id}`);
+  await set(produtoRef, data)
 }
