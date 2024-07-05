@@ -40,8 +40,17 @@ app.use('/api', createProxyMiddleware({
     },
     onProxyReq: (proxyReq, req, res) => {
         if (req.body) {
-            const bodyData = Object.keys(req.body).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(req.body[key])}`).join('&');
-            proxyReq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+            let bodyData;
+
+            // Verifica o Content-Type original e formata o corpo da requisição de acordo
+            if (req.is('application/json')) {
+                bodyData = JSON.stringify(req.body);
+                proxyReq.setHeader('Content-Type', 'application/json');
+            } else {
+                bodyData = Object.keys(req.body).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(req.body[key])}`).join('&');
+                proxyReq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+            }
+
             proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
             proxyReq.write(bodyData);
         }

@@ -325,6 +325,21 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
     let sku;
     const produt = await produto.getProdutoById(id);
+    const estrutura = produt[empresa].request.estrutura.componentes;
+    if (estrutura) {
+      estrutura.forEach(async produto => {
+        const id = produto.produto.id
+        const produtoMestre = await produto.getProdutoById(id);
+        sku = produtoMestre[empresa].request.codigo;
+      });
+    } else {
+      console.log('Produto não tem estrutura')
+      sku = produt[empresa].request.codigo;
+    }
+
+
+
+    //const produt = await produto.getProdutoById(id);
     const newID = produt[empresa].request.estrutura.componentes[0].produto.id;
     if (newID) {
       console.log('Produto tem estrutura')
@@ -362,7 +377,7 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
           console.log('Produto não tem estrutura')
           sku = produt[empresa].request.codigo;
         }
-        
+
         const quantidadeSolicitada = item.quantidade;
         console.log(`Atualizando quantidade para SKU: ${sku} com quantidade: ${quantidadeSolicitada}`);
         await atualizarEstoque(sku, -quantidadeSolicitada);
