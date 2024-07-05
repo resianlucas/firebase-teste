@@ -301,13 +301,13 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   console.log('Pedido Unitário: ', pedido);
 
   // Verifica se o pedido possui nota fiscal
-
   const empresa = Object.keys(pedido)[0]; // Assumindo que o objeto empresa está na primeira chave
   let itensPedido = pedido[empresa].request.itens;
   console.log('Itens do pedido: ', itensPedido);
 
   if (pedido[empresa].request.notaFiscal.id === 0) {
     console.error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
+    throw new Error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`)
     return;
   }
   let operacaoInvalida = false;
@@ -333,8 +333,6 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
     } catch (error) {
 
     }
-
-
 
     const estoqueValido = await verificarEstoque(sku, quantidadeSolicitada);
     if (!estoqueValido) {
@@ -376,15 +374,15 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('testButto').addEventListener('click', async () => {
+// document.addEventListener('DOMContentLoaded', () => {
+//   document.getElementById('testButto').addEventListener('click', async () => {
 
-    const id = parseInt(document.getElementById('parametro-funca').value) //idPedido
-    const empresa = document.getElementById('parametro-quantidad').value //idLoja
-    try {
-      lancarEstoqueByPedidoVenda(id, empresa);
-    } catch (e) {
-      console.log('Erro causado ao lancar estoque: ', e)
-    }
-  })
-})
+//     const id = parseInt(document.getElementById('parametro-funca').value) //idPedido
+//     const empresa = document.getElementById('parametro-quantidad').value //idLoja
+//     try {
+//       lancarEstoqueByPedidoVenda(id, empresa);
+//     } catch (e) {
+//       console.log('Erro causado ao lancar estoque: ', e)
+//     }
+//   })
+// })

@@ -844,7 +844,7 @@ export default class Produto extends BaseClass {
                 },
                 imagens: {
                     externas: [
-                        { link: '' }
+                        { link: "" }
                     ]
                 }
             },
@@ -1236,7 +1236,11 @@ export default class Produto extends BaseClass {
 
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
-
+        console.log('Payload de produto prestes a subir: ', this.payload)
+        const p = JSON.stringify(this.payload);
+        const r = JSON.parse(p)
+        console.log('Payload após json.stringfy: ', p)
+        console.log('Payload após JSON.parse: ', r)
         try {
             let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
@@ -1450,22 +1454,20 @@ export async function criarProduto(produto) {
         payload: {
             nome: produto.name,
             codigo: produto.sku,
-            tipo: 'P',
-            situacao: 'A',
-            formato: 'S',
+            tipo: "P",
+            situacao: "A",
+            formato: "S",
             gtin: produto.ean,
             marca: produto.brand,
             preco: produto.price,
             descricaoCurta: produto.description,
             midia: {
                 imagens: {
-                    externas: [{
-                        link: toString(produto.imageUrl)
-                    }],
-                    internas: []
-                },
-                video: {
-                    url: ""
+                    externas: [
+                        {
+                            link: produto.imageUrl
+                        }
+                    ]
                 }
             }
         }
@@ -1476,9 +1478,9 @@ export async function criarProduto(produto) {
     const produtoCriado = await product.createProduct();
 
     await sleep(10000)
-    await pegarIdsProdutoBySku(produto.sku)  
+    await pegarIdsProdutoBySku(produto.sku)
 
-    if(produtoCriado) {
+    if (produtoCriado) {
         console.log('Colocando estoque para o produto: ')
         await novoEstoque(product.payload.codigo, produto.quantity)
     }
@@ -1573,7 +1575,7 @@ function verificarProduto(sku) {
 //             const sku = document.getElementById('parametro-funca').value
 //             console.log("produto a ser processado: ", sku)
 //             console.log('sku do produto a ser encontrado: ', sku)
-            
+
 //             console.log('Operação finalizada');
 //         } catch (error) {
 //             console.log("Erro ao pegar produtos: ", error)

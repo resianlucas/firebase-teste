@@ -1,4 +1,5 @@
 import PedidoVenda, { pegarPedidoPeloID } from '../classes/PedidoVenda.js';
+import { lancarEstoqueByPedidoVenda as lancarEstoque } from '../classes/Estoque.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
     const pedidoIdSpan = document.getElementById('pedidoId');
@@ -10,6 +11,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const idLojaSpan = document.getElementById('idLoja');
     const idEmpresaSpan = document.getElementById('idEmpresa');
     const itemsTable = document.getElementById('itemsTable').getElementsByTagName('tbody')[0];
+    const lancarEstoqueButton = document.getElementById('lancarEstoqueButton');
+
 
     // Função para buscar parâmetros da URL
     function getQueryParams() {
@@ -58,6 +61,26 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    async function handleLancarEstoque() {
+        const params = getQueryParams();
+        const pedidoId = parseInt(params.id);
+        const idLoja = parseInt(params.empresa);
+
+        if (!pedidoId || !idLoja) {
+            console.error('Parâmetros inválidos para lançamento de estoque.');
+            return;
+        }
+
+        try {
+            await lancarEstoque(pedidoId, idLoja);
+            console.log('Estoque lançado com sucesso!');
+            alert('FEITO COM SUCESSO')
+        } catch (error) {
+            console.error('Erro ao lançar estoque:', error);
+            alert('Erro ao lançar estoque: ', error)
+        }
+    }
+
     // Obtém o ID do pedido da URL
     const params = getQueryParams();
     const pedidoId = params.id;
@@ -66,6 +89,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (pedidoId) {
         await displayPedidoDetalhes(parseInt(pedidoId), empresaId);
     }
+
+    lancarEstoqueButton.addEventListener('click', handleLancarEstoque);
 
     // Theme toggle functionality
     const themeToggle = document.getElementById('themeToggle');
