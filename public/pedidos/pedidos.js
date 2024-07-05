@@ -11,11 +11,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     const buttonLaunch = document.getElementById('lancar');
 
     let orders = [];
+    const dt = new Date().toISOString().split('T')[0];
+    console.log('data de hoje: ', dt)
 
     async function fetchPedidos() {
         const pedidoVenda = new PedidoVenda({
-            idLoja: null
+            idLoja: null,
+            params: {
+                dataInicial: dt
+            }
         });
+        console.log(pedidoVenda)
         const result = await pedidoVenda.getPedidoVenda();
 
         if (result) {
@@ -36,6 +42,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     order.idLoja = 'Shopee' 
                 } else if (order.idLoja === 204036006) {
                     order.idLoja = 'Mercado Livre'
+                } else if (order.idLoja === 204045472) {
+                    order.idLoja = 'Shopee'
                 }
             })
 
@@ -100,9 +108,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    buttonLaunch.addEventListener('click', async function(event) {
-        event.preventDefault();
-    });
+    // buttonLaunch.addEventListener('click', async function(event) {
+    //     event.preventDefault();
+    // });
     
 
     // Apply filters
@@ -155,6 +163,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     order.idLoja = 'Shopee' 
                 } else if (order.idLoja === 204036006) {
                     order.idLoja = 'Mercado Livre'
+                } else if (order.idLoja === 204045472) {
+                    order.idLoja = 'Shopee'
                 }
             })
 

@@ -1,7 +1,7 @@
 import { db } from '../script.js';
 import { ref, set, get, child, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-export async function getEstoque(sku) {
+export async function getEstoqu(sku) {
     const estoqueRef = ref(db, 'products/' + sku);
     const snapshot = await get(estoqueRef);
     if (snapshot.exists()) {

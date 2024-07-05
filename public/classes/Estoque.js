@@ -2,7 +2,7 @@ import Deposito from './Deposito.js';
 import { BaseClass } from './BaseClass.js';
 import PedidoVenda from './PedidoVenda.js';
 import Produto, { pegarIdBySku, getAllProduct } from './Produto.js';
-import { updateEstoque, createEstoque, verificarEstoque } from '../database/estoque.js';
+import { getEstoqu, updateEstoque, createEstoque, verificarEstoque } from '../database/estoque.js';
 import { registrarLancamento, verificarLancamentoDuplicado } from '../database/pedido.js';
 
 const baseUrl = 'http://localhost:3000/api'
@@ -207,10 +207,19 @@ export async function pegarEstoque() {
 }
 
 export async function atualizarEstoque(sku, quantidade) {
-  await updateEstoque(sku, quantidade)
+  console.log('Função atualizar estoque')
 
   const ids = await pegarIdBySku(sku)
   console.log('ids encontrados: ', ids)
+
+  const qtdAtual = await getEstoqu(sku)
+  console.log("quantidade atual: ", qtdAtual.quantity)
+  const novaQtd = qtdAtual.quantity + quantidade
+  console.log("nova quantidade: ", novaQtd, typeof novaQtd)
+
+
+  await updateEstoque(sku, quantidade)
+
 
   const deposito = new Deposito()
   const depositos = await deposito.getDeposito();
@@ -218,15 +227,17 @@ export async function atualizarEstoque(sku, quantidade) {
 
   for (const id of idDeposito) {
     for (const idProd of ids) {
+      console.log("id do produto: ", idProd, typeof idProd);
+      console.log(novaQtd)
       const estoque = new Estoque({
         produto: {
-          id: idProd
+          id: parseInt(idProd)
         },
         depositos: {
           id: id
         },
         operacao: 'B',
-        quantidade: parseInt(quantidade.replace(/[^0-9]/g, ''), 10)
+        quantidade: parseInt(novaQtd, 10)
       })
       const result = await estoque.createEstoque();
       console.log('Result:', result);
@@ -236,6 +247,8 @@ export async function atualizarEstoque(sku, quantidade) {
 }
 
 export async function novoEstoque(sku, quantidade) {
+  console.log('sku:', sku)
+  console.log('quantidade: ', quantidade)
   try {
     await createEstoque(sku, quantidade);
     console.log(`Estoque criado/atualizado para SKU: ${sku} com quantidade: ${quantidade}`);
@@ -262,7 +275,7 @@ export async function novoEstoque(sku, quantidade) {
             id: id
           },
           operacao: 'B',
-          quantidade: parseInt(quantidade.replace(/[^0-9]/g, ''), 10)
+          quantidade: parseInt(quantidade, 10)
         })
         const result = await estoque.createEstoque();
         console.log('Result:', result);
@@ -288,13 +301,13 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   console.log('Pedido Unitário: ', pedido);
 
   // Verifica se o pedido possui nota fiscal
-
   const empresa = Object.keys(pedido)[0]; // Assumindo que o objeto empresa está na primeira chave
   let itensPedido = pedido[empresa].request.itens;
   console.log('Itens do pedido: ', itensPedido);
 
   if (pedido[empresa].request.notaFiscal.id === 0) {
     console.error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
+    throw new Error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`)
     return;
   }
   let operacaoInvalida = false;
@@ -311,19 +324,18 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
     }
 
     let sku;
-    const produtoMestre = await produto.getProdutoById(id);
-    if (produtoMestre && produtoMestre[empresa].request.codigo) {
+    const produt = await produto.getProdutoById(id);
+    const newID = produt[empresa].request.estrutura.componentes[0].produto.id;
+    if (newID) {
+      console.log('Produto tem estrutura')
+      const produtoMestre = await produto.getProdutoById(newID);
       sku = produtoMestre[empresa].request.codigo;
-    } else if (prod[empresa].request.estrutura && prod[empresa].request.estrutura.componentes.length > 0) {
-      sku = prod[empresa].request.estrutura.componentes[0].produto.codigo;
     } else {
-      console.error(`Produto mestre ou estrutura para o produto com ID ${id} não encontrado.`);
-      itensNaoCadastrados.push(id);
-      continue;
+      console.log('Produto não tem estrutura')
+      sku = produt[empresa].request.codigo;
     }
 
     const quantidadeSolicitada = item.quantidade;
-
     const estoqueValido = await verificarEstoque(sku, quantidadeSolicitada);
     if (!estoqueValido) {
       console.error(`Operação inválida: quantidade negativa não permitida para SKU: ${sku}.`);
@@ -337,20 +349,20 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
       for (const item of itensPedido) {
         const id = item.produto.id;
         const produto = new Produto({ idLoja: idLoja });
-        let prod = await produto.getProdutoById(id);
+        //let prod = await produto.getProdutoById(id);
+
         let sku;
-
-        const produtoMestre = await produto.getProdutoById(id);
-        if (produtoMestre && produtoMestre[empresa].request.codigo) {
+        const produt = await produto.getProdutoById(id);
+        const newID = produt[empresa].request.estrutura.componentes[0].produto.id;
+        if (newID) {
+          console.log('Produto tem estrutura')
+          const produtoMestre = await produto.getProdutoById(newID);
           sku = produtoMestre[empresa].request.codigo;
-        } else if (prod[empresa].request.estrutura && prod[empresa].request.estrutura.componentes.length > 0) {
-          sku = prod[empresa].request.estrutura.componentes[0].produto.codigo;
         } else {
-          console.error(`Produto mestre ou estrutura para o produto com ID ${id} não encontrado.`);
-          itensNaoCadastrados.push(id);
-          continue;
+          console.log('Produto não tem estrutura')
+          sku = produt[empresa].request.codigo;
         }
-
+        
         const quantidadeSolicitada = item.quantidade;
         console.log(`Atualizando quantidade para SKU: ${sku} com quantidade: ${quantidadeSolicitada}`);
         await atualizarEstoque(sku, -quantidadeSolicitada);
@@ -374,8 +386,8 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 // document.addEventListener('DOMContentLoaded', () => {
 //   document.getElementById('testButto').addEventListener('click', async () => {
 
-//     const id = parseInt(document.getElementById('parametro-funca').value)
-//     const empresa = document.getElementById('parametro-quantidad').value
+//     const id = parseInt(document.getElementById('parametro-funca').value) //idPedido
+//     const empresa = document.getElementById('parametro-quantidad').value //idLoja
 //     try {
 //       lancarEstoqueByPedidoVenda(id, empresa);
 //     } catch (e) {

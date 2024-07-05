@@ -301,36 +301,36 @@ export default class Produto extends BaseClass {
                     }
                 ]
             },
-            camposCustomizados: [
-                {
-                    idCampoCustomizado: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    idVinculo: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    valor: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    item: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    }
-                },
-                {
-                    idCampoCustomizado: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    idVinculo: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    valor: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    item: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    }
-                }
-            ],
+            // camposCustomizados: [
+            //     {
+            //         idCampoCustomizado: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         idVinculo: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         valor: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         item: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         }
+            //     },
+            //     {
+            //         idCampoCustomizado: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         idVinculo: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         valor: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         item: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         }
+            //     }
+            // ],
             variacoes: [
                 {
                     formato: "S",
@@ -844,7 +844,7 @@ export default class Produto extends BaseClass {
                 },
                 imagens: {
                     externas: [
-                        { link: '' }
+                        { link: "" }
                     ]
                 }
             },
@@ -863,36 +863,36 @@ export default class Produto extends BaseClass {
                     }
                 ]
             },
-            camposCustomizados: [
-                {
-                    idCampoCustomizado: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    idVinculo: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    valor: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    item: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    }
-                },
-                {
-                    idCampoCustomizado: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    idVinculo: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    valor: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    item: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    }
-                }
-            ],
+            // camposCustomizados: [
+            //     {
+            //         idCampoCustomizado: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         idVinculo: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         valor: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         item: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         }
+            //     },
+            //     {
+            //         idCampoCustomizado: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         idVinculo: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         valor: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         item: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         }
+            //     }
+            // ],
             variacoes: [
                 {
                     formato: "S",
@@ -1236,7 +1236,11 @@ export default class Produto extends BaseClass {
 
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
-
+        console.log('Payload de produto prestes a subir: ', this.payload)
+        const p = JSON.stringify(this.payload);
+        const r = JSON.parse(p)
+        console.log('Payload após json.stringfy: ', p)
+        console.log('Payload após JSON.parse: ', r)
         try {
             let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
@@ -1252,7 +1256,7 @@ export default class Produto extends BaseClass {
                 });
             });
 
-            console.log(requests.body)
+            console.log(requests)
 
             console.log('REQUESTS: ', requests);
 
@@ -1450,22 +1454,20 @@ export async function criarProduto(produto) {
         payload: {
             nome: produto.name,
             codigo: produto.sku,
-            tipo: 'P',
-            situacao: 'A',
-            formato: 'S',
+            tipo: "P",
+            situacao: "A",
+            formato: "S",
             gtin: produto.ean,
             marca: produto.brand,
             preco: produto.price,
             descricaoCurta: produto.description,
             midia: {
                 imagens: {
-                    externas: [{
-                        link: toString(produto.imageUrl)
-                    }],
-                    internas: []
-                },
-                video: {
-                    url: ""
+                    externas: [
+                        {
+                            link: produto.imageUrl
+                        }
+                    ]
                 }
             }
         }
@@ -1476,19 +1478,20 @@ export async function criarProduto(produto) {
     const produtoCriado = await product.createProduct();
 
     await sleep(10000)
-    await pegarIdsProdutoBySku(produto.sku)  
+    await pegarIdsProdutoBySku(produto.sku)
 
-    if(produtoCriado) {
+    if (produtoCriado) {
+        console.log('Colocando estoque para o produto: ')
         await novoEstoque(product.payload.codigo, produto.quantity)
     }
-    console.log(produtoCriado);
+    console.log('exibindo o produto criado, ultima etapa do processo: ', produtoCriado);
 }
 
 async function pegarIdsProdutoBySku(sku) {
 
     console.log("Pegando id dos produtos")
     try {
-        const produto = new Produto({ params: { criterio: 5, codigo: sku } });
+        const produto = new Produto({ params: { criterio: 2, codigo: sku } });
         console.log('fazendo o objeto para pegar o produto')
         const produtos = await produto.getProduto();
         console.log('Produto encontrado:', produtos);
@@ -1557,28 +1560,28 @@ function verificarProduto(sku) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('testButto').addEventListener('click', async () => {
-        try {
-            const produtos = await getAllProduct()
-            //console.log('produtos para cadastrar: ', produtos)
+// document.addEventListener('DOMContentLoaded', () => {
+//     document.getElementById('testButto').addEventListener('click', async () => {
+//         try {
+//             const produtos = await getAllProduct()
+//             //console.log('produtos para cadastrar: ', produtos)
 
-            for (const produto of produtos) {
-                console.log(produto.sku)
-                await sleep(1000)
-                await pegarIdsProdutoBySku(produto.sku)
-                await sleep(1000)
-            }
-            const sku = document.getElementById('parametro-funca').value
-            console.log("produto a ser processado: ", sku)
-            console.log('sku do produto a ser encontrado: ', sku)
-            
-            console.log('Operação finalizada');
-        } catch (error) {
-            console.log("Erro ao pegar produtos: ", error)
-        }
-    })
-})
+//             for (const produto of produtos) {
+//                 console.log(produto.sku)
+//                 await sleep(1000)
+//                 await pegarIdsProdutoBySku(produto.sku)
+//                 await sleep(1000)
+//             }
+//             const sku = document.getElementById('parametro-funca').value
+//             console.log("produto a ser processado: ", sku)
+//             console.log('sku do produto a ser encontrado: ', sku)
+
+//             console.log('Operação finalizada');
+//         } catch (error) {
+//             console.log("Erro ao pegar produtos: ", error)
+//         }
+//     })
+// })
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
