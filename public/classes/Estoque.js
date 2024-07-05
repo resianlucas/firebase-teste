@@ -323,17 +323,19 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
       continue;
     }
 
-    try {
-      let sku;
-      const produtoMestre = await produto.getProdutoById(id);
-      const newID = produtoMestre[empresa].request.estrutura.componentes[0].produto.id;
-      const p = await produto.getProdutoById(newID);
-      sku = p[empresa].request.codigo;
-      const quantidadeSolicitada = item.quantidade;
-    } catch (error) {
-
+    let sku;
+    const produt = await produto.getProdutoById(id);
+    const newID = produt[empresa].request.estrutura.componentes[0].produto.id;
+    if (newID) {
+      console.log('Produto tem estrutura')
+      const produtoMestre = await produto.getProdutoById(newID);
+      sku = produtoMestre[empresa].request.codigo;
+    } else {
+      console.log('Produto não tem estrutura')
+      sku = produt[empresa].request.codigo;
     }
 
+    const quantidadeSolicitada = item.quantidade;
     const estoqueValido = await verificarEstoque(sku, quantidadeSolicitada);
     if (!estoqueValido) {
       console.error(`Operação inválida: quantidade negativa não permitida para SKU: ${sku}.`);
@@ -348,12 +350,19 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
         const id = item.produto.id;
         const produto = new Produto({ idLoja: idLoja });
         //let prod = await produto.getProdutoById(id);
-        let sku;
 
-        const produtoMestre = await produto.getProdutoById(id);
-        const newID = produtoMestre[empresa].request.estrutura.componentes[0].produto.id;
-        const p = await produto.getProdutoById(newID);
-        sku = p[empresa].request.codigo;
+        let sku;
+        const produt = await produto.getProdutoById(id);
+        const newID = produt[empresa].request.estrutura.componentes[0].produto.id;
+        if (newID) {
+          console.log('Produto tem estrutura')
+          const produtoMestre = await produto.getProdutoById(newID);
+          sku = produtoMestre[empresa].request.codigo;
+        } else {
+          console.log('Produto não tem estrutura')
+          sku = produt[empresa].request.codigo;
+        }
+        
         const quantidadeSolicitada = item.quantidade;
         console.log(`Atualizando quantidade para SKU: ${sku} com quantidade: ${quantidadeSolicitada}`);
         await atualizarEstoque(sku, -quantidadeSolicitada);
