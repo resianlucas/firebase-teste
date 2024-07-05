@@ -301,36 +301,36 @@ export default class Produto extends BaseClass {
                     }
                 ]
             },
-            camposCustomizados: [
-                {
-                    idCampoCustomizado: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    idVinculo: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    valor: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    item: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    }
-                },
-                {
-                    idCampoCustomizado: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    idVinculo: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    valor: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    item: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    }
-                }
-            ],
+            // camposCustomizados: [
+            //     {
+            //         idCampoCustomizado: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         idVinculo: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         valor: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         item: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         }
+            //     },
+            //     {
+            //         idCampoCustomizado: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         idVinculo: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         valor: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         item: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         }
+            //     }
+            // ],
             variacoes: [
                 {
                     formato: "S",
@@ -863,36 +863,36 @@ export default class Produto extends BaseClass {
                     }
                 ]
             },
-            camposCustomizados: [
-                {
-                    idCampoCustomizado: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    idVinculo: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    valor: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    item: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    }
-                },
-                {
-                    idCampoCustomizado: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    idVinculo: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    valor: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    },
-                    item: {
-                        value: "<Error: Too many levels of nesting to fake this schema>"
-                    }
-                }
-            ],
+            // camposCustomizados: [
+            //     {
+            //         idCampoCustomizado: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         idVinculo: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         valor: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         item: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         }
+            //     },
+            //     {
+            //         idCampoCustomizado: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         idVinculo: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         valor: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         },
+            //         item: {
+            //             value: "<Error: Too many levels of nesting to fake this schema>"
+            //         }
+            //     }
+            // ],
             variacoes: [
                 {
                     formato: "S",
@@ -1256,7 +1256,7 @@ export default class Produto extends BaseClass {
                 });
             });
 
-            console.log(requests.body)
+            console.log(requests)
 
             console.log('REQUESTS: ', requests);
 
