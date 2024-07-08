@@ -18,7 +18,8 @@
             <li><a href="/public/produtos/produtos.html">Voltar</a></li>
         </ul>
     </nav>
-
+    <!-- HTML -->
+    
     <form id="addItemForm">
         <div class="header-container">
             <div class="title-container">
@@ -27,7 +28,7 @@
             </div>
             <button type="submit">Salvar Item</button>
         </div>
-
+        
         <main class="main-container">
             <div class="image-container">
                 <label for="url-image">Imagem</label>
@@ -49,7 +50,7 @@
                     <div>
                         <label for="price">Preço</label>
                         <input id="price" type="number" step="0.01" placeholder="Insira o preço..."
-                            pattern="^\d+(\.\d{1,2})?$" title="Formato: R$ 0.00" required>
+                        pattern="^\d+(\.\d{1,2})?$" title="Formato: R$ 0.00" required>
                     </div>
                     <div>
                         <label for="quantity">Quantidade</label>
@@ -58,7 +59,7 @@
                 </div>
             </div>
         </main>
-
+        
         <footer class="footer-container">
             <div class="brand-category-container">
                 <div>
@@ -79,6 +80,10 @@
             </div>
         </footer>
     </form>
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
 </body>
 
 </html>

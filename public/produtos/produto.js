@@ -44,6 +44,10 @@ document.getElementById('url-image').addEventListener('input', function() {
 
 addItemForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    addItemForm.querySelector('button[type="submit"]').disabled = true;
+
+
     const product = {
         name: document.getElementById("name").value,
         sku: document.getElementById("sku").value,
@@ -61,13 +65,17 @@ addItemForm.addEventListener('submit', async (e) => {
     await criarProduto(product)
         .then(() => {
             console.log('Item adicionado com sucesso!');
-            alert('Item adicionado com sucesso!');
             document.getElementById('addItemForm').reset();
+            window.history.back();
         })
         .catch((error) => {
             console.error('Erro ao adicionar item:', error);
             alert('Erro ao adicionar item: ' + error);
-        });
+        })
+        .finally(() => {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            addItemForm.querySelector('button[type="submit"]').disabled = false;
+        })
 });
 
 
