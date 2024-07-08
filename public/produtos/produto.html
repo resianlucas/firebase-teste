@@ -48,7 +48,8 @@
                 <div class="info-row">
                     <div>
                         <label for="price">Preço</label>
-                        <input id="price" type="number" step="0.01" placeholder="Insira o preço..." pattern="^\d+(\.\d{1,2})?$" title="Formato: R$ 0.00" required>
+                        <input id="price" type="number" step="0.01" placeholder="Insira o preço..."
+                            pattern="^\d+(\.\d{1,2})?$" title="Formato: R$ 0.00" required>
                     </div>
                     <div>
                         <label for="quantity">Quantidade</label>
@@ -61,8 +62,11 @@
         <footer class="footer-container">
             <div class="brand-category-container">
                 <div>
-                    <label for="category">Categoria</label>
-                    <input id="category" type="text" placeholder="Insira a categoria...">
+                    <label for="category">Categoria:</label>
+                    <select id="category" name="category" required>
+                        <option value="" disabled selected>Selecione uma categoria</option>
+                        <!-- Opções serão preenchidas pelo JavaScript -->
+                    </select>
                 </div>
                 <div>
                     <label for="brand">Marca</label>
@@ -76,4 +80,5 @@
         </footer>
     </form>
 </body>
+
 </html>

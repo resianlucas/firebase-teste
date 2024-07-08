@@ -1,4 +1,5 @@
 import { BaseClass } from './BaseClass.js'
+import { getAllCategories } from '../database/categoria.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -183,6 +184,15 @@ export default class Categoria extends BaseClass {
             console.error('Erro no método createCategoria:', e.message);
             return null;
         }
+    }
+}
+
+export async function listarCategorias() {
+    try {
+        const categorias = await getAllCategories();
+        return categorias;  
+    } catch (error) {
+        
     }
 }
 

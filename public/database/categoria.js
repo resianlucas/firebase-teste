@@ -22,12 +22,13 @@ export async function updateProduct(name, updates) {
     await update(categoriaRef, updates);
 }
 
-export async function getAllProducts() {
+export async function getAllCategories() {
     const categorias = [];
     const categoriaRef = ref(db, 'category');
     const snapshot = await get(categoriaRef);
     snapshot.forEach((childSnapshot) => {
         categorias.push(childSnapshot.val());
     });
+    console.log('categorias: ', categorias)
     return categorias;
 }

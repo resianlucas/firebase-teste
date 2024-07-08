@@ -1,7 +1,23 @@
 import { getProducto, criarProduto } from '../classes/Produto.js';
+import { listarCategorias } from '../classes/Categoria.js'
 
 
 const addItemForm = document.getElementById('addItemForm');
+const categoriaSelect = document.getElementById('category');
+
+// Função para preencher o menu suspenso de categorias
+async function preencherCategorias() {
+    const categorias = await listarCategorias();
+
+    console.log('categorias dos produtos: ',categorias)
+
+    categorias.forEach(categoria => {
+        const option = document.createElement('option');
+        option.value = categoria.name; // Supondo que as categorias têm um campo 'nome'
+        option.textContent = categoria.name;
+        categoriaSelect.appendChild(option);
+    });
+}
 
 function converterPreco(preco) {
     const precoNumerico = parseFloat(preco.replace(',', '.').replace(/[^0-9.]/g, ''));
@@ -76,3 +92,5 @@ const sku = urlParams.get('sku');
 if (sku) {
     preencherFormulario(sku);
 }
+
+document.addEventListener('DOMContentLoaded', preencherCategorias);
