@@ -1,5 +1,5 @@
 import { BaseClass } from './BaseClass.js'
-import { getAllCategories } from '../database/categoria.js';
+import { getAllCategories, createCategory } from '../database/categoria.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -194,6 +194,10 @@ export async function listarCategorias() {
     } catch (error) {
         
     }
+}
+
+export async function criarCategoria(categoria) {
+    await createCategory(categoria)
 }
 
 

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorias</title>
+    <link rel="stylesheet" href="categoria.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/public/index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <button id="theme-toggle">Toggle Theme</button>
+        <form id="categoria">
+            <h1>Cadastrar Categoria</h1>
+            <div class="form-group">
+                <label for="nomeCategoria">Nome: </label>
+                <input type="text" id="nomeCategoria" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="ncm">NCM: </label>
+                <input type="text" id="ncm" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="cest">CEST: </label>
+                <input type="text" id="cest" placeholder="">
+            </div>
+            <button type="submit">Cadastrar</button>
+        </form>
+    </main>
+
+    <script>
+        document.querySelector('#theme-toggle').addEventListener('click', () => {
+            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+        });
+    </script>
+    <script type="module" src="categoria.js"></script>
+
+</body>
+
+</html>
