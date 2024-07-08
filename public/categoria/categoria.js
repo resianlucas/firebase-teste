@@ -1,4 +1,4 @@
-import { criarCategoria } from "../classes/Categoria";
+import { criarCategoria } from "../classes/Categoria.js";
 
 const addItemForm = document.getElementById('categoria');
 
@@ -16,9 +16,9 @@ addItemForm.addEventListener('submit', async (e) => {
         .then(() => {
             console.log('Item adicionado com sucesso!');
             alert('Item adicionado com sucesso!');
-            document.getElementById('addItemForm').reset();
+            document.getElementById('categoria').reset();
         })
-        .catch((error) => {
+        .catch((error) => { 
             console.error('Erro ao adicionar item:', error);
             alert('Erro ao adicionar item: ' + error);
         });
