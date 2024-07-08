@@ -66,7 +66,7 @@ addItemForm.addEventListener('submit', async (e) => {
         .then(() => {
             console.log('Item adicionado com sucesso!');
             document.getElementById('addItemForm').reset();
-            window.history.back();
+            
         })
         .catch((error) => {
             console.error('Erro ao adicionar item:', error);
@@ -75,6 +75,7 @@ addItemForm.addEventListener('submit', async (e) => {
         .finally(() => {
             document.getElementById('loadingOverlay').style.display = 'none';
             addItemForm.querySelector('button[type="submit"]').disabled = false;
+            window.history.back();
         })
 });
 
