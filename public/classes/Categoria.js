@@ -97,7 +97,7 @@ export default class Categoria extends BaseClass {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${blingInfo.access_token}`
-                    }                   
+                    }
                 });
             });
 
@@ -190,14 +190,18 @@ export default class Categoria extends BaseClass {
 export async function listarCategorias() {
     try {
         const categorias = await getAllCategories();
-        return categorias;  
+        return categorias;
     } catch (error) {
-        
+
     }
 }
 
 export async function criarCategoria(categoria) {
-    await createCategory(categoria)
+    try {
+        await createCategory(categoria)
+    } catch (error) {
+        console.error(`Erro ao cadastrar categoria: ${error}`)
+    }
 }
 
 
