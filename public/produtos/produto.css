@@ -208,6 +208,14 @@ form button:hover {
     background-color: #0056b3;
 }
 
+form button#deleteButton {
+    background-color: #ff4d4d;
+}
+
+form button#deleteButton:hover {
+    background-color: #cc0000;
+}
+
 /* Tema claro */
 body[data-theme="light"] {
     background-color: #f1f1f1;
@@ -255,6 +263,14 @@ body[data-theme="light"] form button {
 
 body[data-theme="light"] form button:hover {
     background-color: #444444;
+}
+
+body[data-theme="light"] form button#deleteButton {
+    background-color: #ff4d4d;
+}
+
+body[data-theme="light"] form button#deleteButton:hover {
+    background-color: #cc0000;
 }
 
 body[data-theme="light"] .product-image img {

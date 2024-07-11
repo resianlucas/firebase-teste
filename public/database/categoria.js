@@ -29,6 +29,5 @@ export async function getAllCategories() {
     snapshot.forEach((childSnapshot) => {
         categorias.push(childSnapshot.val());
     });
-    console.log('categorias: ', categorias)
     return categorias;
 }
