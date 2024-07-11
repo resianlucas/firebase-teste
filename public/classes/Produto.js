@@ -1,6 +1,7 @@
 import { BaseClass } from './BaseClass.js';
-import { getProduct, getAllProducts, createProduct, updateProduct, getProductIdsBySku, setProductId } from '../database/produto.js';
+import { getProduct, getAllProducts, createProduct, updateProduct, getProductIdsBySku, setProductId, deleteProduct } from '../database/produto.js';
 import { novoEstoque } from './Estoque.js';
+import { getCategory } from '../database/categoria.js';
 
 const baseUrl = 'http://localhost:3000/api'
 
@@ -1236,11 +1237,7 @@ export default class Produto extends BaseClass {
 
         let accessToken = await this.getBling();
         console.log('Access Token:', accessToken);
-        console.log('Payload de produto prestes a subir: ', this.payload)
-        const p = JSON.stringify(this.payload);
-        const r = JSON.parse(p)
-        console.log('Payload após json.stringfy: ', p)
-        console.log('Payload após JSON.parse: ', r)
+
         try {
             let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
@@ -1256,8 +1253,6 @@ export default class Produto extends BaseClass {
                 });
             });
 
-            console.log(requests)
-
             console.log('REQUESTS: ', requests);
 
             let responses = await Promise.all(requests);
@@ -1266,15 +1261,24 @@ export default class Produto extends BaseClass {
             for (let i = 0; i < responses.length; i++) {
                 let response = await responses[i].text();
                 try {
-                    console.log('response: ', response)
                     response = JSON.parse(response);
-                } catch (e) {
+                    console.log("response: ", response)
+                } catch (error) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
                     continue;
                 }
 
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];
-
+                if (response.error) {
+                    result[blingInfo.name] = {
+                        id: blingInfo.id,
+                        empresa: blingInfo.name,
+                        dataHora: new Date().toISOString(),
+                        method: 'createProduct',
+                        error: response.error
+                    }
+                    console.error(response.error)
+                }
                 if (response.data) {
                     result[blingInfo.name] = {
                         id: blingInfo.id,
@@ -1325,6 +1329,7 @@ export default class Produto extends BaseClass {
                 let response = await responses[i].text();
                 try {
                     response = JSON.parse(response);
+                    console.log('response: ', response)
                 } catch (e) {
                     console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
                     continue;
@@ -1416,6 +1421,15 @@ export default class Produto extends BaseClass {
 
 }
 
+export async function deletarProduto(sku) {
+    try {
+        await deleteProduct(sku);
+        console.log(`Produto deletado com sucesso: ${sku}`)
+    } catch (error) {
+        console.error(`Erro ao deletar o produto: ${sku}`)
+    }
+}
+
 export async function getAllProduct() {
     try {
         console.log('funcao pegar todos os produtos')
@@ -1444,12 +1458,18 @@ export async function pegarIdBySku(sku) {
     }
 }
 
+
 export async function criarProduto(produto) {
 
     await createProduct(produto);
+    // Verifica se o produto já possui ID salvo na tabela de IDs
+    const idsExistentes = await getProductIdsBySku(produto.sku);
+    console.log('ids existentes: ', idsExistentes)
+    // Obtém a categoria do produto
+    const categoria = await getCategory(produto.category);
+    console.log('Categoria do produto: ', categoria);
 
-    console.log('Produto para subir: ', produto)
-
+    // Monta o payload do produto
     const product = new Produto({
         payload: {
             nome: produto.name,
@@ -1461,6 +1481,10 @@ export async function criarProduto(produto) {
             marca: produto.brand,
             preco: produto.price,
             descricaoCurta: produto.description,
+            tributacao: {
+                ncm: categoria.ncm,
+                cest: categoria.cest
+            },
             midia: {
                 imagens: {
                     externas: [
@@ -1471,21 +1495,86 @@ export async function criarProduto(produto) {
                 }
             }
         }
-    })
+    });
 
-    console.log('Produto para subir: ', product.payload)
+    console.log('Produto para subir: ', product.payload);
 
-    const produtoCriado = await product.createProduct();
+    let produtoCriado;
 
-    await sleep(10000)
-    await pegarIdsProdutoBySku(produto.sku)
+    if (idsExistentes.length > 0) {
+        for (const idProduto of idsExistentes) {
+
+            // Se o produto já existe, atualiza o produto existente
+            // Assume que usa o primeiro ID encontrado
+            produtoCriado = await product.altProduct(idProduto);
+            console.log('Produto atualizado: ', produtoCriado);
+        }
+    } else {
+        // Se o produto não existe, cria um novo produto
+        produtoCriado = await product.createProduct();
+        console.log('Produto criado: ', produtoCriado);
+    }
+
+    await sleep(300);
+    await pegarIdsProdutoBySku(produto.sku);
 
     if (produtoCriado) {
-        console.log('Colocando estoque para o produto: ')
-        await novoEstoque(product.payload.codigo, produto.quantity)
+        console.log('Colocando estoque para o produto: ');
+        await novoEstoque(product.payload.codigo, produto.quantity);
     }
-    console.log('exibindo o produto criado, ultima etapa do processo: ', produtoCriado);
+
+    console.log('Exibindo o produto criado/atualizado, última etapa do processo: ', produtoCriado);
 }
+
+// export async function criarProduto(produto) {
+
+//     await createProduct(produto);
+//     const categoria = await getCategory(produto.category)
+//     console.log('categoria do produto: ',categoria)
+
+//     console.log('Produto para subir: ', produto)
+
+//     const product = new Produto({
+//         payload: {
+//             nome: produto.name,
+//             codigo: produto.sku,
+//             tipo: "P",
+//             situacao: "A",
+//             formato: "S",
+//             gtin: produto.ean,
+//             marca: produto.brand,
+//             preco: produto.price,
+//             descricaoCurta: produto.description,
+//             tributacao: {
+//                 ncm: categoria.ncm,
+//                 cest: categoria.cest
+//             },
+//             midia: {
+//                 imagens: {
+//                     externas: [
+//                         {
+//                             link: produto.imageUrl
+//                         }
+//                     ]
+//                 }
+//             }
+//         }
+//     })
+
+//     console.log('Produto para subir: ', product.payload)
+
+//     const produtoCriado = await product.createProduct();
+//     console.log(produtoCriado)
+
+//     await sleep(300)
+//     await pegarIdsProdutoBySku(produto.sku)
+
+//     if (produtoCriado) {
+//         console.log('Colocando estoque para o produto: ')
+//         await novoEstoque(product.payload.codigo, produto.quantity)
+//     }
+//     console.log('exibindo o produto criado, ultima etapa do processo: ', produtoCriado);
+// }
 
 async function pegarIdsProdutoBySku(sku) {
 

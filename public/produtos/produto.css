@@ -1,4 +1,32 @@
 /* Estilos gerais */
+
+/* CSS */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #000;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -180,6 +208,14 @@ form button:hover {
     background-color: #0056b3;
 }
 
+form button#deleteButton {
+    background-color: #ff4d4d;
+}
+
+form button#deleteButton:hover {
+    background-color: #cc0000;
+}
+
 /* Tema claro */
 body[data-theme="light"] {
     background-color: #f1f1f1;
@@ -227,6 +263,14 @@ body[data-theme="light"] form button {
 
 body[data-theme="light"] form button:hover {
     background-color: #444444;
+}
+
+body[data-theme="light"] form button#deleteButton {
+    background-color: #ff4d4d;
+}
+
+body[data-theme="light"] form button#deleteButton:hover {
+    background-color: #cc0000;
 }
 
 body[data-theme="light"] .product-image img {

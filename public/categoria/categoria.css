@@ -1,0 +1,124 @@
+/* cadastro.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+header nav ul li {
+    margin-right: 10px;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+button#theme-toggle {
+    align-self: flex-end;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button#theme-toggle:hover {
+    background-color: #0056b3;
+}
+
+form {
+    width: 80%;    
+}
+
+form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+form input[type="text"] {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+form button {
+    
+    width: 60%;
+    padding: 10px;
+    margin: 10px 0px 30px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+form button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* Dark Theme */
+body[data-theme='dark'] {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body[data-theme='dark'] main {
+    background-color: #1e1e1e;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme='dark'] form input[type="text"] {
+    background-color: #333;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+
+body[data-theme='dark'] form button[type="submit"] {
+    background-color: #28a745;
+}
+
+body[data-theme='dark'] button#theme-toggle {
+    background-color: #007bff;
+}

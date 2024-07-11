@@ -22,7 +22,7 @@ export async function updateProduct(name, updates) {
     await update(categoriaRef, updates);
 }
 
-export async function getAllProducts() {
+export async function getAllCategories() {
     const categorias = [];
     const categoriaRef = ref(db, 'category');
     const snapshot = await get(categoriaRef);

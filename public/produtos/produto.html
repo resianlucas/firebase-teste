@@ -18,7 +18,8 @@
             <li><a href="/public/produtos/produtos.html">Voltar</a></li>
         </ul>
     </nav>
-
+    <!-- HTML -->
+    
     <form id="addItemForm">
         <div class="header-container">
             <div class="title-container">
@@ -26,12 +27,13 @@
                 <input id="name" type="text" placeholder="Insira o nome..." required>
             </div>
             <button type="submit">Salvar Item</button>
+            <button id="deleteButton" type="button">Deletar Produto</button>
         </div>
-
+        
         <main class="main-container">
             <div class="image-container">
                 <label for="url-image">Imagem</label>
-                <input id="url-image" type="url" placeholder="Insira o URL da imagem..." required>
+                <input id="url-image" type="url" placeholder="Insira o URL da imagem...">
                 <img id="product-preview-image" src="placeholder.jpg" alt="Pré-visualização da Imagem do Produto">
             </div>
             <div class="info-container">
@@ -48,7 +50,8 @@
                 <div class="info-row">
                     <div>
                         <label for="price">Preço</label>
-                        <input id="price" type="number" step="0.01" placeholder="Insira o preço..." pattern="^\d+(\.\d{1,2})?$" title="Formato: R$ 0.00" required>
+                        <input id="price" type="number" step="0.01" placeholder="Insira o preço..."
+                        pattern="^\d+(\.\d{1,2})?$" title="Formato: R$ 0.00" required>
                     </div>
                     <div>
                         <label for="quantity">Quantidade</label>
@@ -57,12 +60,15 @@
                 </div>
             </div>
         </main>
-
+        
         <footer class="footer-container">
             <div class="brand-category-container">
                 <div>
-                    <label for="category">Categoria</label>
-                    <input id="category" type="text" placeholder="Insira a categoria...">
+                    <label for="category">Categoria:</label>
+                    <select id="category" name="category">
+                        <option value="" disabled selected>Selecione uma categoria</option>
+                        <!-- Opções serão preenchidas pelo JavaScript -->
+                    </select>
                 </div>
                 <div>
                     <label for="brand">Marca</label>
@@ -75,5 +81,10 @@
             </div>
         </footer>
     </form>
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
 </body>
+
 </html>
