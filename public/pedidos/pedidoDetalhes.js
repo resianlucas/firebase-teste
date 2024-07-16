@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             alert('FEITO COM SUCESSO')
         } catch (error) {
             console.error('Erro ao lançar estoque:', error);
-            alert('Erro ao lançar estoque: ', error)
+            alert('Erro ao lançar estoque: ', error);
         }
     }
 

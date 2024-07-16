@@ -57,7 +57,6 @@ export default class Categoria extends BaseClass {
             for (let i = 0; i < responses.length; i++) {
                 let response = await responses[i].text();
                 try {
-                    console.log('response: ', response)
                     response = JSON.parse(response);
                     console.log('response: ', response)
                 } catch (e) {
@@ -210,8 +209,8 @@ export async function criarCategoria(categoria) {
 //     document.getElementById('testButto').addEventListener('click', async () => {
 //         try {
 //             const categoria = new Categoria()
-//             const id = document.getElementById('parametro-funca').value
-//             const cat = await categoria.getCategoriaById(id)
+//             //const id = document.getElementById('parametro-funca').value
+//             const cat = await categoria.getCategoria()
 
 //             console.log('Operação finalizada: ', cat);
 //         } catch (error) {

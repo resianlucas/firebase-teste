@@ -327,6 +327,7 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
     const produt = await produto.getProdutoById(id);
     const estrutura = produt[empresa].request.estrutura.componentes;
     if (estrutura) {
+      console.log('Produto tem estrutura')
       estrutura.forEach(async produto => {
         const id = produto.produto.id
         const produtoMestre = await produto.getProdutoById(id);
@@ -338,7 +339,7 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
     }
 
 
-
+    console.log("CONSOLE DEBUG: ",produt[empresa].request)
     //const produt = await produto.getProdutoById(id);
     const newID = produt[empresa].request.estrutura.componentes[0].produto.id;
     if (newID) {
