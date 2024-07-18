@@ -305,11 +305,15 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   let itensPedido = pedido[empresa].request.itens;
   console.log('Itens do pedido: ', itensPedido);
 
-  if (pedido[empresa].request.notaFiscal.id === 0) {
-    console.error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
-    throw new Error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`)
-    return;
+  if(!pedido[empresa].request.idLoja === 203913945) {
+    if (pedido[empresa].request.notaFiscal.id === 0) {
+      console.error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
+      throw new Error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`)
+    }
+  } else {
+    console.log('id da loja: ', pedido[empresa].request.idLoja)
   }
+
   let operacaoInvalida = false;
   let itensNaoCadastrados = [];
 
@@ -325,7 +329,13 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
     let sku;
     const produt = await produto.getProdutoById(id);
-    const estrutura = produt[empresa].request.estrutura.componentes;
+    let estrutura;
+    let newID;
+    if (produt[empresa].request.estrutura.componentes.length > 0) {
+      console.log('componentes do produto: ',produt[empresa].request.estrutura.componentes)
+      estrutura = produt[empresa].request.estrutura.componentes;
+    }
+
     if (estrutura) {
       console.log('Produto tem estrutura')
       estrutura.forEach(async produto => {
@@ -333,6 +343,7 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
         const produtoMestre = await produto.getProdutoById(id);
         sku = produtoMestre[empresa].request.codigo;
       });
+      newID = produt[empresa].request.estrutura.componentes[0].produto.id;
     } else {
       console.log('Produto não tem estrutura')
       sku = produt[empresa].request.codigo;
@@ -341,7 +352,6 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
     console.log("CONSOLE DEBUG: ",produt[empresa].request)
     //const produt = await produto.getProdutoById(id);
-    const newID = produt[empresa].request.estrutura.componentes[0].produto.id;
     if (newID) {
       console.log('Produto tem estrutura')
       const produtoMestre = await produto.getProdutoById(newID);
@@ -368,8 +378,14 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
         //let prod = await produto.getProdutoById(id);
 
         let sku;
+        let newID;
         const produt = await produto.getProdutoById(id);
-        const newID = produt[empresa].request.estrutura.componentes[0].produto.id;
+        
+        if (produt[empresa].request.estrutura.componentes.length > 0) {
+          console.log(produt[empresa].request.estrutura.componentes)
+          newID = produt[empresa].request.estrutura.componentes[0].produto.id;
+        }
+
         if (newID) {
           console.log('Produto tem estrutura')
           const produtoMestre = await produto.getProdutoById(newID);
