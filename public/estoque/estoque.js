@@ -46,6 +46,7 @@ async function searchProductByEan() {
             console.log(`Produto encontrado:`, product);
             updateProductDetails(product);
             incrementProductCounter(product.sku);
+            console.log(`Produto encontrado:${product.sku}`)
         } else {
             await cadastrar(ean);
             alert('Produto não encontrado. Cadastrado na tabela "cadastrar".');
@@ -232,9 +233,24 @@ function loadXml() {
 
             if (productSnapshot) {
                 const product = productSnapshot.val();
+                console.log(`Produto: ${product.sku}`);
+                
                 const currentQuantity = product.quantity || 0;
+                
                 const newQuantity = currentQuantity + quantidade;
-                await update(ref(db, `products/${product.sku}/quantity`), { quantity: newQuantity });
+                console.log(`Nova Quantidade: ${newQuantity}`);
+
+                if (typeof newQuantity !== "number") {
+                    console.error("A nova quantidade não é um número válido.");
+                    await set(ref(db, `products/${product.sku}/quantity`), 0);
+                } else {
+                    await set(ref(db, `products/${product.sku}/quantity`), newQuantity);
+                }
+
+                
+                  
+                // Atualizando a quantidade do produto
+                await set(ref(db, `products/${product.sku}/quantity`), newQuantity);
             } else {
                 await set(ref(db, `cadastrar/${ean}`), {
                     ean: ean,

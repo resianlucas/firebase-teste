@@ -1577,7 +1577,7 @@ export async function criarProduto(produto) {
 
     let produtoCriado;
 
-    if (idsExistentes.length > 0) {
+    if (idsExistentes.length >= 3) {
         for (const idProduto of idsExistentes) {
 
             // Se o produto já existe, atualiza o produto existente

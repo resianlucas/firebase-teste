@@ -9,12 +9,16 @@
     <script type="module">
         import { db } from '/public/script.js';
         import { ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { criarProduto } from "/public/classes/Produto.js";
 
         function validarSKU(sku) {
             if (!sku || sku.trim() === '') {
                 throw new Error('SKU não pode estar em branco.');
             }
             return sku.replace(/[.#$[\]]/g, '-');
+        }
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
         function converterPreco(preco) {
@@ -39,14 +43,57 @@
             return quantidadeNumerica;
         }
 
-        document.getElementById('uploadCSV').addEventListener('change', function (e) {
+        // document.getElementById('uploadCSV').addEventListener('change', async function (e) {
+        //     const file = e.target.files[0];
+        //     if (file) {
+        //         Papa.parse(file, {
+        //             header: true,
+        //             complete: function (results) {
+        //                 const products = results.data;
+        //                 products.forEach(async product => {
+        //                     try {
+        //                         const productData = {
+        //                             name: product.PRODUTO ? product.PRODUTO.trim() : 'Produto sem nome',
+        //                             sku: validarSKU(product.SKU),
+        //                             ean: product.EAN ? product.EAN.trim() : 'EAN não informado',
+        //                             category: product.CATEGORIA.trim(),
+        //                             brand: product.MARCA ? product.MARCA.trim() : 'Marca não informada',
+        //                             price: converterPreco(product.PRECO),
+        //                             quantity: converterQuantidade(product.QUANTIDADE),
+        //                             imageUrl: product.IMAGEM.trim(),
+        //                             description: product.DESCRICAO.trim()
+        //                         };
+
+        //                         const newItemRef = ref(db, 'products/' + productData.sku);
+        //                         set(newItemRef, productData)
+        //                             .then(() => {
+        //                                 console.log('Item adicionado com sucesso!');
+        //                                 await criarProduto(productData);
+        //                                 await sleep(300);
+
+        //                             })
+        //                             .catch((error) => {
+        //                                 console.error('Erro ao adicionar item:', error);
+        //                             });
+        //                     } catch (error) {
+        //                         console.error('Erro ao processar produto:', error.message);
+        //                     }
+        //                 });
+        //             }
+        //         });
+        //     }
+        // });
+
+        document.getElementById('uploadCSV').addEventListener('change', async function (e) {
             const file = e.target.files[0];
             if (file) {
                 Papa.parse(file, {
                     header: true,
-                    complete: function (results) {
+                    complete: async function (results) { // Torna a função completa async
                         const products = results.data;
-                        products.forEach(product => {
+
+                        // Usa for...of em vez de forEach para suportar async/await
+                        for (const product of products) {
                             try {
                                 const productData = {
                                     name: product.PRODUTO ? product.PRODUTO.trim() : 'Produto sem nome',
@@ -61,21 +108,20 @@
                                 };
 
                                 const newItemRef = ref(db, 'products/' + productData.sku);
-                                set(newItemRef, productData)
-                                    .then(() => {
-                                        console.log('Item adicionado com sucesso!');
-                                    })
-                                    .catch((error) => {
-                                        console.error('Erro ao adicionar item:', error);
-                                    });
+                                await set(newItemRef, productData); // Usa await aqui
+                                console.log('Item adicionado com sucesso!');
+
+                                await criarProduto(productData); // Aguarda a criação do produto
+                                await sleep(300); // Aguarda 300 ms
                             } catch (error) {
                                 console.error('Erro ao processar produto:', error.message);
                             }
-                        });
+                        }
                     }
                 });
             }
         });
+
 
     </script>
 </head>

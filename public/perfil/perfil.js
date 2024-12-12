@@ -30,14 +30,20 @@ function displayBlings(blings) {
                     'Client ID: ', bling.client_id,
                     '\nClient Secret: ', bling.client_secret,
                     '\nRefresh Token: ', bling.refresh_token
-                )
-                await refreshBlingToken(bling.client_id, bling.client_secret, bling.refresh_token, bling.id);
-                alert('Token atualizado com sucesso!');
+                );
+                
+                const refresh = await refreshBlingToken(bling.client_id, bling.client_secret, bling.refresh_token, bling.id);
+                console.log(refresh);
+                if (refresh) {
+                    // Aqui já aparece o alerta de sucesso dentro da função refreshBlingToken
+                }
                 const updatedBlings = await fetchBlings();
                 displayBlings(updatedBlings);
             } catch (error) {
-                alert('Erro ao atualizar token: ' + error);
+                // O alerta de erro já será mostrado na função refreshBlingToken
+                console.error('Erro ao atualizar token:', error);
             }
+        
         };
         actionCell.appendChild(refreshButton);
         row.appendChild(actionCell);

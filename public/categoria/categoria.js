@@ -47,3 +47,17 @@ addItemForm.addEventListener('submit', async (e) => {
 // }
 
 // document.addEventListener('DOMContentLoaded', preencherCategorias);
+
+
+// document.addEventListener('DOMContentLoaded', ()=>{
+//     document.getElementById('testButto').addEventListener('click', async () => {
+
+//         const id = parseInt(document.getElementById('parametro-funca').value)
+//         console.log(typeof id)
+//         const empresa = document.getElementById('parametro-quantidad').value
+
+//         const resultado = await pegarPedidoPeloID(id, empresa)
+//         console.log('resultado: ', resultado);
+
+//     })
+// })

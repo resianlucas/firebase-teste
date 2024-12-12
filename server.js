@@ -39,6 +39,8 @@ app.use('/api', createProxyMiddleware({
         '^/api/produtos': '/Api/v3/produtos',
         '^/api/categorias/produtos': '/Api/v3/categorias/produtos',
         '^/api/categorias/produtos/([0-9]+)$': '/Api/v3/categorias/produtos/$1',
+        '^/api/categorias/lojas': '/Api/v3/categorias/lojas',
+
     },
     onProxyReq: (proxyReq, req, res) => {
         if (req.body) {

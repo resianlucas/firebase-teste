@@ -88,6 +88,10 @@ export async function refreshBlingToken(clientId, clientSecret, refreshToken, id
                     access_token: data.access_token,
                     refresh_token: data.refresh_token
                 });
+                
+                // Exibe o alerta de sucesso
+                alert('Token atualizado com sucesso!');
+                return data; // Retorna os dados para indicar sucesso
             } else {
                 throw new Error('Company with the specified ID not found.');
             }
@@ -97,7 +101,8 @@ export async function refreshBlingToken(clientId, clientSecret, refreshToken, id
 
     } catch (error) {
         console.error('Erro ao atualizar token:', error);
-        alert('Erro ao atualizar token: ' + error);
+        alert('Erro ao atualizar token: ' + error.message); // Exibe o alerta de erro
+        throw error; // Lança o erro para tratamento posterior
     }
 }
 

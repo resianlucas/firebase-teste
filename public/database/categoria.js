@@ -31,3 +31,19 @@ export async function getAllCategories() {
     });
     return categorias;
 }
+
+export async function getCategoriaByDesc(descricao) {
+    const dbRef = ref(db, 'cadastrar');
+    const snapshot = await get(dbRef);
+    let productSnapshot = null;
+
+    snapshot.forEach(childSnapshot => {
+        if (childSnapshot.val().descricao === descricao) {
+            productSnapshot = childSnapshot;
+        }
+    });
+
+    console.log(`Resultado da busca por EAN ${descricao}:`, productSnapshot ? productSnapshot.val() : 'Nenhum produto encontrado');
+    return productSnapshot.val();
+}
+
