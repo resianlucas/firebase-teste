@@ -1554,6 +1554,7 @@ export async function criarProduto(produto) {
             situacao: "A",
             formato: "S",
             gtin: produto.ean,
+            imagemURL: produto.imageUrl,
             marca: produto.brand,
             preco: produto.price,
             descricaoCurta: produto.description,
@@ -1596,7 +1597,7 @@ export async function criarProduto(produto) {
 
     if (produtoCriado) {
         console.log('Colocando estoque para o produto: ');
-        await novoEstoque(product.payload.codigo, produto.quantity);
+        await novoEstoque(product.payload.codigo, produto.quantity, produto.price);
     }
 
     console.log('Exibindo o produto criado/atualizado, última etapa do processo: ', produtoCriado);

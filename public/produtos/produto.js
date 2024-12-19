@@ -108,7 +108,7 @@ addItemForm.addEventListener('submit', async (e) => {
     .finally(() => {
         document.getElementById('loadingOverlay').style.display = 'none';
         addItemForm.querySelector('button[type="submit"]').disabled = false;
-        window.history.back();
+        //window.history.back();
     });
 });
 

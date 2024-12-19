@@ -16,6 +16,8 @@ export default class Estoque extends BaseClass {
     operacao = '',
     saldoFisicoTotal = 0,
     saldoVirtualTotal = 0,
+    preco = 0,
+    custo = 0,
     depositos = {
       id: 0
     },
@@ -24,7 +26,9 @@ export default class Estoque extends BaseClass {
       codigo: '',
       idProduto: '',
       quantidade: 0,
-      operacao: ''
+      operacao: '',
+      preco: 0,
+      custo: 0
     },
     idLoja = null
   } = {}) {
@@ -54,6 +58,8 @@ export default class Estoque extends BaseClass {
     this.depositos = { id: depositos.id }
     this.saldoFisicoTotal = saldoFisicoTotal;
     this.saldoVirtualTotal = saldoVirtualTotal;
+    this.preco = preco;
+    this.custo = custo;
     this.params = params;
 
 
@@ -131,7 +137,6 @@ export default class Estoque extends BaseClass {
     }
   }
 
-
   async createEstoque() {
     const endpoint = '/estoques';
     let url = baseUrl + endpoint;
@@ -154,8 +159,8 @@ export default class Estoque extends BaseClass {
             idDeposito: this.depositos.id,
             operacao: this.operacao,
             quantidade: this.quantidade,
-            preco: 0,
-            custo: 0,
+            preco: this.preco,
+            custo: this.custo,
             observacoes: "Atualizado pelo sistema de controle de estoque"
           })
         });
@@ -246,7 +251,7 @@ export async function atualizarEstoque(sku, quantidade) {
 
 }
 
-export async function novoEstoque(sku, quantidade) {
+export async function novoEstoque(sku, quantidade, preco) {
   console.log('sku:', sku)
   console.log('quantidade: ', quantidade)
   try {
@@ -275,6 +280,8 @@ export async function novoEstoque(sku, quantidade) {
             id: id
           },
           operacao: 'B',
+          preco: parseFloat(preco),
+          custo: parseFloat(preco),
           quantidade: parseInt(quantidade, 10)
         })
         const result = await estoque.createEstoque();
