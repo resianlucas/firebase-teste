@@ -159,7 +159,7 @@ export default class Estoque extends BaseClass {
             idDeposito: this.depositos.id,
             operacao: this.operacao,
             quantidade: this.quantidade,
-            preco: this.preco,
+            preco: 0,
             custo: this.custo,
             observacoes: "Atualizado pelo sistema de controle de estoque"
           })
