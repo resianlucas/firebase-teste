@@ -1564,7 +1564,7 @@ export async function criarProduto(produto) {
             },
             midia: {
                 imagens: {
-                    imagemURL: [
+                    imagensURL: [
                         {
                             link: produto.imageUrl
                         }
