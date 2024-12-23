@@ -844,7 +844,7 @@ export default class Produto extends BaseClass {
                     value: "<Error: Too many levels of nesting to fake this schema>"
                 },
                 imagens: {
-                    externas: [
+                    imagensURL: [
                         { link: "" }
                     ]
                 }
@@ -1491,7 +1491,7 @@ export async function atualizarTodosProdutos() {
                     },
                     midia: {
                         imagens: {
-                            externas: [
+                            imagensURL: [
                                 {
                                     link: produto.imageUrl
                                 }
