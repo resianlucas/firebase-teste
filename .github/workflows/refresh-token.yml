@@ -51,6 +51,8 @@ jobs:
                   const company = companies[key];
                   try {
                     console.log(`Atualizando token para empresa ${company.id}...`);
+
+                    console.log(`ClientID:${company.clientID}, ClientSecret:${company.clientSecret}`)
                     
                     const response = await fetch('https://www.bling.com.br/Api/v3/oauth/token', {
                       method: 'POST',
