@@ -52,14 +52,14 @@ jobs:
                   try {
                     console.log(`Atualizando token para empresa ${company.id}...`);
 
-                    console.log(`ClientID:${company.clientID}, ClientSecret:${company.clientSecret}`)
+                    console.log(`ClientID:${company.client_id}, ClientSecret:${company.client_secret}`)
                     
                     const response = await fetch('https://www.bling.com.br/Api/v3/oauth/token', {
                       method: 'POST',
                       headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/x-www-form-urlencoded',
-                        'Authorization': `Basic ${Buffer.from(`${company.clientId}:${company.clientSecret}`).toString('base64')}`
+                        'Authorization': `Basic ${Buffer.from(`${company.client_id}:${company.client_secret}`).toString('base64')}`
                       },
                       body: new URLSearchParams({
                         'grant_type': 'refresh_token',
