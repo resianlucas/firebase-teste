@@ -2,8 +2,8 @@ name: Refresh Bling API Token
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Executa a cada 6 horas
-  workflow_dispatch:  # Permite execução manual
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   refresh-token:
@@ -27,13 +27,13 @@ jobs:
           const { getDatabase, ref, get, update } = require('firebase/database');
           
           const firebaseConfig = {
-            apiKey: "${{ secrets.FIREBASE_API_KEY }}",
-            authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-            databaseURL: "${{ secrets.FIREBASE_DATABASE_URL }}",
-            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
-            storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-            messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
-            appId: "${{ secrets.FIREBASE_APP_ID }}"
+            apiKey: process.env.FIREBASE_API_KEY,
+            authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+            databaseURL: process.env.FIREBASE_DATABASE_URL,
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+            appId: process.env.FIREBASE_APP_ID
           };
           
           async function refreshTokens() {
@@ -61,22 +61,35 @@ jobs:
                     })
                   });
                   
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                  }
+                  
                   const data = await response.json();
                   
-                  await update(ref(db, `bling/${key}`), {
+                  // Validate response data
+                  if (!data.access_token || !data.refresh_token) {
+                    throw new Error('Invalid response: missing token data');
+                  }
+                  
+                  const updates = {
                     access_token: data.access_token,
                     refresh_token: data.refresh_token
-                  });
+                  };
                   
+                  await update(ref(db, `bling/${key}`), updates);
                   console.log(`Token atualizado para empresa ${company.id}`);
                 } catch (error) {
                   console.error(`Erro ao atualizar token para empresa ${company.id}:`, error);
                 }
               }
             }
+            
+            // Close the Firebase connection
+            await app.delete();
           }
           
-          refreshTokens();
+          refreshTokens().catch(console.error);
           EOF
 
       - name: Run Token Refresh
