@@ -1,0 +1,91 @@
+name: Refresh Bling API Token
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Executa a cada 6 horas
+  workflow_dispatch:  # Permite execução manual
+
+jobs:
+  refresh-token:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Create Token Refresh Script
+        run: |
+          cat > refresh.js << 'EOF'
+          const { initializeApp } = require('firebase/app');
+          const { getDatabase, ref, get, update } = require('firebase/database');
+          
+          const firebaseConfig = {
+            apiKey: "${{ secrets.FIREBASE_API_KEY }}",
+            authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+            databaseURL: "${{ secrets.FIREBASE_DATABASE_URL }}",
+            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
+            storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+            messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
+            appId: "${{ secrets.FIREBASE_APP_ID }}"
+          };
+          
+          async function refreshTokens() {
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+            
+            const blingRef = ref(db, 'bling');
+            const snapshot = await get(blingRef);
+            
+            if (snapshot.exists()) {
+              const companies = snapshot.val();
+              
+              for (const key in companies) {
+                const company = companies[key];
+                try {
+                  const response = await fetch('http://localhost:3000/api/Api/v3', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded',
+                      'Authorization': `Basic ${Buffer.from(company.clientId + ':' + company.clientSecret).toString('base64')}`
+                    },
+                    body: new URLSearchParams({
+                      'grant_type': 'refresh_token',
+                      'refresh_token': company.refresh_token
+                    })
+                  });
+                  
+                  const data = await response.json();
+                  
+                  await update(ref(db, `bling/${key}`), {
+                    access_token: data.access_token,
+                    refresh_token: data.refresh_token
+                  });
+                  
+                  console.log(`Token atualizado para empresa ${company.id}`);
+                } catch (error) {
+                  console.error(`Erro ao atualizar token para empresa ${company.id}:`, error);
+                }
+              }
+            }
+          }
+          
+          refreshTokens();
+          EOF
+
+      - name: Run Token Refresh
+        run: node refresh.js
+        env:
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}

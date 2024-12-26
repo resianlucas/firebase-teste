@@ -19,7 +19,7 @@ async function preencherCategorias() {
     // Preencher o formulário se houver um SKU na URL
     const urlParams = new URLSearchParams(window.location.search);
     const sku = urlParams.get('sku');
-    //const sku = "Impala Fut&Sol"
+    //const sku = "Kit Sh+Cond Menina Baby Muriel"
 
     if (sku) {
         await preencherFormulario(sku);
