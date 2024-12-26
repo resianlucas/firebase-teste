@@ -40,56 +40,66 @@ jobs:
             const app = initializeApp(firebaseConfig);
             const db = getDatabase(app);
             
-            const blingRef = ref(db, 'bling');
-            const snapshot = await get(blingRef);
-            
-            if (snapshot.exists()) {
-              const companies = snapshot.val();
+            try {
+              const blingRef = ref(db, 'bling');
+              const snapshot = await get(blingRef);
               
-              for (const key in companies) {
-                const company = companies[key];
-                try {
-                  const response = await fetch('https://www.bling.com.br/Api/v3/oauth/token', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                      'Authorization': `Basic ${Buffer.from(company.clientId + ':' + company.clientSecret).toString('base64')}`
-                    },
-                    body: new URLSearchParams({
-                      'grant_type': 'refresh_token',
-                      'refresh_token': company.refresh_token
-                    })
-                  });
-                  
-                  if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+              if (snapshot.exists()) {
+                const companies = snapshot.val();
+                
+                for (const key in companies) {
+                  const company = companies[key];
+                  try {
+                    console.log(`Atualizando token para empresa ${company.id}...`);
+                    
+                    const response = await fetch('https://www.bling.com.br/Api/v3/oauth/token', {
+                      method: 'POST',
+                      headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': `Basic ${Buffer.from(`${company.clientId}:${company.clientSecret}`).toString('base64')}`
+                      },
+                      body: new URLSearchParams({
+                        'grant_type': 'refresh_token',
+                        'refresh_token': company.refresh_token
+                      }).toString()
+                    });
+                    
+                    const responseText = await response.text();
+                    console.log(`Response for ${company.id}:`, responseText);
+                    
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+                    }
+                    
+                    const data = JSON.parse(responseText);
+                    
+                    if (!data.access_token || !data.refresh_token) {
+                      throw new Error('Invalid response: missing token data');
+                    }
+                    
+                    await update(ref(db, `bling/${key}`), {
+                      access_token: data.access_token,
+                      refresh_token: data.refresh_token
+                    });
+                    
+                    console.log(`Token atualizado com sucesso para empresa ${company.id}`);
+                  } catch (error) {
+                    console.error(`Erro ao atualizar token para empresa ${company.id}:`, error);
                   }
-                  
-                  const data = await response.json();
-                  
-                  // Validate response data
-                  if (!data.access_token || !data.refresh_token) {
-                    throw new Error('Invalid response: missing token data');
-                  }
-                  
-                  const updates = {
-                    access_token: data.access_token,
-                    refresh_token: data.refresh_token
-                  };
-                  
-                  await update(ref(db, `bling/${key}`), updates);
-                  console.log(`Token atualizado para empresa ${company.id}`);
-                } catch (error) {
-                  console.error(`Erro ao atualizar token para empresa ${company.id}:`, error);
                 }
               }
+            } finally {
+              // Encerra a conexão com o Firebase
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              process.exit(0);
             }
-            
-            // Close the Firebase connection
-            await app.delete();
           }
           
-          refreshTokens().catch(console.error);
+          refreshTokens().catch(error => {
+            console.error('Erro fatal:', error);
+            process.exit(1);
+          });
           EOF
 
       - name: Run Token Refresh
