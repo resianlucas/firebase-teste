@@ -1,5 +1,6 @@
 import PedidoVenda, { pegarPedidoPeloID } from '../classes/PedidoVenda.js';
 import { lancarEstoqueByPedidoVenda as lancarEstoque } from '../classes/Estoque.js';
+import { verificarLancamentoDuplicado } from '../database/pedido.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
     const pedidoIdSpan = document.getElementById('pedidoId');
@@ -12,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const idEmpresaSpan = document.getElementById('idEmpresa');
     const itemsTable = document.getElementById('itemsTable').getElementsByTagName('tbody')[0];
     const lancarEstoqueButton = document.getElementById('lancarEstoqueButton');
-
 
     // Função para buscar parâmetros da URL
     function getQueryParams() {
@@ -73,11 +73,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         try {
             await lancarEstoque(pedidoId, idLoja);
-            console.log('Estoque lançado com sucesso!');
-            alert('FEITO COM SUCESSO')
+            console.log("Estoque lançado com sucesso!");
+            alert("Estoque lançado com sucesso!");
         } catch (error) {
-            console.error('Erro ao lançar estoque:', error);
-            alert('Erro ao lançar estoque: ', error);
+            console.error("Erro ao lançar estoque:", error.message || error);
+            alert(`Erro ao lançar estoque: ${error.message || error}`);
         }
     }
 

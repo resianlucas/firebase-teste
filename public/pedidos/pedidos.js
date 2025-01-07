@@ -1,4 +1,5 @@
 import PedidoVenda, { pegarPedidoPeloID } from '../classes/PedidoVenda.js';
+import { verificarLancamentoDuplicado } from '../database/pedido.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
     const ordersTable = document.getElementById('ordersTable').getElementsByTagName('tbody')[0];
@@ -21,43 +22,52 @@ document.addEventListener('DOMContentLoaded', async function () {
                 dataInicial: dt
             }
         });
-        console.log(pedidoVenda)
+        console.log(pedidoVenda);
         const result = await pedidoVenda.getPedidoVenda();
 
         if (result) {
-            orders = Object.values(result).flatMap(empresa => empresa.request.map(pedido => ({
-                id: pedido[0],
-                numero: pedido[1],
-                numeroLoja: pedido[2],
-                data: pedido[3],
-                idLoja: pedido[4],
-                idEmpresa: pedido[5],
-                situacao: pedido[6] // Supondo que a posição 6 seja o status do pedido
-            })));
+            let fetchedOrders = Object.values(result).flatMap(empresa =>
+                empresa.request.map(pedido => ({
+                    id: pedido[0],
+                    numero: pedido[1],
+                    numeroLoja: pedido[2],
+                    data: pedido[3],
+                    idLoja: pedido[4],
+                    idEmpresa: pedido[5],
+                    situacao: pedido[6] // Supondo que a posição 6 seja o status do pedido
+                }))
+            );
 
-            orders.forEach(order => {
+            // Transformação de IDs para nomes amigáveis
+            fetchedOrders.forEach(order => {
                 if (order.idLoja === 203913945) {
-                    order.idLoja = 'Frente Caixa' 
+                    order.idLoja = 'Frente Caixa';
                 } else if (order.idLoja === 203744342) {
-                    order.idLoja = 'Shopee' 
+                    order.idLoja = 'Shopee';
                 } else if (order.idLoja === 204036006) {
-                    order.idLoja = 'Mercado Livre'
+                    order.idLoja = 'Mercado Livre';
                 } else if (order.idLoja === 204045472) {
-                    order.idLoja = 'Shopee'
+                    order.idLoja = 'Shopee';
                 }
-            })
+            });
 
-            orders.forEach(order => {
-                if (order.numeroLoja === "") {
-                    order.numeroLoja === "Sem número"
-                }
-            })
-            
+            fetchedOrders = await Promise.all(
+                fetchedOrders.map(async order => {
+                    const lancado = await verificarLancamentoDuplicado(order.id);
+                    return lancado ? null : order; // Retorna null se já foi lançado
+                })
+            );
+
+            // Filtrar apenas os pedidos não nulos
+            orders = fetchedOrders.filter(order => order !== null);
+
+            // Exibir os pedidos filtrados
             displayOrders(orders);
         } else {
             console.error('Erro ao buscar pedidos de venda');
         }
     }
+
 
     function displayOrders(orders) {
         ordersTable.innerHTML = '';
@@ -111,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // buttonLaunch.addEventListener('click', async function(event) {
     //     event.preventDefault();
     // });
-    
+
 
     // Apply filters
     filterForm.addEventListener('submit', async function (event) {
@@ -122,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const idLoja = document.getElementById('idLoja').value;
         const idEmpresa = document.getElementById('idEmpresa').value;
         const status = document.getElementById('status').value === 'Todos' ? null : document.getElementById('status').value;
-        
+
         console.log('Status: ', status);
         console.log('Data Inicial: ', dataInicial.toString());
         console.log('Data Final: ', dataFinal);
@@ -134,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             dataFinal: dataFinal,
             idLoja: idLoja
         };
-        
+
         if (status !== null) {
             params.idsSituacoes = [status];
         }
@@ -158,9 +168,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             orders.forEach(order => {
                 if (order.idLoja === 203913945) {
-                    order.idLoja = 'Frente Caixa' 
+                    order.idLoja = 'Frente Caixa'
                 } else if (order.idLoja === 203744342) {
-                    order.idLoja = 'Shopee' 
+                    order.idLoja = 'Shopee'
                 } else if (order.idLoja === 204036006) {
                     order.idLoja = 'Mercado Livre'
                 } else if (order.idLoja === 204045472) {

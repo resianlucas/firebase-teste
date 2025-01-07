@@ -297,11 +297,17 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
   const pedid = new PedidoVenda({ idLoja: idLoja });
 
   // Verifica se o pedido já foi lançado
-  const pedidoLancado = await verificarLancamentoDuplicado(idPedidoVenda);
-  if (pedidoLancado) {
-    console.error(`Pedido de venda com ID ${idPedidoVenda} já foi lançado.`);
-    return;
+  try {
+    const pedidoLancado = await verificarLancamentoDuplicado(idPedidoVenda);
+    if (pedidoLancado) {
+      console.error(`Pedido de venda com ID ${idPedidoVenda} já foi lançado.`);
+      throw new Error(`Pedido de venda com ID ${idPedidoVenda} já foi lançado.`);
+    }
+  } catch (error) {
+    console.error("Erro ao verificar o lançamento do pedido:", error.message);
+    throw error; // Propaga o erro para ser tratado em um nível superior, se necessário.
   }
+  
 
   // Coleta do pedido
   const pedido = await pedid.getPedidoVendaById(idPedidoVenda);
