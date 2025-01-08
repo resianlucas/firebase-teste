@@ -154,16 +154,20 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
         const result = await pedidoVenda.getPedidoVenda();
         if (result) {
-            orders = Object.values(result).flatMap(empresa => empresa.request.map(pedido => ({
-                id: pedido[0],
-                numero: pedido[1],
-                numeroLoja: pedido[2],
-                data: pedido[3],
-                idLoja: pedido[4],
-                idEmpresa: pedido[5],
-                situacao: pedido[6] // Supondo que a posição 6 seja o status do pedido
-            })));
-            orders.forEach(order => {
+
+            let fetchedOrders = Object.values(result).flatMap(empresa =>
+                empresa.request.map(pedido => ({
+                    id: pedido[0],
+                    numero: pedido[1],
+                    numeroLoja: pedido[2],
+                    data: pedido[3],
+                    idLoja: pedido[4],
+                    idEmpresa: pedido[5],
+                    situacao: pedido[6] // Supondo que a posição 6 seja o status do pedido
+                }))
+            );
+
+            fetchedOrders.forEach(order => {
                 if (order.idLoja === 203913945) {
                     order.idLoja = 'Frente Caixa'
                 } else if (order.idLoja === 203744342) {
@@ -173,13 +177,21 @@ document.addEventListener('DOMContentLoaded', async function () {
                 } else if (order.idLoja === 204045472) {
                     order.idLoja = 'Shopee'
                 }
-            })
-            orders.forEach(order => {
-                if (order.numeroLoja === "") {
-                    order.numeroLoja === "Sem número"
-                }
-            })
+            });
+
+            fetchedOrders = await Promise.all(
+                fetchedOrders.map(async order => {
+                    const lancado = await verificarLancamentoDuplicado(order.id);
+                    return lancado ? null : order; // Retorna null se já foi lançado
+                })
+            );
+
+            // Filtrar apenas os pedidos não nulos
+            orders = fetchedOrders.filter(order => order !== null);
+
+            // Exibir os pedidos filtrados
             displayOrders(orders);
+
         } else {
             console.error('Erro ao buscar pedidos de venda');
         }
