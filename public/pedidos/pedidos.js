@@ -9,19 +9,29 @@ document.addEventListener('DOMContentLoaded', async function () {
     const closePopup = document.querySelector('.popup .close');
     const filterForm = document.getElementById('filterForm');
     const themeToggle = document.getElementById('themeToggle');
-    const buttonLaunch = document.getElementById('lancar');
 
     let orders = [];
-    const dt = new Date().toISOString().split('T')[0];
-    console.log('data de hoje: ', dt)
+
+    // Obtém a data de hoje e de ontem
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const dtToday = today.toISOString().split('T')[0];
+    const dtYesterday = yesterday.toISOString().split('T')[0];
+
+    console.log('Data de hoje:', dtToday);
+    console.log('Data de ontem:', dtYesterday);
 
     async function fetchPedidos() {
         const pedidoVenda = new PedidoVenda({
             idLoja: null,
             params: {
-                dataInicial: dt
+                dataInicial: dtYesterday, // Inclui pedidos de ontem
+                dataFinal: dtToday       // Até hoje
             }
         });
+
         console.log(pedidoVenda);
         const result = await pedidoVenda.getPedidoVenda();
 
@@ -68,7 +78,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-
     function displayOrders(orders) {
         ordersTable.innerHTML = '';
         orders.forEach(order => {
@@ -84,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 window.location.href = `pedidoDetalhes.html?id=${order.id}&empresa=${order.idEmpresa}`;
             });
         });
-        console.log(orders)
+        console.log(orders);
     }
 
     // Initial fetch and display of orders
@@ -116,79 +125,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (event.target === filterPopup) {
             filterPopup.style.display = 'none';
         }
-    });
-
-    // buttonLaunch.addEventListener('click', async function(event) {
-    //     event.preventDefault();
-    // });
-
-
-    // Apply filters
-    filterForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-
-        const dataInicial = document.getElementById('dataInicial').value;
-        const dataFinal = document.getElementById('dataFinal').value;
-        const idLoja = document.getElementById('idLoja').value;
-        const idEmpresa = document.getElementById('idEmpresa').value;
-        const status = document.getElementById('status').value === 'Todos' ? null : document.getElementById('status').value;
-
-        console.log('Status: ', status);
-        console.log('Data Inicial: ', dataInicial.toString());
-        console.log('Data Final: ', dataFinal);
-        console.log('ID Loja: ', idLoja);
-        console.log('ID Empresa: ', idEmpresa);
-
-        const params = {
-            dataInicial: dataInicial,
-            dataFinal: dataFinal,
-            idLoja: idLoja
-        };
-
-        if (status !== null) {
-            params.idsSituacoes = [status];
-        }
-
-        const pedidoVenda = new PedidoVenda({
-            idLoja: idEmpresa,
-            params: params
-        });
-        const result = await pedidoVenda.getPedidoVenda();
-
-        if (result) {
-            orders = Object.values(result).flatMap(empresa => empresa.request.map(pedido => ({
-                id: pedido[0],
-                numero: pedido[1],
-                numeroLoja: pedido[2],
-                data: pedido[3],
-                idLoja: pedido[4],
-                idEmpresa: pedido[5],
-                situacao: pedido[6] // Supondo que a posição 6 seja o status do pedido
-            })));
-
-            orders.forEach(order => {
-                if (order.idLoja === 203913945) {
-                    order.idLoja = 'Frente Caixa'
-                } else if (order.idLoja === 203744342) {
-                    order.idLoja = 'Shopee'
-                } else if (order.idLoja === 204036006) {
-                    order.idLoja = 'Mercado Livre'
-                } else if (order.idLoja === 204045472) {
-                    order.idLoja = 'Shopee'
-                }
-            })
-
-            orders.forEach(order => {
-                if (order.numeroLoja === "") {
-                    order.numeroLoja === "Sem número"
-                }
-            })
-
-            displayOrders(orders);
-        } else {
-            console.error('Erro ao buscar pedidos de venda');
-        }
-        filterPopup.style.display = 'none';
     });
 
     // Theme toggle functionality
