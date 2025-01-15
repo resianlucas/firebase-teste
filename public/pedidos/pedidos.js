@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Obtém a data de hoje e de ontem
     const today = new Date();
     const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
+    yesterday.setDate(today.getDate() - 2);
 
     const dtToday = today.toISOString().split('T')[0];
     const dtYesterday = yesterday.toISOString().split('T')[0];
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             );
 
             // Filtrar apenas os pedidos não nulos
-            orders = fetchedOrders.filter(order => order !== null);
+            orders = fetchedOrders.filter(order => order !== null && (order.situacao === 6 || order.situacao === 9));
 
             // Exibir os pedidos filtrados
             displayOrders(orders);

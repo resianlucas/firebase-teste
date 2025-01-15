@@ -1538,9 +1538,6 @@ export async function atualizarTodosProdutos() {
 export async function criarProduto(produto) {
 
     await createProduct(produto);
-    // Verifica se o produto já possui ID salvo na tabela de IDs
-    const idsExistentes = await getProductIdsBySku(produto.sku);
-    console.log('ids existentes: ', idsExistentes)
     // Obtém a categoria do produto
     const categoria = await getCategory(produto.category);
     console.log('Categoria do produto: ', categoria);
@@ -1577,20 +1574,26 @@ export async function criarProduto(produto) {
     console.log('Produto para subir: ', product.payload);
 
     let produtoCriado;
-
-    if (idsExistentes.length >= 3) {
-        for (const idProduto of idsExistentes) {
-
-            // Se o produto já existe, atualiza o produto existente
-            // Assume que usa o primeiro ID encontrado
-            produtoCriado = await product.altProduct(idProduto);
-            console.log('Produto atualizado: ', produtoCriado);
+    while (true) {
+        const idsExistentes = await getProductIdsBySku(produto.sku);
+        console.log('Quantidade de IDs encontrados: ', idsExistentes.length);
+        if (idsExistentes.length >= 3) {
+            for (const idProduto of idsExistentes) {
+    
+                // Se o produto já existe, atualiza o produto existente
+                // Assume que usa o primeiro ID encontrado
+                produtoCriado = await product.altProduct(idProduto);
+                console.log('Produto atualizado: ', produtoCriado);
+            }
+            break;
+        } else {
+            // Se o produto não existe, cria um novo produto
+            produtoCriado = await product.createProduct();
+            console.log('Produto criado: ', produtoCriado);
+            await pegarIdsProdutoBySku(produto.sku);
         }
-    } else {
-        // Se o produto não existe, cria um novo produto
-        produtoCriado = await product.createProduct();
-        console.log('Produto criado: ', produtoCriado);
     }
+    
 
     await sleep(300);
     await pegarIdsProdutoBySku(produto.sku);

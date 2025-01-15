@@ -223,6 +223,9 @@ function loadXml() {
             const ean = produto.getElementsByTagName("cEAN")[0].textContent;
             const quantidade = parseInt(produto.getElementsByTagName("qCom")[0].textContent, 10);
             const price = parseFloat(produto.getElementsByTagName('vUnCom')[0].textContent);
+            const p = parseFloat((price * 1.5).toFixed(2));
+            const newPrice = Math.ceil(p * 20) / 20;
+
 
             if (!productCounters[ean]) {
                 productCounters[ean] = 0;
@@ -237,14 +240,17 @@ function loadXml() {
                 
                 const currentQuantity = product.quantity || 0;
                 
-                const newQuantity = currentQuantity + quantidade;
+                const newQuantity = currentQuantity; //+ quantidade;
                 console.log(`Nova Quantidade: ${newQuantity}`);
+                console.log(`Preço: ${newPrice}`);
 
                 if (typeof newQuantity !== "number") {
                     console.error("A nova quantidade não é um número válido.");
                     await set(ref(db, `products/${product.sku}/quantity`), 0);
+
                 } else {
                     await set(ref(db, `products/${product.sku}/quantity`), newQuantity);
+                    await set(ref(db, `products/${product.sku}/price`), newPrice);
                 }
 
                 
@@ -255,7 +261,7 @@ function loadXml() {
                 await set(ref(db, `cadastrar/${ean}`), {
                     ean: ean,
                     quantity: quantidade,
-                    price: price,
+                    price: newPrice,
                     sku: produto.getElementsByTagName("cProd")[0].textContent,
                     name: produto.getElementsByTagName("xProd")[0].textContent
                 });
