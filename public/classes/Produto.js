@@ -552,7 +552,7 @@ export default class Produto extends BaseClass {
             tipo: 'T',
             idCategoria: null,
             idLoja: null,
-            codigo: '',
+            codigos: '',
             nome: '',
             idsProdutos: []
         },
@@ -1116,19 +1116,28 @@ export default class Produto extends BaseClass {
     //////////////////////////////
 
     async getProduto() {
+        console.log('Iniciando método `getProduto`');
+    
         const endpoint = '/produtos';
         let url = baseUrl + endpoint;
         let queryString = this.buildQueryString(this.params);
         if (queryString) {
             url += '?' + queryString;
         }
-        console.log('URL:', url);
-
+        console.log('URL construída para a requisição:', url);
+    
         let accessToken = await this.getBling();
+        if (!accessToken || Object.keys(accessToken).length === 0) {
+            console.warn('Nenhum token de acesso foi encontrado para as empresas.');
+            return null; // Retorna caso não existam tokens
+        }
+        console.log('Tokens de acesso obtidos:', accessToken);
+    
         try {
+            console.log('Criando requisições para todas as empresas...');
             let requests = Object.keys(accessToken).map(id => {
                 const blingInfo = accessToken[id];
-                console.log('Bling Info: ', blingInfo);
+                console.log(`Configuração da requisição para a empresa "${blingInfo.name}" com ID "${blingInfo.id}"`);
                 return fetch(url, {
                     method: 'GET',
                     headers: {
@@ -1137,26 +1146,28 @@ export default class Produto extends BaseClass {
                     }
                 });
             });
-
-            console.log('REQUESTS: ', requests);
-
+    
+            console.log('Enviando requisições para as APIs...');
             let responses = await Promise.all(requests);
-
+    
             let result = {};
             for (let i = 0; i < responses.length; i++) {
+                console.log(`Processando resposta ${i + 1} de ${responses.length}...`);
                 let response = await responses[i].text();
+    
                 try {
+                    console.log(`Parseando resposta ${i + 1}:`, response);
                     response = JSON.parse(response);
-                    console.log('response de getProduto', response)
                 } catch (e) {
-                    console.error(`Erro ao parsear resposta do servidor ${i}:`, response);
+                    console.error(`Erro ao parsear resposta ${i + 1}:`, response);
+                    console.warn('A resposta não pôde ser interpretada como JSON. Pulando esta resposta.');
                     continue;
                 }
-
+    
                 let blingInfo = accessToken[Object.keys(accessToken)[i]];
-
+    
                 if (response.data && response.data.length > 0) {
-
+                    console.log(`Dados encontrados para a empresa "${blingInfo.name}" (ID: ${blingInfo.id}):`, response.data);
                     result[blingInfo.name] = {
                         id: blingInfo.id,
                         empresa: blingInfo.name,
@@ -1164,15 +1175,20 @@ export default class Produto extends BaseClass {
                         method: 'getProduto',
                         request: response.data
                     };
+                } else {
+                    console.warn(`Nenhum dado foi retornado para a empresa "${blingInfo.name}" (ID: ${blingInfo.id}).`);
                 }
             }
-            console.log('OPERAÇÃO FINALIZADA', result)
+    
+            console.log('Todas as respostas foram processadas. Resultado final:', result);
             return result;
+    
         } catch (error) {
             console.error('Erro ao buscar produtos:', error);
             return null;
         }
     }
+    
 
     async getProdutoById(idProduto) {
         const endpoint = `/produtos/${idProduto}`;
@@ -1722,20 +1738,27 @@ export async function criarProduto(produto) {
 // }
 
 async function pegarIdsProdutoBySku(sku) {
+    console.log("Pegando ID dos produtos");
 
-    console.log("Pegando id dos produtos")
     try {
-        const produto = new Produto({ params: { criterio: 2, codigo: sku } });
-        console.log('fazendo o objeto para pegar o produto')
+        const produto = new Produto({ params: { codigo: sku } });
+        console.log('Criando o objeto para buscar o produto');
         const produtos = await produto.getProduto();
+
+        // Verifica se o objeto `produtos` possui chaves e não é nulo ou indefinido
+        if (!produtos || Object.keys(produtos).length === 0) {
+            console.warn('Nenhum produto encontrado para o SKU fornecido:', sku);
+            return; // Encerra a execução caso `produtos` esteja vazio ou inválido
+        }
+
         console.log('Produto encontrado:', produtos);
-        await sleep(1000)
-        console.log('Aplicando intervalo')
+        await sleep(1000);
+        console.log('Aplicando intervalo');
 
         for (const chave in produtos) {
             if (produtos.hasOwnProperty(chave)) {
                 const bling = produtos[chave];
-                if (bling.request.length > 0) {
+                if (bling.request && bling.request.length > 0) {
                     const productData = {
                         requestCode: bling.request[0].codigo,
                         requestId: bling.request[0].id,
@@ -1743,7 +1766,7 @@ async function pegarIdsProdutoBySku(sku) {
                         id: bling.id
                     };
 
-                    await setProductId(bling.request[0].codigo, bling.request[0].id, productData)
+                    await setProductId(bling.request[0].codigo, bling.request[0].id, productData);
 
                     console.log('Informações do produto salvas no Firebase:', productData);
                 }
@@ -1755,6 +1778,7 @@ async function pegarIdsProdutoBySku(sku) {
         console.error('Erro ao buscar e salvar produtos:', error);
     }
 }
+
 
 
 function verificarProduto(sku) {

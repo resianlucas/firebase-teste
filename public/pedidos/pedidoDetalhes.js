@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             await lancarEstoque(pedidoId, idLoja);
             console.log("Estoque lançado com sucesso!");
             alert("Estoque lançado com sucesso!");
+            window.history.back();
         } catch (error) {
             console.error("Erro ao lançar estoque:", error.message || error);
             alert(`Erro ao lançar estoque: ${error.message || error}`);

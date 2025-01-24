@@ -2,7 +2,7 @@ import { getAllProduct, getProducto } from "../classes/Produto.js";
 import { atualizarEstoque, novoEstoque } from "../classes/Estoque.js";
 
 let produtos = [];
-const productsPerPage = 100;
+const productsPerPage = 500;
 let currentPage = 1;
 let totalProducts = 0;
 let totalPages = 0;

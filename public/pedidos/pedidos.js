@@ -1,4 +1,5 @@
 import PedidoVenda, { pegarPedidoPeloID } from '../classes/PedidoVenda.js';
+import { lancarEstoqueByPedidoVenda as lancarEstoque } from '../classes/Estoque.js';
 import { verificarLancamentoDuplicado } from '../database/pedido.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
@@ -9,13 +10,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     const closePopup = document.querySelector('.popup .close');
     const filterForm = document.getElementById('filterForm');
     const themeToggle = document.getElementById('themeToggle');
+    const lancarTodosEstoquesButton = document.getElementById('lancarTodosEstoque');
 
     let orders = [];
 
     // Obtém a data de hoje e de ontem
     const today = new Date();
     const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 2);
+    yesterday.setDate(today.getDate() - 1);
 
     const dtToday = today.toISOString().split('T')[0];
     const dtYesterday = yesterday.toISOString().split('T')[0];
@@ -73,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             // Exibir os pedidos filtrados
             displayOrders(orders);
+
         } else {
             console.error('Erro ao buscar pedidos de venda');
         }
@@ -98,6 +101,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Initial fetch and display of orders
     await fetchPedidos();
+
+    lancarTodosEstoquesButton.addEventListener('click', async () => {
+        await lancarEstoqueParaTodosPedidos(orders);
+    });
 
     // Search functionality
     searchInput.addEventListener('keyup', function () {
@@ -197,6 +204,31 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
         filterPopup.style.display = 'none';
     });
+
+    // Função para lançar estoque de todos os pedidos válidos
+    async function lancarEstoqueParaTodosPedidos(pedidos) {
+        const erros = [];
+
+        for (const pedido of pedidos) {
+            try {
+                await lancarEstoque(pedido.id, pedido.idEmpresa); // Usando a função existente
+                console.log(`Estoque lançado com sucesso para o pedido: ${pedido.numero}`);
+            } catch (error) {
+                console.error(`Erro ao lançar estoque para o pedido ${pedido.numero}:`, error.message || error);
+                erros.push({
+                    pedido: pedido.numero,
+                    erro: error.message || error,
+                });
+            }
+        }
+
+        if (erros.length) {
+            console.warn("Alguns pedidos não puderam ser lançados:", erros);
+            alert("Alguns pedidos não puderam ser lançados. Verifique o console para mais detalhes.");
+        } else {
+            alert("Todos os pedidos válidos tiveram o estoque lançado com sucesso!");
+        }
+    }
 
     // Theme toggle functionality
     themeToggle.addEventListener('click', () => {

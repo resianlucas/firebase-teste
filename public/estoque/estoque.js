@@ -240,7 +240,7 @@ function loadXml() {
                 
                 const currentQuantity = product.quantity || 0;
                 
-                const newQuantity = currentQuantity; //+ quantidade;
+                const newQuantity = currentQuantity + quantidade;
                 console.log(`Nova Quantidade: ${newQuantity}`);
                 console.log(`Preço: ${newPrice}`);
 

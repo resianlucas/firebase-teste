@@ -319,16 +319,8 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
     throw new Error("Itens do pedido não encontrados.");
   }
 
-  // if (pedido[empresa]?.request?.idLoja !== 203913945) {
-  //   if (pedido[empresa]?.request?.notaFiscal?.id === 0) {
-  //     console.error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
-  //     throw new Error(`Pedido de venda com ID ${idPedidoVenda} não possui nota fiscal.`);
-  //   }
-  // } else {
-  //   console.log("ID da loja:", pedido[empresa]?.request?.idLoja);
-  // }
-
   let operacaoInvalida = false;
+  const errosDetalhados = [];
   const itensNaoCadastrados = [];
 
   for (const item of itensPedido) {
@@ -348,8 +340,10 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
       for (const componente of estrutura) {
         const componenteProduto = await produto.getProdutoById(componente.produto.id);
         if (!componenteProduto) {
-          console.error(`Componente com ID ${componente.produto.id} não encontrado.`);
+          const erroComponente = `Componente com ID ${componente.produto.id} não encontrado.`;
+          console.error(erroComponente);     
           itensNaoCadastrados.push(componente.produto.id);
+          errosDetalhados.push(erroComponente);
           continue;
         }
 
@@ -358,9 +352,10 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
         const estoqueValido = await verificarEstoque(componenteSku, quantidadeComponente);
         if (!estoqueValido) {
-          console.error(`Operação inválida: quantidade negativa não permitida para SKU: ${componenteSku}.`);
+          const erroEstoque = `Operação inválida: quantidade negativa não permitida para SKU: ${componenteSku}.`;
+          console.error(erroEstoque);
           operacaoInvalida = true;
-          break;
+          errosDetalhados.push(erroEstoque);
         }
       }
     } else {
@@ -369,9 +364,10 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
 
       const estoqueValido = await verificarEstoque(sku, quantidadeSolicitada);
       if (!estoqueValido) {
-        console.error(`Operação inválida: quantidade negativa não permitida para SKU: ${sku}.`);
+        const erroEstoque = `Operação inválida: quantidade negativa não permitida para SKU: ${sku}.`;
+        console.error(erroEstoque);
         operacaoInvalida = true;
-        break;
+        errosDetalhados.push(erroEstoque);
       }
     }
 
@@ -416,10 +412,11 @@ export async function lancarEstoqueByPedidoVenda(idPedidoVenda, idLoja) {
       throw error;
     }
   } else {
-    console.error("A operação foi cancelada devido a uma validação inválida.");
-    throw new Error("A operação foi cancelada devido a uma validação inválida.");
+    console.error("A operação foi cancelada devido a uma validação inválida. Detalhes:", errosDetalhados);
+    throw new Error(`A operação foi cancelada devido a uma validação inválida. Detalhes: ${errosDetalhados.join("; ")}`);
   }
 }
+
 
 
 // document.addEventListener('DOMContentLoaded', () => {
